@@ -1,0 +1,17 @@
+add: func(x, y) =>
+    <- x + y
+endfn
+
+range: func(start, end, step=>1) =>
+    arr => [..end] // Array of length "end"
+    while i = start, i < end, i +> 1 =>
+        arr[i] => i * step
+    endwl
+    <- arr
+endfn
+
+main: func =>
+    for elem in !(range 0 !(add !input 1) 2) =>
+        !print !(add elem !input)
+    endfr
+endfn

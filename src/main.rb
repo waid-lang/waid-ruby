@@ -12,8 +12,6 @@ def main
         builder.run
     rescue WaidError => error
         puts error.msg
-    ensure
-        puts "holi"
     end
 end
 

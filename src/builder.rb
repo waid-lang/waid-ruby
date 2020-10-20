@@ -25,7 +25,7 @@ class Builder
 
         source_file = WaidFile.new(@source_path)
 
-        tokenizer = Tokenizer.new(source_file, debug, error_collector)
+        tokenizer = Tokenizer.new(source_file, @debug, error_collector)
         tokenizer.tokenize
 
         if error_collector.has_errors

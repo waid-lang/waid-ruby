@@ -1,6 +1,7 @@
 require_relative 'token'
+require_relative 'source_position'
 
-keywords = {
+$keywords = {
   "func" => TokenKind::KEY_FUNC,
   "endfn" => TokenKind::KEY_ENDFN,
   "while" => TokenKind::KEY_WHILE,
@@ -18,6 +19,24 @@ keywords = {
   # "false" => TokenKind::KEY_FALSE
 }
 
+def is_keyword(word)
+  $keywords.key?(word)
+end
+
+def is_whitespace(char)
+  char =~ /\A\s*\Z/
+end
+
+def is_valid_id_char(char)
+  !char.match(/\A[a-zA-Z0-9]*\z/).nil?
+end
+
+class String
+  def is_number?
+    true if Float(self) rescue false
+  end
+end
+
 class Tokenizer
   attr_accessor :tokens
   def initialize(source, debug, err_coll)
@@ -27,27 +46,83 @@ class Tokenizer
 
     @tokens = Array.new
 
+    @line_number = 1;
+    @column_number = 0
+    @current_line = String.new
+
     @current_index = 0
     @current_char = String.new
     @peek_char = @source[@current_index]
   end
 
+  def add_token(tt, value=nil)
+    @tokens << Token.new(
+      tt,
+      SourcePosition.new(
+        @line_number,
+        @column_number,
+        @source.line_indexes.last,
+        @source
+      ),
+      value
+    )
+  end
+
+  def add_syntax_error(desc)
+     @error_collector.add_error(
+       CompilationError.new(
+         desc,
+         get_full_line,
+         SourcePosition.new(
+           @line_number,
+           @column_number,
+           @source.line_indexes.last,
+           @source
+         )
+       )
+     )
+  end
   def push_char
     @current_char = @peek_char
 
     # El peek char se encuentra en el índice actua +1
     @current_index += 1
-    @peek_char = @source[@current_index]
+    @peek_char = @source[@current_index + 1]
 
-    return @current_char
+    @current_line += @current_char? @current_char : ""
+
+    if @current_char == "\n"
+      @line_number += 1
+      @source.line_indexes.push(@column_number)
+    end
+    @current_char
+  end
+
+  def read_until(char)
+    res = String.new
+    while @current_char != char
+      res += @current_char
+      push_char
+    end
+    res
   end
 
   def check_comment
     if @current_char == "\#"
-      @tokens << Token(TokenKind::COMMENT, read_until("\n"))
-      return true
+      push_char
+      @tokens << Token.new(
+        TokenKind::COMMENT,
+        SourcePosition.new(
+          @line_number,
+          @column_number,
+          @source.line_indexes.last,
+          @source
+        ),
+        read_until("\n")
+      )
+      true
     end
-    return false
+    false
   end
 
   def check_operator
@@ -86,13 +161,64 @@ class Tokenizer
         else
           return false
         end
+        add_token(t)
+        true
   end
 
   def check_literal
-    
+    num = String.new
+    if @current_char.is_number?
+      tt = -1
+      num += @current_char
+      while @peek_char.is_number?
+        push_char
+        num += @current_char
+        push_char
+      end
+      if @peek_char == "."
+        num += current_char
+        push_char
+
+        if not @peek_char.is_number?
+          add_syntax_error("Malformed floating point number.")
+          return true
+        end
+
+        while @peek_char.is_number?
+          push_char
+          num += @current_char
+        end
+        tt = TokenKind::LITERAL_FLOAT       
+      else
+        tt = TokenKind::LITERAL_INT
+      end
+      add_token(tt, num)
+      true
+    end
+    false
   end
 
-  def tokenize(*args)
+  def check_word
+    word = String.new
+    if is_valid_id_char(@current_char)
+      tt = -1
+      word += @current_char
+      while is_valid_id_char(@peek_char)
+        push_char
+        word += @current_char
+      end
+      if is_keyword(word)
+        tt = $keywords[word]
+      else
+        tt = TokenKind::IDENTIFIER
+      end
+      add_token(tt, word)
+      true
+    end
+    false
+  end
+
+  def tokenize
     while push_char
       if check_comment or check_operator or check_literal or check_word
         next

@@ -1,9 +1,9 @@
 require_relative 'waid_exception'
 
 class WaidFile
+    attr_accessor :line_indexes
     def initialize(path)
         if not File.exist?(path)
-            puts ":O"
             raise WaidError.new("File '#{File.basename(path)}' doesn't exist.")
         end
         @file_path = path

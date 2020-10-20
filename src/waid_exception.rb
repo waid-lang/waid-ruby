@@ -1,8 +1,8 @@
-class WaidError
+class WaidError < StandardError
     attr_reader :msg
     def initialize(msg, prefix="Error")
-        super
         @msg = make_message(msg, prefix)
+        super(msg)
     end
 
     def make_message(m, p)

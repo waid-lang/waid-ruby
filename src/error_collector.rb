@@ -32,7 +32,7 @@ CompilationError = Struct.new(:error_description, :full_line, :source_position) 
         #     15|     token_arr@[i] => !->reset_token(token_arr@[i], x_coord - 2);
         #                                                            ^~~~~~~~~~~
         error_string = "Error: #{error_description}\n\t#{source_position.line}| #{full_line}\n\t"
-        error_string += " " * (source_position.column + number_of_digits(source_position.line) + 1) + "^"
+        error_string += " " * (source_position.column + number_of_digits(source_position.line) + 2) + "^"
     end
 end
 

@@ -24,11 +24,11 @@ def is_keyword(word)
 end
 
 def is_whitespace(char)
-  char =~ /\A\s*\Z/
+  char =~ /\s/
 end
 
 def is_valid_id_char(char)
-  !char.match(/\A[a-zA-Z0-9]*\z/).nil?
+  !char.match(/\A[a-zA-Z0-9_]*\z/).nil?
 end
 
 class String
@@ -65,6 +65,7 @@ class Tokenizer
       ),
       value
     )
+    puts @tokens.last.to_s
   end
 
   def add_syntax_error(desc)
@@ -85,8 +86,7 @@ class Tokenizer
   def get_full_line
     line = String.new
     line_start = @source.line_indexes.last
-    puts line_start
-    while not @source[line_start].eql? "\n"
+    while @source[line_start] and not @source[line_start].eql? "\n"
       line += @source[line_start]
       line_start += 1
     end
@@ -161,6 +161,8 @@ class Tokenizer
           TokenKind::OP_COMMA
         when '.'
           TokenKind::OP_DOT
+        when ':'
+          TokenKind::OP_COLON
         when '('
           TokenKind::OP_OPEN_PARENTHESIS
         when ')'
@@ -204,7 +206,8 @@ class Tokenizer
         tt = TokenKind::LITERAL_INT
       end
       add_token(tt, num)
-      true
+      push_char
+      return true
     end
     false
   end
@@ -224,7 +227,7 @@ class Tokenizer
         tt = TokenKind::IDENTIFIER
       end
       add_token(tt, word)
-      true
+      return true
     end
     false
   end
@@ -232,6 +235,12 @@ class Tokenizer
   def tokenize
     while push_char
       if check_comment or check_operator or check_literal or check_word
+        next
+      else
+        if not is_whitespace(@current_char)
+          error = "Unknown char '#{@current_char}'."
+          add_syntax_error(error)
+        end
         next
       end
     end

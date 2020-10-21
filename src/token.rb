@@ -39,7 +39,7 @@ module TokenKind
   OP_NOT_EQUAL         = 0x1F
   OP_LESS_EQUAL        = 0x10
   OP_GREATER_EQUAL     = 0x21
-  OP_RETURN            = 0x22
+  OP_            = 0x22
   OP_EXCLAMATION       = 0x23
   
   OP_COMMA             = 0x24
@@ -74,6 +74,118 @@ class Token
   end
 
   def to_s
-    # TODO
+    s = case @kind
+        when TokenKind::EOF
+          "EOF"
+        when TokenKind::COMMENT
+          "COMMENT"
+        when TokenKind::IDENTIFIER
+          "IDENTIFIER"
+        when TokenKind::LITERAL_INT
+          "LITERAL_INT"
+        when TokenKind::LITERAL_FLOAT
+          "LITERAL_FLOAT"
+        when TokenKind::LITERAL_STRING
+          "LITERAL_STRING"
+        #when TokenKind::LITERAL_STRING_INTERPOLATED
+        #  "LITERAL_STRING_INTERPOLATED"
+        
+        when TokenKind::KEY_FUNC
+          "FUNC"
+        when TokenKind::KEY_ENDFN
+          "ENDFN"
+        when TokenKind::KEY_WHILE
+          "WHILE"
+        when TokenKind::KEY_ENDWL
+          "ENDWL"
+        when TokenKind::KEY_FOR
+          "FOR"
+        when TokenKind::KEY_ENDFR
+          "ENDFR"
+        when TokenKind::KEY_IF
+          "IF"
+        when TokenKind::KEY_ELSE
+          "ELSE"
+        when TokenKind::KEY_ELIF
+          "ELSEIF"
+        when TokenKind::KEY_ENDIF
+          "ENDIF"
+        #when TokenKind::KEY_AND
+        #  "AND"
+        #when TokenKind::KEY_OR
+        #  "OR"
+        #when TokenKind::KEY_NOT
+        #  "NOT"
+        #when TokenKind::KEY_TRUE
+        #  "TRUE"
+        #when TokenKind::KEY_FALSE
+        #  "FALSE"
+        
+        when TokenKind::OP_PLUS
+          "+"
+        when TokenKind::OP_MINUS
+          "-"
+        when TokenKind::OP_ASTERISK
+          "*"
+        when TokenKind::OP_SLASH
+          "/"
+        when TokenKind::OP_MODULUS
+          "%"
+        when TokenKind::OP_ASSIGN
+          "=>"
+        when TokenKind::OP_PLUS_ASSIGN
+          "+>"
+        when TokenKind::OP_MINUS_ASSIGN
+          "->"
+        when TokenKind::OP_ASTERISK_ASSIGN
+          "*>"
+        when TokenKind::OP_SLASH_ASSIGN
+          "/>"
+        when TokenKind::OP_MODULUS_ASSIGN
+          "%>"
+        when TokenKind::OP_LESS
+          "<"
+        when TokenKind::OP_GREATER
+          ">"
+        when TokenKind::OP_EQUAL
+          "=="
+        when TokenKind::OP_NOT_EQUAL
+          "/="
+        when TokenKind::OP_LESS_EQUAL
+          "<="
+        when TokenKind::OP_GREATER_EQUAL
+          ">="
+        #when TokenKind::OP_RETURN
+        #  "<-"
+        when TokenKind::OP_EXCLAMATION
+          "!"
+        #when TokenKind::OP_AT
+        #  "@"
+        
+        when TokenKind::OP_COMMA
+          ","
+        when TokenKind::OP_COLON
+          ":"
+        #when TokenKind::OP_SEMICOLON
+        #  ";"
+        when TokenKind::OP_DOT
+          "."
+        when TokenKind::OP_OPEN_PARENTHESIS
+          "("
+        when TokenKind::OP_CLOSE_PARENTHESIS
+          ")"
+        when TokenKind::OP_OPEN_BRACKETS
+          "["
+        when TokenKind::OP_CLOSE_BRACKETS
+          "]"
+        #when TokenKind::OP_OPEN_CURLYBRACES
+        #  "{"
+        #when TokenKind::OP_CLOSE_CURLYBRACES
+        #  "}"
+        
+        #when TokenKind::END
+        #  "END"
+        end
+    s
   end
 end

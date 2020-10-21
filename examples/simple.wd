@@ -1,10 +1,11 @@
-add: func(x, y) =>
+<add : func(x, y) =>
     <- x + y
 endfn
 
+# Pseudo range function
 range: func(start, end, step=>1) =>
-    arr => [..end] // Array of length "end"
-    while i = start, i < end, i +> 1 =>
+    arr => [..end] # Array of length "end"
+    while i => start, i < end, i +> 1 =>
         arr[i] => i * step
     endwl
     <- arr

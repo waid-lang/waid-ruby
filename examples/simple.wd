@@ -1,4 +1,4 @@
-<add : func(x, y) =>
+add : func(x, y) =>
     <- x + y
 endfn
 

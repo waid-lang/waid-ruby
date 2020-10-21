@@ -39,7 +39,7 @@ module TokenKind
   OP_NOT_EQUAL         = 0x1F
   OP_LESS_EQUAL        = 0x10
   OP_GREATER_EQUAL     = 0x21
-  OP_            = 0x22
+  OP_RETURN            = 0x22
   OP_EXCLAMATION       = 0x23
   
   OP_COMMA             = 0x24
@@ -155,8 +155,8 @@ class Token
           "<="
         when TokenKind::OP_GREATER_EQUAL
           ">="
-        #when TokenKind::OP_RETURN
-        #  "<-"
+        when TokenKind::OP_RETURN
+          "<-"
         when TokenKind::OP_EXCLAMATION
           "!"
         #when TokenKind::OP_AT

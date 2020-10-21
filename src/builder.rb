@@ -1,7 +1,7 @@
-require_relative 'error_collector'
-require_relative 'waid_exception'
-require_relative 'file_util'
-require_relative 'tokenizer'
+require_relative 'common/error_collector'
+require_relative 'common/waid_exception'
+require_relative 'common/file_util'
+require_relative 'tokenizer/tokenizer'
 
 class Builder
     attr_writer :source_path

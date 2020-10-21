@@ -1,5 +1,5 @@
 require_relative 'token'
-require_relative 'source_position'
+require_relative '../common/source_position'
 
 $keywords = {
   "func" => TokenKind::KEY_FUNC,
@@ -47,7 +47,7 @@ class Tokenizer
     @tokens = Array.new
 
     @line_number = 1
-    @column_number = 0
+    @column_number = -1 # No sé por qué -1, pero si parto en 0 todo se va a la b
     @current_line = String.new
 
     @current_char = String.new
@@ -65,7 +65,6 @@ class Tokenizer
       ),
       value
     )
-    puts @tokens.last.to_s
   end
 
   def add_syntax_error(desc)
@@ -140,14 +139,19 @@ class Tokenizer
     t = case @current_char
         when '+'
           @peek_char == '>'? TokenKind::OP_PLUS_ASSIGN : TokenKind::OP_PLUS
+          push_char
         when '-'
           @peek_char == '>'? TokenKind::OP_MINUS_ASSIGN : TokenKind::OP_MINUS
+          push_char
         when '*'
           @peek_char == '>'? TokenKind::OP_ASTERISK_ASSIGN : TokenKind::OP_ASTERISK
+          push_char
         when '/'
           @peek_char == '>'? TokenKind::OP_SLASH_ASSIGN : TokenKind::OP_SLASH
+          push_char
         when '%'
           @peek_char == '>'? TokenKind::OP_MODULUS_ASSIGN : TokenKind::OP_MODULUS
+          push_char
         when '='
           if @peek_char == ">"
             push_char
@@ -155,6 +159,9 @@ class Tokenizer
           else
             return false
           end
+        when '<'
+          @peek_char == '-'? TokenKind::OP_RETURN : TokenKind::OP_LESS
+          push_char
         when '!'
           TokenKind::OP_EXCLAMATION
         when ','
@@ -189,7 +196,7 @@ class Tokenizer
         push_char
       end
       if @peek_char == "."
-        num += @current_char
+        num += @peek_char
         push_char
 
         if not @peek_char.is_number?
@@ -244,5 +251,6 @@ class Tokenizer
         next
       end
     end
+    add_token(TokenKind::EOF)
   end
 end

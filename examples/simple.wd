@@ -13,6 +13,6 @@ endfn
 
 main: func =>
     for elem in !(range 0 !(add !input 1) 2) =>
-        !print !(add elem !input)
+        !print !(add elem !(add !input 0.5))
     endfr
 endfn

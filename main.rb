@@ -1,5 +1,5 @@
-require_relative 'builder'
-require_relative 'waid_exception'
+require_relative 'src/builder'
+require_relative 'src/common/waid_exception'
 
 def main
     return if ARGV.length < 1

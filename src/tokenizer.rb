@@ -46,13 +46,12 @@ class Tokenizer
 
     @tokens = Array.new
 
-    @line_number = 1;
+    @line_number = 1
     @column_number = 0
     @current_line = String.new
 
-    @current_index = 0
     @current_char = String.new
-    @peek_char = @source[@current_index]
+    @peek_char = @source[@column_number]
   end
 
   def add_token(tt, value=nil)
@@ -82,18 +81,30 @@ class Tokenizer
        )
      )
   end
+
+  def get_full_line
+    line = String.new
+    line_start = @source.line_indexes.last
+    puts line_start
+    while not @source[line_start].eql? "\n"
+      line += @source[line_start]
+      line_start += 1
+    end
+    line
+  end
+
   def push_char
     @current_char = @peek_char
 
     # El peek char se encuentra en el índice actua +1
-    @current_index += 1
-    @peek_char = @source[@current_index + 1]
+    @column_number += 1
+    @peek_char = @source[@column_number + 1]
 
     @current_line += @current_char? @current_char : ""
 
     if @current_char == "\n"
       @line_number += 1
-      @source.line_indexes.push(@column_number)
+      @source.line_indexes.push(@column_number + 1)
     end
     @current_char
   end
@@ -176,7 +187,7 @@ class Tokenizer
         push_char
       end
       if @peek_char == "."
-        num += current_char
+        num += @current_char
         push_char
 
         if not @peek_char.is_number?

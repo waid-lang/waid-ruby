@@ -5,11 +5,10 @@ require_relative 'tokenizer/tokenizer'
 
 class Builder
     attr_writer :source_path
-    def initialize(debug=false)
+    def initialize()
         @show_tokens = false
         @show_ast = false
         @source_path = String.new
-        @debug = debug
     end
 
     def set_show_tokens
@@ -25,7 +24,7 @@ class Builder
 
         source_file = WaidFile.new(@source_path)
 
-        tokenizer = Tokenizer.new(source_file, @debug, error_collector)
+        tokenizer = Tokenizer.new(source_file, error_collector)
         tokenizer.tokenize
 
         if error_collector.has_errors

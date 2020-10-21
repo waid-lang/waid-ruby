@@ -39,15 +39,14 @@ end
 
 class Tokenizer
   attr_accessor :tokens
-  def initialize(source, debug, err_coll)
+  def initialize(source, err_coll)
     @source = source
-    @debug = debug
     @error_collector = err_coll
 
     @tokens = Array.new
 
     @line_number = 1
-    @column_number = -1 # No sé por qué -1, pero si parto en 0 todo se va a la b
+    @column_number = 0
     @current_line = String.new
 
     @current_char = String.new
@@ -97,7 +96,7 @@ class Tokenizer
 
     # El peek char se encuentra en el índice actua +1
     @column_number += 1
-    @peek_char = @source[@column_number + 1]
+    @peek_char = @source[@column_number]
 
     @current_line += @current_char? @current_char : ""
 
@@ -138,14 +137,27 @@ class Tokenizer
   def check_operator
     t = case @current_char
         when '+'
-          @peek_char == '>'? TokenKind::OP_PLUS_ASSIGN : TokenKind::OP_PLUS
-          push_char
+          # TODO: Función para generalizar estos if-else
+          if @peek_char == ">"
+            push_char
+            TokenKind::OP_PLUS_ASSIGN
+          else
+            TokenKind::OP_PLUS
+          end
         when '-'
-          @peek_char == '>'? TokenKind::OP_MINUS_ASSIGN : TokenKind::OP_MINUS
-          push_char
+          if @peek_char == ">"
+            push_char
+            TokenKind::OP_MINUS_ASSIGN
+          else
+            TokenKind::OP_MINUS
+          end
         when '*'
-          @peek_char == '>'? TokenKind::OP_ASTERISK_ASSIGN : TokenKind::OP_ASTERISK
-          push_char
+          if @peek_char == ">"
+            push_char
+            TokenKind::OP_ASTERISK_ASSIGN
+          else
+            TokenKind::OP_ASTERISK
+          end
         when '/'
           @peek_char == '>'? TokenKind::OP_SLASH_ASSIGN : TokenKind::OP_SLASH
           push_char
@@ -160,8 +172,12 @@ class Tokenizer
             return false
           end
         when '<'
-          @peek_char == '-'? TokenKind::OP_RETURN : TokenKind::OP_LESS
-          push_char
+          if @peek_char == "-"
+            push_char
+            TokenKind::OP_RETURN
+          else
+            TokenKind::OP_LESS
+          end
         when '!'
           TokenKind::OP_EXCLAMATION
         when ','
@@ -241,7 +257,7 @@ class Tokenizer
 
   def tokenize
     while push_char
-      if check_comment or check_operator or check_literal or check_word
+      if check_word or check_comment or check_operator or check_literal
         next
       else
         if not is_whitespace(@current_char)

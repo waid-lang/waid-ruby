@@ -30,7 +30,7 @@ def main
         builder.source_path = file
         builder.run
     rescue WaidError => error
-        puts error.msg
+        print error.msg
     end
 end
 

@@ -8,7 +8,6 @@ def main
     @options = {}
     OptionParser.new do |op|
         op.banner += ' filename'
-
         op.on("-t", "--show-tokens", "Print the tokens produced by the scanner") do
             @options[:show_tokens] = true
         end
@@ -27,6 +26,7 @@ def main
         if @options[:show_tokens]
             builder.set_show_tokens
         end
+        
         builder.source_path = file
         builder.run
     rescue WaidError => error

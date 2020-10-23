@@ -70,6 +70,7 @@ WHILE_STMT       = "while", EXPR, WHILE_BODY, "=>", LISTA_STMTS, "endwl";
 
 RETURN_STMTS     = "<-", EXPR;
 ESTAMENTO        = DECL_VARIABLE
+                 | DECL_FUNC
                  | RETURN_STMT
                  | IF_STMT
                  | WHILE_STMT

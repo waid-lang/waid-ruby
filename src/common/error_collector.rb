@@ -41,15 +41,15 @@ class ErrorCollector
         @errors = Array.new
     end
 
-    def add_error(comp_error)
+    def addError(comp_error)
         @errors.push(comp_error)
     end
 
-    def has_errors
+    def hasErrors
         not @errors.empty?
     end
 
-    def show_errors
+    def showErrors
         @errors.each do |err|
             puts "\t#{err.to_s}"
         end

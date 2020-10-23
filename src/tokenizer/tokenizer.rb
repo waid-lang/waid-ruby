@@ -53,7 +53,7 @@ class Tokenizer
     @peek_char = @source[@column_number]
   end
 
-  def add_token(tt, value=nil)
+  def addToken(tt, value=nil)
     @tokens << Token.new(
       tt,
       SourcePosition.new(
@@ -66,11 +66,11 @@ class Tokenizer
     )
   end
 
-  def add_syntax_error(desc)
+  def addSyntaxError(desc)
      @error_collector.add_error(
        CompilationError.new(
          desc,
-         get_full_line,
+         getFullLine,
          SourcePosition.new(
            @line_number,
            @column_number,
@@ -81,7 +81,7 @@ class Tokenizer
      )
   end
 
-  def get_full_line
+  def getFullLine
     line = String.new
     line_start = @source.line_indexes.last
     while @source[line_start] and not @source[line_start].eql? "\n"
@@ -91,7 +91,7 @@ class Tokenizer
     line
   end
 
-  def push_char
+  def pushChar
     @current_char = @peek_char
 
     # El peek char se encuentra en el índice actua +1
@@ -107,18 +107,18 @@ class Tokenizer
     @current_char
   end
 
-  def read_until(char)
+  def readUntil(char)
     res = String.new
     while @current_char != char
       res += @current_char
-      push_char
+      pushChar
     end
     res
   end
 
-  def check_comment
+  def checkComment
     if @current_char == "\#"
-      push_char
+      pushChar
       @tokens << Token.new(
         TokenKind::COMMENT,
         SourcePosition.new(
@@ -127,7 +127,7 @@ class Tokenizer
           @source.line_indexes.last,
           @source
         ),
-        read_until("\n")
+        readUntil("\n")
       )
       true
     end
@@ -139,41 +139,41 @@ class Tokenizer
         when '+'
           # TODO: Función para generalizar estos if-else
           if @peek_char == ">"
-            push_char
+            pushChar
             TokenKind::OP_PLUS_ASSIGN
           else
             TokenKind::OP_PLUS
           end
         when '-'
           if @peek_char == ">"
-            push_char
+            pushChar
             TokenKind::OP_MINUS_ASSIGN
           else
             TokenKind::OP_MINUS
           end
         when '*'
           if @peek_char == ">"
-            push_char
+            pushChar
             TokenKind::OP_ASTERISK_ASSIGN
           else
             TokenKind::OP_ASTERISK
           end
         when '/'
           @peek_char == '>'? TokenKind::OP_SLASH_ASSIGN : TokenKind::OP_SLASH
-          push_char
+          pushChar
         when '%'
           @peek_char == '>'? TokenKind::OP_MODULUS_ASSIGN : TokenKind::OP_MODULUS
-          push_char
+          pushChar
         when '='
           if @peek_char == ">"
-            push_char
+            pushChar
             TokenKind::OP_ASSIGN
           else
             return false
           end
         when '<'
           if @peek_char == "-"
-            push_char
+            pushChar
             TokenKind::OP_RETURN
           else
             TokenKind::OP_LESS
@@ -197,51 +197,51 @@ class Tokenizer
         else
           return false
         end
-        add_token(t)
+        addToken(t)
         true
   end
 
-  def check_literal
+  def checkLiteral
     num = String.new
     if @current_char.is_number?
       tt = -1
       num += @current_char
       while @peek_char.is_number?
-        push_char
+        pushChar
         num += @current_char
-        push_char
+        pushChar
       end
       if @peek_char == "."
         num += @peek_char
-        push_char
+        pushChar
 
         if not @peek_char.is_number?
-          add_syntax_error("Malformed floating point number.")
+          addSyntaxError("Malformed floating point number.")
           return true
         end
 
         while @peek_char.is_number?
-          push_char
+          pushChar
           num += @current_char
         end
         tt = TokenKind::LITERAL_FLOAT       
       else
         tt = TokenKind::LITERAL_INT
       end
-      add_token(tt, num)
-      push_char
+      addToken(tt, num)
+      pushChar
       return true
     end
     false
   end
 
-  def check_word
+  def checkWord
     word = String.new
     if is_valid_id_char(@current_char)
       tt = -1
       word += @current_char
       while is_valid_id_char(@peek_char)
-        push_char
+        pushChar
         word += @current_char
       end
       if is_keyword(word)
@@ -249,24 +249,24 @@ class Tokenizer
       else
         tt = TokenKind::IDENTIFIER
       end
-      add_token(tt, word)
+      addToken(tt, word)
       return true
     end
     false
   end
 
-  def tokenize
-    while push_char
-      if check_word or check_comment or check_operator or check_literal
+  def tokenize!
+    while pushChar
+      if checkWord or checkComment or check_operator or checkLiteral
         next
       else
         if not is_whitespace(@current_char)
           error = "Unknown char '#{@current_char}'."
-          add_syntax_error(error)
+          addSyntaxError(error)
         end
         next
       end
     end
-    add_token(TokenKind::EOF)
+    addToken(TokenKind::EOF)
   end
 end

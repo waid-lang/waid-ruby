@@ -51,8 +51,11 @@ module TokenKind
   OP_CLOSE_BRACKETS    = 0x2A
 end
 
+# TODO: Implementar como Struct mejor (?)
 class Token
   attr_accessor :value
+  attr_reader :kind
+  attr_reader :source_position
   # Sería bueno implementar una clase que represente la posición en el código
   # fuente.
   def initialize(token_kind, source_pos, value=nil)

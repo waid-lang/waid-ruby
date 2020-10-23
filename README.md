@@ -1,5 +1,7 @@
 # WaidLang
-I'm too lazy to write a nice presentation so in the meantime here's a small sample of the language:
+I am too lazy to write a nice presentation so in the meantime here is a small sample of the language and its context free grammar.
+
+It is currently implemented with a custom lexer and a LL(1) parser (recursive descent), although I would like to write a LL(1) parsing table in the future.
 ```py
 add: func(x, y) =>
     <- x + y
@@ -20,7 +22,7 @@ main: func =>
     endfr
 endfn
 ```
-And its grammar:
+
 ```ebnf
 LETRA            = "A" ... "Z"
                  | "a" ... "z"
@@ -94,6 +96,7 @@ WHILE_STMT       = "while", EXPR, WHILE_BODY, "=>", LISTA_STMTS, "endwl";
 
 RETURN_STMTS     = "<-", EXPR;
 ESTAMENTO        = DECL_VARIABLE
+                 | DECL_FUNC
                  | RETURN_STMT
                  | IF_STMT
                  | WHILE_STMT

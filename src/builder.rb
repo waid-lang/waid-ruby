@@ -21,9 +21,10 @@ class Builder
     end
 
     def run
-        error_collector = ErrorCollector.new
 
         source_file = WaidFile.new(@source_path)
+
+        error_collector = ErrorCollector.new(source_file)
 
         tokenizer = Tokenizer.new(source_file, error_collector)
         tokenizer.tokenize!
@@ -40,5 +41,9 @@ class Builder
 
         parser = Parser.new(tokenizer.tokens, error_collector)
         parser.parse!
+
+        if error_collector.hasErrors
+            error_collector.showErrors
+        end
     end
 end

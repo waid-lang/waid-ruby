@@ -19,8 +19,7 @@ OPERANDO         = LITERAL
 LISTA_STMTS      = {ESTAMENTO};
 LISTA_EXPR       = EXPR, {",", EXPR};
 
-EXPR             = EXPR_ARITMETICA
-                 | EXPR_BOOLEANA;
+EXPR             = EXPR_BOOLEANA;
 
 EXPR_ARITMETICA  = MULT, {OP_SUMA, MULT};
 OP_SUMA          = "+"
@@ -43,7 +42,7 @@ OP_RELATIONAL    = ">"
                  | ">="
                  | "<=";
 EXPR_BOOL_SEC    = "(", EXPR_BOOLEANA, ")"
-                 | EXPR_PRIMARIA
+                 | EXPR_ARITMETICA
 
 EXPR_PRIMARIA    = OPERANDO
                  | FUNC_CALL;

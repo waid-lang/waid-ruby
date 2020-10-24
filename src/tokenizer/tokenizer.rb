@@ -102,7 +102,7 @@ class Tokenizer
 
     if @current_char == "\n"
       @line_number += 1
-      @source.line_indexes.push(@column_number + 1)
+      @source.line_indexes.push(@column_number)
     end
     @current_char
   end

@@ -1,0 +1,3 @@
+add: func(x, y) =>
+    <- x + y
+endfn

@@ -40,10 +40,12 @@ class Parser
             return true
         end
         @error_collector.addError(CompilationError.new(
-            "Expected '#{token_kind}', but got '#{@peek_token}' instead.",
-            "TODO: Ver cómo añadir la línea completa :(",
+            "Expected '#{token_string(token_kind)}', but got '#{@peek_token}' instead.",
+            @error_collector.getLine(@peek_token.source_position),
             @peek_token.source_position
         ))
+        @error_collector.showErrors
+        return nil
     end
 
     def parse!
@@ -64,7 +66,6 @@ class Parser
         #           | IF_STMT
         #           | WHILE_STMT
         #           | EXPR;
-
         case @current_token.kind
         when TokenKind::IDENTIFIER # Puede ser declaración de función o de variable
             if peekTokenEquals(TokenKind::OP_COLON)
@@ -91,6 +92,7 @@ class Parser
         end
         statement.Identifier = @current_token.value
 
+        # TODO: Implementar todo esto como un método y que lo añada como error
         if not consumePeek(TokenKind::OP_ASSIGN)
             return nil
         end
@@ -104,16 +106,9 @@ class Parser
         # DECL_FUNC   = DECL_TIPO, TIPO_FUNC, CUERPO_FUNC;
         # CUERPO_FUNC = "=>", LISTA_STMTS, "endfn";
         # DECL_TIP    = IDENTIFICADOR, ":";
-        # TIPO_FUNC        = "func", PARAMETROS;
-        # PARAMETROS       = "(", [LISTA_PARAMS], ")";
-        # LISTA_PARAMS     = PARAM_DECL, {",", PARAM_DECL};
-        # PARAM_DECL       = IDENTIFICADOR, [VALOR_DEFECTO];
-        # VALOR_DEFECTO    = "=>", OPERANDO;
+        # TIPO_FUNC        = "func", PARAMETROS
         statement = FuncDeclarationStatement.new
 
-        if not consumePeek(TokenKind::IDENTIFIER)
-            return nil
-        end
         statement.Identifier = @current_token.value
 
         if not consumePeek(TokenKind::OP_COLON)
@@ -124,15 +119,8 @@ class Parser
             return nil
         end
 
-        if not consumePeek(TokenKind::OP_OPEN_PARENTHESIS)
-            return nil
-        end
-
         statement.Parameters = parseFunctionParameters
 
-        if not consumePeek(TokenKind::OP_CLOSE_PARENTHESIS)
-            return nil
-        end
 
         if not consumePeek(TokenKind::OP_ASSIGN)
             return nil
@@ -147,20 +135,82 @@ class Parser
     end
 
     def parseFunctionParameters
+        # PARAMETROS = "(", [LISTA_PARAMS], ")";
+        # LISTA_PARAMS     = PARAM_DECL, {",", PARAM_DECL};
+        # PARAM_DECL       = IDENTIFICADOR, [VALOR_DEFECTO];
+        # VALOR_DEFECTO    = "=>", OPERANDO; // TODO
+        identifiers = Array.new
+
+        if not consumePeek(TokenKind::OP_OPEN_PARENTHESIS)
+            return nil
+        end
+
+        if peekTokenEquals(TokenKind::OP_CLOSE_PARENTHESIS)
+            pushToken
+            return identifiers
+        end
+
+        if not consumePeek(TokenKind::IDENTIFIER)
+            return nil
+        end
+
+        identifiers.push(Identifier.new(@current_token.value))
+
+        # TODO
+        while peekTokenEquals(TokenKind::OP_COMMA)
+            pushToken
+            pushToken
+
+            identifiers.push(Identifier.new(@current_token.value))
+        end
+        puts identifiers
+
+        if not consumePeek(TokenKind::OP_CLOSE_PARENTHESIS)
+            return nil
+        end
+        identifiers
+    end
+
+    def parseStatementList
+        # LISTA_STMTS = {ESTAMENTO};
+        list = StatementList.new
+        while not peekTokenEquals(TokenKind::KEY_ENDFN) and \
+                not peekTokenEquals(TokenKind::KEY_ENDWL) and \
+                not peekTokenEquals(TokenKind::EOF)
+            pushToken
+            statement = parseStatement
+            if statement
+                list.push(statement)
+            end
+        end
+        list
     end
 
     def parseReturnStatement
+        # RETURN_STMTS = "<-", EXPR;
+        statement = ReturnStatement.new
+        statement.ReturnValue = parseExpression
+        return statement
     end
 
     def parseIfStatement
+        return nil
     end
 
     def parseWhileStatement
+        return nil
     end
 
     def parseExpressionStatement
+        return nil
     end
 
     def parseExpression
+        # EXPR = EXPR_BOOLEANA;
+        parseBooleanExpression
+    end
+
+    def parseBooleanExpression
+        return nil
     end
 end

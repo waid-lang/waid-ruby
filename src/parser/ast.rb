@@ -10,6 +10,10 @@ class StatementList
     def initialize
         @Statements = Array.new
     end
+    
+    def push(elem)
+        @Statements.push(elem)
+    end
 end
 
 ReturnStatement = Struct.new(
@@ -43,3 +47,4 @@ WhileStatement = Struct.new(
     :Body # StatementList
 )
 
+Identifier = Struct.new(:Value)

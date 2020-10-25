@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require_relative 'src/builder'
 require_relative 'src/common/waid_exception'
 
@@ -6,16 +8,17 @@ require 'optparse'
 def main
 
     @options = {}
-    OptionParser.new do |op|
+    optparser = OptionParser.new do |op|
         op.banner += ' filename'
         op.on("-t", "--show-tokens", "Print the tokens produced by the scanner") do
             @options[:show_tokens] = true
         end
-    end.parse!
+    end
 
+    optparser.parse!
     # NO SÉ SI ESTA ES LA MANERA CORRECTA DE HACERLO EN RUBY PERDÓN
     if ARGV.empty?
-        puts optparse
+        puts optparser
         exit(-1)
     end
     file = ARGV.pop

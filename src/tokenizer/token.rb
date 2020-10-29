@@ -41,7 +41,7 @@ module TokenKind
   OP_GREATER_EQUAL     = 0x21
   OP_RETURN            = 0x22
   OP_EXCLAMATION       = 0x23
-  
+
   OP_COMMA             = 0x24
   OP_COLON             = 0x25
   OP_DOT               = 0x26
@@ -65,9 +65,9 @@ def token_string(tok)
         "LITERAL_FLOAT"
       when TokenKind::LITERAL_STRING
         "LITERAL_STRING"
-      #when TokenKind::LITERAL_STRING_INTERPOLATED
-      #  "LITERAL_STRING_INTERPOLATED"
-      
+        #when TokenKind::LITERAL_STRING_INTERPOLATED
+        #  "LITERAL_STRING_INTERPOLATED"
+
       when TokenKind::KEY_FUNC
         "FUNC"
       when TokenKind::KEY_ENDFN
@@ -88,17 +88,17 @@ def token_string(tok)
         "ELSEIF"
       when TokenKind::KEY_ENDIF
         "ENDIF"
-      #when TokenKind::KEY_AND
-      #  "AND"
-      #when TokenKind::KEY_OR
-      #  "OR"
-      #when TokenKind::KEY_NOT
-      #  "NOT"
-      #when TokenKind::KEY_TRUE
-      #  "TRUE"
-      #when TokenKind::KEY_FALSE
-      #  "FALSE"
-      
+        #when TokenKind::KEY_AND
+        #  "AND"
+        #when TokenKind::KEY_OR
+        #  "OR"
+        #when TokenKind::KEY_NOT
+        #  "NOT"
+        #when TokenKind::KEY_TRUE
+        #  "TRUE"
+        #when TokenKind::KEY_FALSE
+        #  "FALSE"
+
       when TokenKind::OP_PLUS
         "+"
       when TokenKind::OP_MINUS
@@ -137,15 +137,15 @@ def token_string(tok)
         "<-"
       when TokenKind::OP_EXCLAMATION
         "!"
-      #when TokenKind::OP_AT
-      #  "@"
-      
+        #when TokenKind::OP_AT
+        #  "@"
+
       when TokenKind::OP_COMMA
         ","
       when TokenKind::OP_COLON
         ":"
-      #when TokenKind::OP_SEMICOLON
-      #  ";"
+        #when TokenKind::OP_SEMICOLON
+        #  ";"
       when TokenKind::OP_DOT
         "."
       when TokenKind::OP_OPEN_PARENTHESIS
@@ -156,13 +156,13 @@ def token_string(tok)
         "["
       when TokenKind::OP_CLOSE_BRACKETS
         "]"
-      #when TokenKind::OP_OPEN_CURLYBRACES
-      #  "{"
-      #when TokenKind::OP_CLOSE_CURLYBRACES
-      #  "}"
-      
-      #when TokenKind::END
-      #  "END"
+        #when TokenKind::OP_OPEN_CURLYBRACES
+        #  "{"
+        #when TokenKind::OP_CLOSE_CURLYBRACES
+        #  "}"
+
+        #when TokenKind::END
+        #  "END"
       end
   s
 end

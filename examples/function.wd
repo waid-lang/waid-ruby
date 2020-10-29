@@ -1,3 +1,15 @@
 add: func(x, y) =>
     <- x + y
 endfn
+
+generate_add: func(num) =>
+    new: func(x) =>
+        <- x + num
+    endfn
+    <- new
+endfn
+
+main: func() =>
+    add_5 => !generate_add 5
+    !(print !(add 4 !(add_5 7)))
+endfn

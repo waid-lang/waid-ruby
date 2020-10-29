@@ -67,18 +67,18 @@ class Tokenizer
   end
 
   def addSyntaxError(desc)
-     @error_collector.add_error(
-       CompilationError.new(
-         desc,
-         getFullLine,
-         SourcePosition.new(
-           @line_number,
-           @column_number,
-           @source.line_indexes.last,
-           @source
-         )
-       )
-     )
+    @error_collector.addError(
+      CompilationError.new(
+        desc,
+        getFullLine,
+        SourcePosition.new(
+          @line_number,
+          @column_number,
+          @source.line_indexes.last,
+          @source
+        )
+      )
+    )
   end
 
   def getFullLine
@@ -197,8 +197,8 @@ class Tokenizer
         else
           return false
         end
-        addToken(t)
-        true
+    addToken(t)
+    true
   end
 
   def checkLiteral

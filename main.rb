@@ -13,6 +13,10 @@ def main
         op.on("-t", "--show-tokens", "Print the tokens produced by the scanner") do
             @options[:show_tokens] = true
         end
+
+        op.on("-a", "--show-ast", "Print the AST produced by the parser") do
+          @options[:show_ast] = true
+        end
     end
 
     optparser.parse!
@@ -28,6 +32,10 @@ def main
 
         if @options[:show_tokens]
             builder.set_show_tokens
+        end
+
+        if @options[:show_ast]
+          builder.set_show_ast
         end
         
         builder.source_path = file

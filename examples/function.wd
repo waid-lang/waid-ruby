@@ -10,6 +10,6 @@ generate_add: func(num) =>
 endfn
 
 main: func() =>
-    add_5 => !generate_add 5
+    add_5 => !(generate_add 5)
     !(print !(add 4 !(add_5 7)))
 endfn

@@ -79,6 +79,8 @@ class Parser
       return parseIfStatement
     when TokenKind::KEY_WHILE
       return parseWhileStatement
+    when TokenKind::OP_EXCLAMATION
+      return parseFunctionCall
     else
       return parseExpressionStatement
     end
@@ -96,7 +98,7 @@ class Parser
     if not consumePeek(TokenKind::OP_ASSIGN)
       return nil
     end
-    pushToken
+    #pushToken
 
     statement.Value = parseExpression
     statement
@@ -320,9 +322,44 @@ class Parser
     # EXPR_PRIMARIA = OPERANDO
     #               | FUNC_CALL;
     if peekTokenEquals(TokenKind::OP_EXCLAMATION)
+      consumePeek(TokenKind::OP_EXCLAMATION)
       return parseFunctionCall
     end
     return parseOperand
+  end
+
+  def parseFunctionCall
+    expr = FunctionCall.new
+    #consumePeek(TokenKind::OP_EXCLAMATION)
+
+    if peekTokenEquals(TokenKind::OP_OPEN_PARENTHESIS)
+      # Tiene argumentos
+      pushToken
+      if not consumePeek(TokenKind::IDENTIFIER)
+        return nil
+      end
+
+      expr.Function = Identifier.new(@current_token.value)
+      expr.Arguments = Array.new
+
+      expr.Arguments.push(parseExpression)
+
+      while not peekTokenEquals(TokenKind::OP_CLOSE_PARENTHESIS)
+        expr.Arguments.push(parseExpression)
+      end
+
+      if not consumePeek(TokenKind::OP_CLOSE_PARENTHESIS)
+        return nil
+      end
+      return expr
+    end
+      # Sin argumentos
+    if not consumePeek(TokenKind::IDENTIFIER)
+      return nil
+    end
+    expr.Function = Identifier.new(@current_token.value)
+    expr.Arguments.push(Empty.new)
+    expr
   end
 
   def parseOperand

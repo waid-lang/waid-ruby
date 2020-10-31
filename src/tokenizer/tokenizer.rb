@@ -31,6 +31,10 @@ def is_valid_id_char(char)
   !char.match(/\A[a-zA-Z0-9_]*\z/).nil?
 end
 
+def is_valid_first_id_char(char)
+  !char.match(/\A[a-zA-Z_]*\z/).nil?
+end
+
 class String
   def is_number?
     true if Float(self) rescue false
@@ -204,6 +208,7 @@ class Tokenizer
   def checkLiteral
     num = String.new
     if @current_char.is_number?
+      puts @current_char
       tt = -1
       num += @current_char
       while @peek_char.is_number?
@@ -237,7 +242,7 @@ class Tokenizer
 
   def checkWord
     word = String.new
-    if is_valid_id_char(@current_char)
+    if is_valid_first_id_char(@current_char)
       tt = -1
       word += @current_char
       while is_valid_id_char(@peek_char)

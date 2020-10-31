@@ -87,6 +87,31 @@ class FuncDeclarationStatement
   end
 end
 
+class FunctionCall
+  attr_accessor :Function, :Arguments
+  def initialize(f=nil, a=Array.new)
+    @Function = f
+    @Arguments = a
+  end
+
+  def to_string(level)
+    puts ident(level, "FunctionCall")
+    puts ident(level + 1, "FunctionName")
+    @Function.to_string(level + 2)
+
+    puts ident(level + 1, "Arguments")
+    @Arguments.each do |arg|
+      arg.to_string(level + 2)
+    end
+  end
+end
+
+class Empty
+  def to_string(level)
+    puts ident(level, "Empty")
+  end
+end
+
 IfStatement = Struct.new(
   :Condition, # Expresión
   :Body, # StatementList
@@ -137,8 +162,8 @@ UnaryOperatorExpression = Struct.new(
 
 class LiteralInt
   attr_accessor :Value
-  def initialize
-    @Value
+  def initialize(val=nil)
+    @Value = val
   end
 
   def to_string(level)

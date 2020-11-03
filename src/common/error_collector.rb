@@ -51,6 +51,7 @@ class ErrorCollector
   end
 
   def showErrors
+    puts @source_file.get_filename
     @errors.each do |err|
       puts "\t#{err.to_s}"
     end

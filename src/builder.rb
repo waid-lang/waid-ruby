@@ -43,6 +43,7 @@ class Builder
 
     if @show_ast
       parser.ast.to_string
+      #parser.ast.print
     end
 
     if error_collector.hasErrors

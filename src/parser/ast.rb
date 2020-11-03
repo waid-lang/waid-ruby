@@ -1,6 +1,7 @@
+$AST_INDENTATION = 3
 
-def ident(level, text)
-  " " * 2 * level + text
+def indent(level, text)
+  " " * $AST_INDENTATION * (level) + text
 end
 
 class Programa
@@ -11,7 +12,7 @@ class Programa
 
   def to_string
     level = 0
-    puts "AST"
+    puts "Program"
     @Statements.each do |stmt|
       stmt.to_string(level + 1)
     end
@@ -36,8 +37,8 @@ class ReturnStatement
   end
 
   def to_string(level)
-    puts ident(level, "ReturnStatement")
-    puts ident(level + 1, "ReturnValue")
+    puts indent(level, "ReturnStatement")
+    puts indent(level + 1, "ReturnValue")
     @ReturnValue.to_string(level + 2)
   end
 end
@@ -51,11 +52,11 @@ class VarDeclarationStatement
   end
 
   def to_string(level)
-    puts ident(level, "VariableDeclaration")
-    puts ident(level + 1, "Identifier")
+    puts indent(level, "VariableDeclaration")
+    puts indent(level + 1, "Identifier")
     @Identifier.to_string(level + 2)
 
-    puts ident(level + 1, "Value")
+    puts indent(level + 1, "Value")
     @Value.to_string(level + 2)
   end
 end
@@ -71,16 +72,16 @@ class FuncDeclarationStatement
   end
 
   def to_string(level)
-    puts ident(level, "FunctionDeclarationStatement")
-    puts ident(level + 1, "Identifier")
+    puts indent(level, "FunctionDeclarationStatement")
+    puts indent(level + 1, "Identifier")
     @Identifier.to_string(level + 2)
 
-    puts ident(level + 1, "Paramenters")
+    puts indent(level + 1, "Paramenters")
     @Parameters.each do |id|
       id.to_string(level + 2)
     end
 
-    puts ident(level + 1, "Body")
+    puts indent(level + 1, "Body")
     @Body.Statements.each do |stmt|
       stmt.to_string(level + 2)
     end
@@ -95,11 +96,11 @@ class FunctionCall
   end
 
   def to_string(level)
-    puts ident(level, "FunctionCall")
-    puts ident(level + 1, "FunctionName")
+    puts indent(level, "FunctionCall")
+    puts indent(level + 1, "FunctionName")
     @Function.to_string(level + 2)
 
-    puts ident(level + 1, "Arguments")
+    puts indent(level + 1, "Arguments")
     @Arguments.each do |arg|
       arg.to_string(level + 2)
     end
@@ -108,7 +109,7 @@ end
 
 class Empty
   def to_string(level)
-    puts ident(level, "Empty")
+    puts indent(level, "Empty")
   end
 end
 
@@ -117,11 +118,44 @@ IfStatement = Struct.new(
   :Body, # StatementList
   :ElseBody # StatementList
 )
+class IfStatement
+  attr_accessor :Condition, :Body, :ElseBody
+  def initialize
+    @Condition = nil
+    @Body = nil
+    @ElseBody = nil
+  end
 
-WhileStatement = Struct.new(
-  :Condition, # Expresión
-  :Body # StatementList
-)
+  def to_string(level)
+    puts indent(level, "IfStatement")
+    puts indent(level + 1, "Condition")
+    @Condition.to_string(level + 2)
+
+    puts indent(level + 1, "Body")
+    @Body.Statements.each do |stmt|
+      stmt.to_string(level + 2)
+    end
+  end
+end
+
+class WhileStatement
+  attr_accessor :Condition, :Body
+  def initialize
+    @Condition = nil
+    @Body = nil
+  end
+
+  def to_string(level)
+    puts indent(level, "WhileStatement")
+    puts indent(level + 1, "Condition")
+    @Condition.to_string(level + 2)
+
+    puts indent(level + 1, "Body")
+    @Body.Statements.each do |stmt|
+      stmt.to_string(level + 2)
+    end
+  end
+end
 
 class Identifier
   attr_accessor :Value
@@ -130,8 +164,8 @@ class Identifier
   end
 
   def to_string(level)
-    puts ident(level, "Identifier")
-    puts ident(level + 1, @Value)
+    puts indent(level, "Identifier")
+    puts indent(level + 1, @Value)
   end
 end
 
@@ -143,14 +177,14 @@ class BinaryOperatorExpression
   end
 
   def to_string(level)
-    puts ident(level, "BinaryOperation")
-    puts ident(level + 1, "Left")
+    puts indent(level, "BinaryOperation")
+    puts indent(level + 1, "Left")
     @Left.to_string(level + 2)
 
-    puts ident(level + 1, "Operator")
-    puts ident(level + 2, @Operator.to_s)
+    puts indent(level + 1, "Operator")
+    puts indent(level + 2, @Operator.to_s)
 
-    puts ident(level + 1, "Right")
+    puts indent(level + 1, "Right")
     @Right.to_string(level + 2)
   end
 end 
@@ -167,9 +201,8 @@ class LiteralInt
   end
 
   def to_string(level)
-    puts ident(level, "LiteralInt")
-    puts ident(level + 1, "Value")
-    puts ident(level + 2, @Value.to_s)
+    puts indent(level, "LiteralInt")
+    puts indent(level + 1, @Value.to_s)
   end
 end
 

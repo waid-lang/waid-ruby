@@ -176,6 +176,7 @@ class Parser
     list = StatementList.new
     while not peekTokenEquals(TokenKind::KEY_ENDFN) and \
         not peekTokenEquals(TokenKind::KEY_ENDWL) and \
+        not peekTokenEquals(TokenKind::KEY_ENDIF) and \
         not peekTokenEquals(TokenKind::EOF)
       pushToken
       statement = parseStatement
@@ -194,7 +195,19 @@ class Parser
   end
 
   def parseIfStatement
-    return nil
+    stmt = IfStatement.new
+    stmt.Condition = parseExpression
+
+    if not consumePeek(TokenKind::OP_ASSIGN)
+      return nil
+    end
+
+    stmt.Body = parseStatementList
+
+    if not consumePeek(TokenKind::KEY_ENDIF)
+      return nil
+    end
+    stmt
   end
 
   def parseWhileStatement
@@ -207,7 +220,7 @@ class Parser
 
     stmt.Body = parseStatementList
 
-    if not consumePeek(TokenKind::OP_ASSIGN)
+    if not consumePeek(TokenKind::KEY_ENDWL)
       return nil
     end
     stmt
@@ -227,7 +240,7 @@ class Parser
     expr = parseRelationalExpression
     while peekTokenEquals(TokenKind::OP_EQUAL) or peekTokenEquals(TokenKind::OP_NOT_EQUAL)
       pushToken
-      expr = BinaryExpressionStatement.new(expr, @current_token, parseRelationalExpression)
+      expr = BinaryOperatorExpression.new(expr, @current_token, parseRelationalExpression)
     end
     expr
   end
@@ -237,7 +250,8 @@ class Parser
     expr = parseSecondaryBooleanExpression
     while peekTokenEquals(TokenKind::OP_GREATER) or peekTokenEquals(TokenKind::OP_LESS) \
         or peekTokenEquals(TokenKind::OP_GREATER_EQUAL) or peekTokenEquals(TokenKind::OP_LESS_EQUAL)
-      expr = BinaryExpressionStatement.new(expr, @current_token, parseSecondaryBooleanExpression)
+      pushToken
+      expr = BinaryOperatorExpression.new(expr, @current_token, parseSecondaryBooleanExpression)
     end
     expr
   end
@@ -340,12 +354,16 @@ class Parser
       end
 
       expr.Function = Identifier.new(@current_token.value)
-      expr.Arguments = Array.new
-
       expr.Arguments.push(parseExpression)
 
-      while not peekTokenEquals(TokenKind::OP_CLOSE_PARENTHESIS)
+      if not peekTokenEquals(TokenKind::OP_CLOSE_PARENTHESIS)
         expr.Arguments.push(parseExpression)
+      end
+      
+      expr_ = parseExpression
+      while expr_
+        expr.Arguments.push(expr_)
+        expr_ = parseExpression
       end
 
       if not consumePeek(TokenKind::OP_CLOSE_PARENTHESIS)
@@ -374,8 +392,8 @@ class Parser
     when TokenKind::LITERAL_INT
       consumePeek(TokenKind::LITERAL_INT)
       operand = LiteralInt.new(@current_token.value)
-    when TokenKind::LITERAL_FLOAT
-    when TokenKind::LITERAL_STRING
+    else
+      return nil
     end
     operand
   end

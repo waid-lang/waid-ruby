@@ -123,16 +123,16 @@ class Tokenizer
   def checkComment
     if @current_char == "\#"
       pushChar
-      @tokens << Token.new(
-        TokenKind::COMMENT,
-        SourcePosition.new(
-          @line_number,
-          @column_number,
-          @source.line_indexes.last,
-          @source
-        ),
+      #@tokens << Token.new(
+      #  TokenKind::COMMENT,
+      #  SourcePosition.new(
+      #    @line_number,
+      #    @column_number,
+      #    @source.line_indexes.last,
+      #    @source
+      #  ),
         readUntil("\n")
-      )
+      #)
       true
     end
     false
@@ -173,12 +173,15 @@ class Tokenizer
             pushChar
             TokenKind::OP_ASSIGN
           else
-            return false
+            TokenKind::OP_EQUAL
           end
         when '<'
           if @peek_char == "-"
             pushChar
             TokenKind::OP_RETURN
+          elsif @peek_char == '='
+            pushChar
+            TokenKind::OP_LESS_EQUAL
           else
             TokenKind::OP_LESS
           end
@@ -208,7 +211,6 @@ class Tokenizer
   def checkLiteral
     num = String.new
     if @current_char.is_number?
-      puts @current_char
       tt = -1
       num += @current_char
       while @peek_char.is_number?
@@ -234,7 +236,6 @@ class Tokenizer
         tt = TokenKind::LITERAL_INT
       end
       addToken(tt, num)
-      pushChar
       return true
     end
     false

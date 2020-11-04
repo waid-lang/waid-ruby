@@ -48,7 +48,7 @@ EXPR_PRIMARIA    = OPERANDO
                  | FUNC_CALL;
                  
 FUNC_CALL        = "!", "(", IDENTIFICADOR, [LISTA_EXPR], ")";
-                 | "!", IDENTIFICADOR, [EXPR];
+                 | "!", IDENTIFICADOR;
 
 TIPO_FUNC        = "func", PARAMETROS;
 PARAMETROS       = "(", [LISTA_PARAMS], ")";

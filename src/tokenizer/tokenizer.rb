@@ -31,6 +31,10 @@ def is_valid_id_char(char)
   !char.match(/\A[a-zA-Z0-9_]*\z/).nil?
 end
 
+def is_valid_first_id_char(char)
+  !char.match(/\A[a-zA-Z_]*\z/).nil?
+end
+
 class String
   def is_number?
     true if Float(self) rescue false
@@ -119,16 +123,16 @@ class Tokenizer
   def checkComment
     if @current_char == "\#"
       pushChar
-      @tokens << Token.new(
-        TokenKind::COMMENT,
-        SourcePosition.new(
-          @line_number,
-          @column_number,
-          @source.line_indexes.last,
-          @source
-        ),
+      #@tokens << Token.new(
+      #  TokenKind::COMMENT,
+      #  SourcePosition.new(
+      #    @line_number,
+      #    @column_number,
+      #    @source.line_indexes.last,
+      #    @source
+      #  ),
         readUntil("\n")
-      )
+      #)
       true
     end
     false
@@ -168,13 +172,17 @@ class Tokenizer
           if @peek_char == ">"
             pushChar
             TokenKind::OP_ASSIGN
-          else
-            return false
+          elsif @peek_char == '='
+            pushChar
+            TokenKind::OP_EQUAL
           end
         when '<'
           if @peek_char == "-"
             pushChar
             TokenKind::OP_RETURN
+          elsif @peek_char == '='
+            pushChar
+            TokenKind::OP_LESS_EQUAL
           else
             TokenKind::OP_LESS
           end
@@ -229,7 +237,6 @@ class Tokenizer
         tt = TokenKind::LITERAL_INT
       end
       addToken(tt, num)
-      pushChar
       return true
     end
     false
@@ -237,7 +244,7 @@ class Tokenizer
 
   def checkWord
     word = String.new
-    if is_valid_id_char(@current_char)
+    if is_valid_first_id_char(@current_char)
       tt = -1
       word += @current_char
       while is_valid_id_char(@peek_char)

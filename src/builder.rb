@@ -42,7 +42,8 @@ class Builder
     parser.parse!
 
     if @show_ast
-      parser.ast.to_string
+      #parser.ast.to_string
+      parser.ast.print_tree("", true)
     end
 
     if error_collector.hasErrors

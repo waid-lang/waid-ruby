@@ -1,5 +1,5 @@
-add: func(x, y) =>
-    <- x + y
+add: func(x, y, z) =>
+    <- x + y + z
 endfn
 
 generate_add: func(num) =>
@@ -10,6 +10,8 @@ generate_add: func(num) =>
 endfn
 
 main: func() =>
-    add_5 => !generate_add 5
-    !(print !(add 4 !(add_5 7)))
+    add_5 => !(generate_add 5)
+    !(print !(add !(add_5 8+4*7 !(add_5 7) 8)))
 endfn
+
+!main

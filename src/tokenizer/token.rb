@@ -37,7 +37,7 @@ module TokenKind
   OP_GREATER           = 0x1D
   OP_EQUAL             = 0x1E
   OP_NOT_EQUAL         = 0x1F
-  OP_LESS_EQUAL        = 0x10
+  OP_LESS_EQUAL        = 0x20
   OP_GREATER_EQUAL     = 0x21
   OP_RETURN            = 0x22
   OP_EXCLAMATION       = 0x23

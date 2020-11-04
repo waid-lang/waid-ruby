@@ -1,0 +1,28 @@
+fib_rec: func(n) =>
+  if n < 2 =>
+    <- n
+  endif
+  <- !(fib_rec n - 1) + !(fib_rec n - 2)
+endfn
+
+fib_while: func(n) =>
+  a => 0
+  b => 1
+  while b <= n =>
+    prev_a => a
+    a => b
+    b => prev_a + b
+  endwl
+  <- a
+endfn
+
+main: func() =>
+  num => !input
+  if !(fib_rec num) == !(fib_while num) =>
+    !(print 1)
+  else =>
+    !(print 0)
+  endif
+endfn
+
+!main

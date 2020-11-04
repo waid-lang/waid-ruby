@@ -24,3 +24,5 @@ main: func() =>
     !(print 0)
   endif
 endfn
+
+!main

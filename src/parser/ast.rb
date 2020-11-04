@@ -1,4 +1,8 @@
 $AST_INDENTATION = 3
+$AST_LAST = "└" + "─" * ($AST_INDENTATION - 1)
+$AST_MIDDLE = "├" + "─" * ($AST_INDENTATION - 1)
+$AST_LINE = "│" + " " * ($AST_INDENTATION - 1)
+$AST_SPACE = " " * $AST_INDENTATION
 
 def indent(level, text)
   " " * $AST_INDENTATION * (level) + text
@@ -15,6 +19,13 @@ class Programa
     puts "Program"
     @Statements.each do |stmt|
       stmt.to_string(level + 1)
+    end
+  end
+
+  def print_tree(indent, last)
+    puts "Program"
+    @Statements.each_with_index do |stmt, index|
+      stmt.print_tree(indent, index == @Statements.length - 1)
     end
   end
 end
@@ -41,6 +52,19 @@ class ReturnStatement
     puts indent(level + 1, "ReturnValue")
     @ReturnValue.to_string(level + 2)
   end
+
+  def print_tree(indent, last)
+    print indent
+    if last
+      print $AST_LAST
+      indent += $AST_SPACE
+    else
+      print $AST_MIDDLE
+      indent += $AST_LINE
+    end
+    puts "ReturnStatement"
+    @ReturnValue.print_tree(indent, true)
+  end
 end
 
 class VarDeclarationStatement
@@ -59,6 +83,23 @@ class VarDeclarationStatement
     puts indent(level + 1, "Value")
     @Value.to_string(level + 2)
   end
+
+  def print_tree(indent, last)
+    print indent
+    if last
+      print $AST_LAST
+      indent += $AST_SPACE
+    else
+      print $AST_MIDDLE
+      indent += $AST_LINE
+    end
+    puts "VariableDeclaration"
+    puts indent + $AST_MIDDLE + "Identifier"
+    @Identifier.print_tree(indent + $AST_LINE, true)
+
+    puts indent + $AST_LAST + "Value"
+    @Value.print_tree(indent + $AST_SPACE, true)
+    end
 end
 
 class FuncDeclarationStatement
@@ -86,6 +127,30 @@ class FuncDeclarationStatement
       stmt.to_string(level + 2)
     end
   end
+
+  def print_tree(indent, last)
+    print indent
+    if last
+      print $AST_LAST
+      indent += $AST_SPACE
+    else
+      print $AST_MIDDLE
+      indent += $AST_LINE
+    end
+    puts "FuncDecl"
+    puts indent + $AST_MIDDLE + "Identifier"
+    @Identifier.print_tree(indent + $AST_LINE, true)
+
+    puts indent + $AST_MIDDLE + "Parameters"
+    @Parameters.each_with_index do |id, index|
+      id.print_tree(indent + $AST_LINE, index == @Parameters.length - 1)
+    end
+
+    puts indent + $AST_LAST + "Body"
+    @Body.Statements.each_with_index do |stmt, index|
+      stmt.print_tree(indent + $AST_SPACE, index == @Body.Statements.length - 1)
+    end
+  end
 end
 
 class FunctionCall
@@ -105,19 +170,45 @@ class FunctionCall
       arg.to_string(level + 2)
     end
   end
+
+  def print_tree(indent, last)
+    print indent
+    if last
+      print $AST_LAST
+      indent += $AST_SPACE
+    else
+      print $AST_MIDDLE
+      indent += $AST_LINE
+    end
+    puts "FunctionCall"
+    puts indent + $AST_MIDDLE + "Identifier"
+    @Function.print_tree(indent + $AST_LINE, true)
+
+    puts indent + $AST_LAST + "Arguments"
+    @Arguments.each_with_index do |stmt, index|
+      stmt.print_tree(indent + $AST_SPACE, index == @Arguments.length - 1)
+    end
+  end
 end
 
 class Empty
   def to_string(level)
     puts indent(level, "Empty")
   end
+
+  def print_tree(indent, last)
+    print indent
+    if last
+      print $AST_LAST
+      indent += $AST_SPACE
+    else
+      print $AST_MIDDLE
+      indent += $AST_LINE
+    end
+    puts "None"
+  end
 end
 
-IfStatement = Struct.new(
-  :Condition, # Expresión
-  :Body, # StatementList
-  :ElseBody # StatementList
-)
 class IfStatement
   attr_accessor :Condition, :Body, :ElseBody
   def initialize
@@ -134,6 +225,24 @@ class IfStatement
     puts indent(level + 1, "Body")
     @Body.Statements.each do |stmt|
       stmt.to_string(level + 2)
+    end
+  end
+  def print_tree(indent, last)
+    print indent
+    if last
+      print $AST_LAST
+      indent += $AST_SPACE
+    else
+      print $AST_MIDDLE
+      indent += $AST_LINE
+    end
+    puts "IfStatement"
+    puts indent + $AST_MIDDLE + "Condition"
+    @Condition.print_tree(indent + $AST_LINE, true)
+
+    puts indent + $AST_LAST + "Body"
+    @Body.Statements.each_with_index do |stmt, index|
+      stmt.print_tree(indent + $AST_SPACE, index == @Body.Statements.length - 1)
     end
   end
 end
@@ -155,6 +264,25 @@ class WhileStatement
       stmt.to_string(level + 2)
     end
   end
+
+  def print_tree(indent, last)
+    print indent
+    if last
+      print $AST_LAST
+      indent += $AST_SPACE
+    else
+      print $AST_MIDDLE
+      indent += $AST_LINE
+    end
+    puts "WhileStatement"
+    puts indent + $AST_MIDDLE + "Condition"
+    @Condition.print_tree(indent + $AST_LINE, true)
+
+    puts indent + $AST_LAST + "Body"
+    @Body.Statements.each_with_index do |stmt, index|
+      stmt.print_tree(indent + $AST_SPACE, index == @Body.Statements.length - 1)
+    end
+  end
 end
 
 class Identifier
@@ -166,6 +294,19 @@ class Identifier
   def to_string(level)
     puts indent(level, "Identifier")
     puts indent(level + 1, @Value)
+  end
+
+  def print_tree(indent, last)
+    print indent
+    if last
+      print $AST_LAST
+      indent += $AST_SPACE
+    else
+      print $AST_MIDDLE
+      indent += $AST_LINE
+    end
+    puts "Identifier"
+    puts indent + $AST_LAST + @Value
   end
 end
 
@@ -187,6 +328,26 @@ class BinaryOperatorExpression
     puts indent(level + 1, "Right")
     @Right.to_string(level + 2)
   end
+
+  def print_tree(indent, last)
+    print indent
+    if last
+      print $AST_LAST
+      indent += $AST_SPACE
+    else
+      print $AST_MIDDLE
+      indent += $AST_LINE
+    end
+    puts "BinaryOperation"
+    puts indent + $AST_MIDDLE + "Left"
+    @Left.print_tree(indent + $AST_LINE, true)
+
+    puts indent + $AST_MIDDLE + "Operator"
+    puts indent + $AST_LINE + $AST_LAST + @Operator.to_s
+
+    puts indent + $AST_LAST + "Right"
+    @Right.print_tree(indent + $AST_SPACE, true)
+  end
 end 
 
 UnaryOperatorExpression = Struct.new(
@@ -203,6 +364,19 @@ class LiteralInt
   def to_string(level)
     puts indent(level, "LiteralInt")
     puts indent(level + 1, @Value.to_s)
+  end
+
+  def print_tree(indent, last)
+    print indent
+    if last
+      print $AST_LAST
+      indent += $AST_SPACE
+    else
+      print $AST_MIDDLE
+      indent += $AST_LINE
+    end
+    puts "IntLiteral"
+    puts indent + $AST_LAST + @Value.to_s
   end
 end
 

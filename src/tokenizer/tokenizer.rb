@@ -172,7 +172,8 @@ class Tokenizer
           if @peek_char == ">"
             pushChar
             TokenKind::OP_ASSIGN
-          else
+          elsif @peek_char == '='
+            pushChar
             TokenKind::OP_EQUAL
           end
         when '<'

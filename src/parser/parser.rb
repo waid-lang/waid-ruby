@@ -231,8 +231,25 @@ class Parser
   end
 
   def parseExpression
-    # EXPR = EXPR_BOOLEANA;
-    parseBooleanExpression
+    parseBooleanOrExpression
+  end
+
+  def parseBooleanOrExpression
+    expr = parseBooleanAndExpression
+    while peekTokenEquals(TokenKind::KEY_OR)
+      pushToken
+      expr = BinaryOperatorExpression.new(expr, @current_token, parseBooleanAndExpression)
+    end
+    expr
+  end
+
+  def parseBooleanAndExpression
+    expr = parseBooleanNegExpression
+    while peekTokenEquals(TokenKind::KEY_AND)
+      pushToken
+      expr = BinaryOperatorExpression.new(expr, @current_token, parseBooleanNegExpression)
+    end
+    expr
   end
 
   def parseBooleanExpression

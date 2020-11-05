@@ -3,24 +3,34 @@ I am too lazy to write a nice presentation so in the meantime here is a small sa
 
 It is currently implemented with a custom lexer and a LL(1) parser (recursive descent), although I would like to write a LL(1) parsing table in the future.
 ```py
-add: func(x, y) =>
-    <- x + y
+fib_rec: func(n) =>
+  if n < 2 =>
+    <- n
+  endif
+  <- !(fib_rec n - 1) + !(fib_rec n - 2)
 endfn
 
-# Pseudo range function
-range: func(start, end, step=>1) =>
-    arr => [..end] # Array of length "end"
-    while i => start, i < end, i +> 1 =>
-        arr[i] => i * step
-    endwl
-    <- arr
+fib_while: func(n) =>
+  a => 0
+  b => 1
+  while b <= n =>
+    prev_a => a
+    a => b
+    b => prev_a + b
+  endwl
+  <- a
 endfn
 
-main: func =>
-    for elem in !(range 0 !(add !input 1) 2) =>
-        !print !(add elem !input)
-    endfr
+main: func() =>
+  num => !input
+  if !(fib_rec num) == !(fib_while num) =>
+    !(print 0)
+  else =>
+    !(print -1)
+  endif
 endfn
+
+!main
 ```
 
 ```ebnf
@@ -45,7 +55,20 @@ OPERANDO         = LITERAL
 LISTA_STMTS      = {ESTAMENTO};
 LISTA_EXPR       = EXPR, {",", EXPR};
 
-EXPR             = EXPR_BOOLEANA;
+EXPR             = EXPR_BOOL_OR;
+EXPR_BOOL_OR     = EXPR_BOOL_AND, {"or", EXPR_BOOL_AND};
+EXPR_BOOL_AND    = EXPR_BOOL_NEG, {"and", EXPR_BOOL_NEG};
+EXPR_BOOL_NEG    = "not", EXPR_BOOL_NEG
+                 | EXPR_COMP;
+
+EXPR_COMP        = RELATIONAL, {OP_EQUALITY, RELATIONAL};
+OP_EQUALITY      = "="
+                 | "/=";
+RELATIONAL       = EXPR_ARITMETICA, {OP_RELATIONAL, EXPR_ARITMETICA};
+OP_RELATIONAL    = ">"
+                 | "<"
+                 | ">="
+                 | "<=";
 
 EXPR_ARITMETICA  = MULT, {OP_SUMA, MULT};
 OP_SUMA          = "+"
@@ -55,24 +78,10 @@ OP_MULT          = "*"
                  | "/"
                  | "%";
 NEG              = "-", NEG
-                 | EXPR_ARIT_SEC;
-EXPR_ARIT_SEC    = "(", EXPR_ARITMETICA, ")"
-                 | EXPR_PRIMARIA;
-
-EXPR_BOOLEANA    = RELATIONAL, {OP_EQUALITY, RELATIONAL};
-OP_EQUALITY      = "="
-                 | "/=";
-RELATIONAL       = EXPR_BOOL_SEC, {OP_RELATIONAL, EXPR_BOOL_SEC};
-OP_RELATIONAL    = ">"
-                 | "<"
-                 | ">="
-                 | "<=";
-EXPR_BOOL_SEC    = "(", EXPR_BOOLEANA, ")"
-                 | EXPR_ARITMETICA
-
+                 | EXPR_PRIMARIA
 EXPR_PRIMARIA    = OPERANDO
                  | FUNC_CALL;
-                 
+
 FUNC_CALL        = "!", "(", IDENTIFICADOR, [LISTA_EXPR], ")";
                  | "!", IDENTIFICADOR;
 

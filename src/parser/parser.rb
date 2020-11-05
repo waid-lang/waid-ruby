@@ -82,7 +82,7 @@ class Parser
     when TokenKind::OP_EXCLAMATION
       return parseFunctionCall
     else
-      return parseExpressionStatement
+      return nil
     end
   end
 
@@ -177,6 +177,7 @@ class Parser
     while not peekTokenEquals(TokenKind::KEY_ENDFN) and \
         not peekTokenEquals(TokenKind::KEY_ENDWL) and \
         not peekTokenEquals(TokenKind::KEY_ENDIF) and \
+        not peekTokenEquals(TokenKind::KEY_ELSE) and \
         not peekTokenEquals(TokenKind::EOF)
       pushToken
       statement = parseStatement
@@ -198,11 +199,20 @@ class Parser
     stmt = IfStatement.new
     stmt.Condition = parseExpression
 
+    # Definimos elsebody al tiro por si no sale nada
+    stmt.ElseBody = StatementList.new
+
     if not consumePeek(TokenKind::OP_ASSIGN)
       return nil
     end
 
     stmt.Body = parseStatementList
+
+    if peekTokenEquals(TokenKind::KEY_ELSE)
+      pushToken
+      consumePeek(TokenKind::OP_ASSIGN)
+      stmt.ElseBody = parseStatementList
+    end
 
     if not consumePeek(TokenKind::KEY_ENDIF)
       return nil
@@ -227,16 +237,40 @@ class Parser
   end
 
   def parseExpressionStatement
-    return nil
+    nil
   end
 
   def parseExpression
-    # EXPR = EXPR_BOOLEANA;
-    parseBooleanExpression
+    parseBooleanOrExpression
   end
 
-  def parseBooleanExpression
-    # EXPR_BOOLEANA = RELATIONAL, {OP_EQUALITY, RELATIONAL};
+  def parseBooleanOrExpression
+    expr = parseBooleanAndExpression
+    while peekTokenEquals(TokenKind::KEY_OR)
+      pushToken
+      expr = BinaryOperatorExpression.new(expr, @current_token, parseBooleanAndExpression)
+    end
+    expr
+  end
+
+  def parseBooleanAndExpression
+    expr = parseBooleanNegExpression
+    while peekTokenEquals(TokenKind::KEY_AND)
+      pushToken
+      expr = BinaryOperatorExpression.new(expr, @current_token, parseBooleanNegExpression)
+    end
+    expr
+  end
+
+  def parseBooleanNegExpression
+    if peekTokenEquals(TokenKind::KEY_NOT)
+      pushToken
+      return UnaryOperatorExpression.new(@current_token, parseBooleanNegExpression)
+    end
+    parseCompareExpression
+  end
+
+  def parseCompareExpression
     expr = parseRelationalExpression
     while peekTokenEquals(TokenKind::OP_EQUAL) or peekTokenEquals(TokenKind::OP_NOT_EQUAL)
       pushToken
@@ -246,33 +280,11 @@ class Parser
   end
 
   def parseRelationalExpression
-    # RELATIONAL = EXPR_BOOL_SEC, {OP_RELATIONAL, EXPR_BOOL_SEC};
-    expr = parseSecondaryBooleanExpression
+    expr = parseArithmeticExpression
     while peekTokenEquals(TokenKind::OP_GREATER) or peekTokenEquals(TokenKind::OP_LESS) \
         or peekTokenEquals(TokenKind::OP_GREATER_EQUAL) or peekTokenEquals(TokenKind::OP_LESS_EQUAL)
       pushToken
-      expr = BinaryOperatorExpression.new(expr, @current_token, parseSecondaryBooleanExpression)
-    end
-    expr
-  end
-
-  # TODO: Estar muy atento con este método. Algo puede fallar con los peek de
-  # los paréntesis
-  def parseSecondaryBooleanExpression
-    # EXPR_BOOL_SEC    = "(", EXPR_BOOLEANA, ")"                                                  
-    #                  | EXPR_ARITMETICA
-    if not peekTokenEquals(TokenKind::OP_OPEN_PARENTHESIS)
-      return parseArithmeticExpression
-    end
-
-    if not consumePeek(TokenKind::OP_OPEN_PARENTHESIS)
-      return nil
-    end
-
-    expr = parseBooleanExpression
-
-    if not consumePeek(TokenKind::OP_CLOSE_PARENTHESIS)
-      return nil
+      expr = BinaryOperatorExpression.new(expr, @current_token, parseArithmeticExpression)
     end
     expr
   end
@@ -308,28 +320,9 @@ class Parser
     #     | EXPR_ARIT_SEC;
     if peekTokenEquals(TokenKind::OP_MINUS)
       pushToken
-      return parseNegativeExpression
+      return UnaryOperatorExpression.new(@current_token, parseNegativeExpression)
     end
-    parseSecondaryArithmeticExpression
-  end
-
-  def parseSecondaryArithmeticExpression
-    # EXPR_ARIT_SEC = "(", EXPR_ARITMETICA, ")"
-    #               | EXPR_PRIMARIA;
-    if not peekTokenEquals(TokenKind::OP_OPEN_PARENTHESIS)
-      return parsePrimaryExpression
-    end
-
-    if not consumePeek(TokenKind::OP_OPEN_PARENTHESIS)
-      return nil
-    end
-
-    expr = parseArithmeticExpression
-
-    if not consumePeek(TokenKind::OP_CLOSE_PARENTHESIS)
-      return nil
-    end
-    expr
+    parsePrimaryExpression
   end
 
   def parsePrimaryExpression
@@ -391,7 +384,10 @@ class Parser
       consumePeek(TokenKind::OP_CLOSE_PARENTHESIS)
     when TokenKind::LITERAL_INT
       consumePeek(TokenKind::LITERAL_INT)
-      operand = LiteralInt.new(@current_token.value)
+      operand = IntLiteral.new(@current_token.value)
+    when TokenKind::KEY_TRUE
+      consumePeek(TokenKind::KEY_TRUE)
+      operand = BooleanLiteral.new(@current_token.value)
     else
       return nil
     end

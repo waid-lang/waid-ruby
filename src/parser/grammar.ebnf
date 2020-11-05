@@ -19,7 +19,20 @@ OPERANDO         = LITERAL
 LISTA_STMTS      = {ESTAMENTO};
 LISTA_EXPR       = EXPR, {",", EXPR};
 
-EXPR             = EXPR_BOOLEANA;
+EXPR             = EXPR_BOOL_OR;
+EXPR_BOOL_OR     = EXPR_BOOL_AND, {"or", EXPR_BOOL_AND};
+EXPR_BOOL_AND    = EXPR_BOOL_NEG, {"and", EXPR_BOOL_NEG};
+EXPR_BOOL_NEG    = "not", EXPR_BOOL_NEG
+                 | EXPR_COMP;
+
+EXPR_COMP        = RELATIONAL, {OP_EQUALITY, RELATIONAL};
+OP_EQUALITY      = "="
+                 | "/=";
+RELATIONAL       = EXPR_ARITMETICA, {OP_RELATIONAL, EXPR_ARITMETICA};
+OP_RELATIONAL    = ">"
+                 | "<"
+                 | ">="
+                 | "<=";
 
 EXPR_ARITMETICA  = MULT, {OP_SUMA, MULT};
 OP_SUMA          = "+"
@@ -29,24 +42,10 @@ OP_MULT          = "*"
                  | "/"
                  | "%";
 NEG              = "-", NEG
-                 | EXPR_ARIT_SEC;
-EXPR_ARIT_SEC    = "(", EXPR_ARITMETICA, ")"
-                 | EXPR_PRIMARIA;
-
-EXPR_BOOLEANA    = RELATIONAL, {OP_EQUALITY, RELATIONAL};
-OP_EQUALITY      = "="
-                 | "/=";
-RELATIONAL       = EXPR_BOOL_SEC, {OP_RELATIONAL, EXPR_BOOL_SEC};
-OP_RELATIONAL    = ">"
-                 | "<"
-                 | ">="
-                 | "<=";
-EXPR_BOOL_SEC    = "(", EXPR_BOOLEANA, ")"
-                 | EXPR_ARITMETICA
-
+                 | EXPR_PRIMARIA
 EXPR_PRIMARIA    = OPERANDO
                  | FUNC_CALL;
-                 
+
 FUNC_CALL        = "!", "(", IDENTIFICADOR, [LISTA_EXPR], ")";
                  | "!", IDENTIFICADOR;
 

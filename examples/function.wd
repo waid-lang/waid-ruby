@@ -11,7 +11,16 @@ endfn
 
 main: func() =>
     add_5 => !(generate_add 5)
-    !(print !(add !(add_5 8+4*7 !(add_5 7) 8)))
+    add_8 => !(generate_add 8)
+
+    while true =>
+        in => !input
+        if in % 2 == 0 =>
+            !(print !(add_5 in))
+        else =>
+            !(print !(add_8 in))
+        endif
+    endwl
 endfn
 
 !main

@@ -12,11 +12,11 @@ $keywords = {
   "else" => TokenKind::KEY_ELSE,
   "elif" => TokenKind::KEY_ELIF,
   "endif" => TokenKind::KEY_ENDIF,
-  # "and" => TokenKind::KEY_AND,
-  # "or" => TokenKind::KEY_OR,
-  # "not" => TokenKind::KEY_NOT,
-  # "true" => TokenKind::KEY_TRUE,
-  # "false" => TokenKind::KEY_FALSE
+  "and" => TokenKind::KEY_AND,
+  "or" => TokenKind::KEY_OR,
+  "not" => TokenKind::KEY_NOT,
+  "true" => TokenKind::KEY_TRUE,
+  "false" => TokenKind::KEY_FALSE
 }
 
 def is_keyword(word)
@@ -168,6 +168,12 @@ class Tokenizer
         when '%'
           @peek_char == '>'? TokenKind::OP_MODULUS_ASSIGN : TokenKind::OP_MODULUS
           pushChar
+          if @peek_char == '>'
+            pushChar
+            TokenKind::OP_MODULUS_ASSIGN
+          else
+            TokenKind::OP_MODULUS
+          end
         when '='
           if @peek_char == ">"
             pushChar

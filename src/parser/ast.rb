@@ -36,6 +36,10 @@ class StatementList
     @Statements = Array.new
   end
 
+  def empty?
+    @Statements.empty?
+  end
+
   def push(elem)
     @Statements.push(elem)
   end
@@ -240,9 +244,17 @@ class IfStatement
     puts indent + $AST_MIDDLE + "Condition"
     @Condition.print_tree(indent + $AST_LINE, true)
 
-    puts indent + $AST_LAST + "Body"
+    puts indent + $AST_MIDDLE + "Body"
     @Body.Statements.each_with_index do |stmt, index|
-      stmt.print_tree(indent + $AST_SPACE, index == @Body.Statements.length - 1)
+      stmt.print_tree(indent + $AST_LINE, index == @Body.Statements.length - 1)
+    end
+
+    puts indent + $AST_LAST + "ElseBody"
+    @ElseBody.Statements.each_with_index do |stmt, index|
+      stmt.print_tree(indent + $AST_SPACE, index == @ElseBody.Statements.length - 1)
+    end
+    if @ElseBody.empty?
+      puts indent + $AST_SPACE + $AST_LAST + "Empty"
     end
   end
 end
@@ -350,19 +362,39 @@ class BinaryOperatorExpression
   end
 end 
 
-UnaryOperatorExpression = Struct.new(
-  :Operator,
-  :Expression
-)
+class UnaryOperatorExpression
+  attr_accessor :Operator, :Expression
+  def initialize(op=nil, exp=nil)
+    @Operator = op
+    @Expression = exp
+  end
 
-class LiteralInt
+  def print_tree(indent, last)
+    print indent
+    if last
+      print $AST_LAST
+      indent += $AST_SPACE
+    else
+      print $AST_MIDDLE
+      indent += $AST_LINE
+    end
+    puts "UnaryOperation"
+    puts indent + $AST_MIDDLE + "Operator"
+    puts indent + $AST_LINE + $AST_LAST + @Operator.to_s
+
+    puts indent + $AST_LAST + "Expression"
+    @Expression.print_tree(indent + $AST_SPACE, true)
+  end
+end
+
+class IntLiteral
   attr_accessor :Value
   def initialize(val=nil)
     @Value = val
   end
 
   def to_string(level)
-    puts indent(level, "LiteralInt")
+    puts indent(level, "IntLiteral")
     puts indent(level + 1, @Value.to_s)
   end
 
@@ -376,6 +408,31 @@ class LiteralInt
       indent += $AST_LINE
     end
     puts "IntLiteral"
+    puts indent + $AST_LAST + @Value.to_s
+  end
+end
+
+class BooleanLiteral
+  attr_accessor :Value
+  def initialize(val=nil)
+    @Value = val
+  end
+
+  def to_string(level)
+    puts indent(level, "BooleanLiteral")
+    puts indent(level + 1, @Value.to_s)
+  end
+
+  def print_tree(indent, last)
+    print indent
+    if last
+      print $AST_LAST
+      indent += $AST_SPACE
+    else
+      print $AST_MIDDLE
+      indent += $AST_LINE
+    end
+    puts "BooleanLiteral"
     puts indent + $AST_LAST + @Value.to_s
   end
 end

@@ -19,9 +19,9 @@ endfn
 main: func() =>
   num => !input
   if !(fib_rec num) == !(fib_while num) =>
-    !(print 1)
-  else =>
     !(print 0)
+  else =>
+    !(print -1)
   endif
 endfn
 

@@ -168,6 +168,12 @@ class Tokenizer
         when '%'
           @peek_char == '>'? TokenKind::OP_MODULUS_ASSIGN : TokenKind::OP_MODULUS
           pushChar
+          if @peek_char == '>'
+            pushChar
+            TokenKind::OP_MODULUS_ASSIGN
+          else
+            TokenKind::OP_MODULUS
+          end
         when '='
           if @peek_char == ">"
             pushChar

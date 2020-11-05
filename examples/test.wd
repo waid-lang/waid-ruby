@@ -13,7 +13,7 @@ range: func(start, end, step) =>
     <- arr
 endfn
 
-main: func =>
+main: func() =>
     for elem in !(range 0 !(add !input 1) 2) =>
         !print !(add elem !input)
     endfr

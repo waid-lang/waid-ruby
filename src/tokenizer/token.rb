@@ -93,17 +93,16 @@ def token_string(tok)
         "ELSEIF"
       when TokenKind::KEY_ENDIF
         "ENDIF"
-        #when TokenKind::KEY_AND
-        #  "AND"
-        #when TokenKind::KEY_OR
-        #  "OR"
-        #when TokenKind::KEY_NOT
-        #  "NOT"
-        #when TokenKind::KEY_TRUE
-        #  "TRUE"
-        #when TokenKind::KEY_FALSE
-        #  "FALSE"
-
+      when TokenKind::KEY_AND
+        "AND"
+      when TokenKind::KEY_OR
+        "OR"
+      when TokenKind::KEY_NOT
+        "NOT"
+      when TokenKind::KEY_TRUE
+        "TRUE"
+      when TokenKind::KEY_FALSE
+        "FALSE"
       when TokenKind::OP_PLUS
         "+"
       when TokenKind::OP_MINUS

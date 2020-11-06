@@ -1,8 +1,23 @@
 # WaidLang
-I am too lazy to write a nice presentation so in the meantime here is a small sample of the language and its context free grammar.
+My personal attempt at writing a programming language from scratch.
 
-It is currently implemented with a custom lexer and a LL(1) parser (recursive descent), although I would like to write a LL(1) parsing table in the future.
+Waid is everything you never wanted. It's ugly, verbose, and it doesn't even work yet.
+It's currently implemented with a custom lexer and a LL(1) parser (recursive descent), although I would like to write a LL(1) parsing table in the future.
+
+I'm working on a tree walking interpreter at the moment, but I'm planning to write a VM in C++ in the future.
+
+## Usage
+```bash
+$ ./main.rb
+Usage: main [options] filename
+    -t, --show-tokens                Print the tokens produced by the scanner
+    -a, --show-ast                   Print the AST produced by the parser
+```
+
+
+***main.wd***
 ```py
+# Recursive function to calculate nth fibonacci number
 fib_rec: func(n) =>
   if n < 2 =>
     <- n
@@ -10,6 +25,7 @@ fib_rec: func(n) =>
   <- !(fib_rec n - 1) + !(fib_rec n - 2)
 endfn
 
+# Iterative Function to calculate nth fibonacci number
 fib_while: func(n) =>
   a => 0
   b => 1
@@ -23,6 +39,8 @@ endfn
 
 main: func() =>
   num => !input
+  
+  # Checks if both functions return the same value
   if !(fib_rec num) == !(fib_while num) =>
     !(print 0)
   else =>
@@ -33,82 +51,195 @@ endfn
 !main
 ```
 
-```ebnf
-LETRA            = "A" ... "Z"
-                 | "a" ... "z"
-                 | "_"
-DIGITO_DECIMAL   = "0" ... "9";
-
-IDENTIFICADOR    = LETRA, {LETRA | DIGITO_DECIMAL};
-LISTA_IDS        = IDENTIFICADOR, {",", IDENTIFICADOR};
-
-LITERAL_ENTERO   = (DIGITO_DECIMAL - "0"), {DIGITO_DECIMAL};
-LITERAL_FLOAT    = DECIMALES, ".", DECIMALES;
-DECIMALES        = DIGITO_DECIMAL, {DIGITO_DECIMAL};
-LITERAL          = LITERAL_ENTERO
-                 | LITERAL_FLOAT;
-                
-OPERANDO         = LITERAL
-                 | IDENTIFICADOR
-                 | "(", EXPR, ")";
-                
-LISTA_STMTS      = {ESTAMENTO};
-LISTA_EXPR       = EXPR, {",", EXPR};
-
-EXPR             = EXPR_BOOL_OR;
-EXPR_BOOL_OR     = EXPR_BOOL_AND, {"or", EXPR_BOOL_AND};
-EXPR_BOOL_AND    = EXPR_BOOL_NEG, {"and", EXPR_BOOL_NEG};
-EXPR_BOOL_NEG    = "not", EXPR_BOOL_NEG
-                 | EXPR_COMP;
-
-EXPR_COMP        = RELATIONAL, {OP_EQUALITY, RELATIONAL};
-OP_EQUALITY      = "="
-                 | "/=";
-RELATIONAL       = EXPR_ARITMETICA, {OP_RELATIONAL, EXPR_ARITMETICA};
-OP_RELATIONAL    = ">"
-                 | "<"
-                 | ">="
-                 | "<=";
-
-EXPR_ARITMETICA  = MULT, {OP_SUMA, MULT};
-OP_SUMA          = "+"
-                 | "-";
-MULT             = NEG, {OP_MULT, NEG};
-OP_MULT          = "*"
-                 | "/"
-                 | "%";
-NEG              = "-", NEG
-                 | EXPR_PRIMARIA
-EXPR_PRIMARIA    = OPERANDO
-                 | FUNC_CALL;
-
-FUNC_CALL        = "!", "(", IDENTIFICADOR, [LISTA_EXPR], ")";
-                 | "!", IDENTIFICADOR;
-
-TIPO_FUNC        = "func", PARAMETROS;
-PARAMETROS       = "(", [LISTA_PARAMS], ")";
-LISTA_PARAMS     = PARAM_DECL, {",", PARAM_DECL};
-PARAM_DECL       = IDENTIFICADOR, [VALOR_DEFECTO];
-VALOR_DEFECTO    = "=>", OPERANDO;
-
-DECL_FUNC        = DECL_TIPO, TIPO_FUNC, CUERPO_FUNC;
-CUERPO_FUNC      = "=>", LISTA_STMTS, "endfn";
-DECL_TIPO        = IDENTIFICADOR, ":";
-
-DECL_VARIABLE    = IDENTIFICADOR, "=>", EXPR;
-
-IF_STMT          = "if", EXPR, "=>", LISTA_STMTS, [ELIF_BLOCK], "endif";
-ELIF_BLOCK       = "else", "=>", LISTA_STMTS;
-
-WHILE_STMT       = "while", EXPR, WHILE_BODY, "=>", LISTA_STMTS, "endwl";
-
-RETURN_STMTS     = "<-", EXPR;
-ESTAMENTO        = DECL_VARIABLE
-                 | DECL_FUNC
-                 | RETURN_STMT
-                 | IF_STMT
-                 | WHILE_STMT
-                 | EXPR;
-PROGRAMA         = {LISTA_STMTS};
 ```
-
+$ ./main.rb -a main.wd
+Program
+├──FuncDecl
+│  ├──Identifier
+│  │  └──Identifier
+│  │     └──fib_rec
+│  ├──Parameters
+│  │  └──Identifier
+│  │     └──n
+│  └──Body
+│     ├──IfStatement
+│     │  ├──Condition
+│     │  │  └──BinaryOperation
+│     │  │     ├──Left
+│     │  │     │  └──Identifier
+│     │  │     │     └──n
+│     │  │     ├──Operator
+│     │  │     │  └──<
+│     │  │     └──Right
+│     │  │        └──IntLiteral
+│     │  │           └──2
+│     │  ├──Body
+│     │  │  └──ReturnStatement
+│     │  │     └──Identifier
+│     │  │        └──n
+│     │  └──ElseBody
+│     │     └──Empty
+│     └──ReturnStatement
+│        └──BinaryOperation
+│           ├──Left
+│           │  └──FunctionCall
+│           │     ├──Identifier
+│           │     │  └──Identifier
+│           │     │     └──fib_rec
+│           │     └──Arguments
+│           │        └──BinaryOperation
+│           │           ├──Left
+│           │           │  └──Identifier
+│           │           │     └──n
+│           │           ├──Operator
+│           │           │  └──-
+│           │           └──Right
+│           │              └──IntLiteral
+│           │                 └──1
+│           ├──Operator
+│           │  └──+
+│           └──Right
+│              └──FunctionCall
+│                 ├──Identifier
+│                 │  └──Identifier
+│                 │     └──fib_rec
+│                 └──Arguments
+│                    └──BinaryOperation
+│                       ├──Left
+│                       │  └──Identifier
+│                       │     └──n
+│                       ├──Operator
+│                       │  └──-
+│                       └──Right
+│                          └──IntLiteral
+│                             └──2
+├──FuncDecl
+│  ├──Identifier
+│  │  └──Identifier
+│  │     └──fib_while
+│  ├──Parameters
+│  │  └──Identifier
+│  │     └──n
+│  └──Body
+│     ├──VariableDeclaration
+│     │  ├──Identifier
+│     │  │  └──Identifier
+│     │  │     └──a
+│     │  └──Value
+│     │     └──IntLiteral
+│     │        └──0
+│     ├──VariableDeclaration
+│     │  ├──Identifier
+│     │  │  └──Identifier
+│     │  │     └──b
+│     │  └──Value
+│     │     └──IntLiteral
+│     │        └──1
+│     ├──WhileStatement
+│     │  ├──Condition
+│     │  │  └──BinaryOperation
+│     │  │     ├──Left
+│     │  │     │  └──Identifier
+│     │  │     │     └──b
+│     │  │     ├──Operator
+│     │  │     │  └──<=
+│     │  │     └──Right
+│     │  │        └──Identifier
+│     │  │           └──n
+│     │  └──Body
+│     │     ├──VariableDeclaration
+│     │     │  ├──Identifier
+│     │     │  │  └──Identifier
+│     │     │  │     └──prev_a
+│     │     │  └──Value
+│     │     │     └──Identifier
+│     │     │        └──a
+│     │     ├──VariableDeclaration
+│     │     │  ├──Identifier
+│     │     │  │  └──Identifier
+│     │     │  │     └──a
+│     │     │  └──Value
+│     │     │     └──Identifier
+│     │     │        └──b
+│     │     └──VariableDeclaration
+│     │        ├──Identifier
+│     │        │  └──Identifier
+│     │        │     └──b
+│     │        └──Value
+│     │           └──BinaryOperation
+│     │              ├──Left
+│     │              │  └──Identifier
+│     │              │     └──prev_a
+│     │              ├──Operator
+│     │              │  └──+
+│     │              └──Right
+│     │                 └──Identifier
+│     │                    └──b
+│     └──ReturnStatement
+│        └──Identifier
+│           └──a
+├──FuncDecl
+│  ├──Identifier
+│  │  └──Identifier
+│  │     └──main
+│  ├──Parameters
+│  └──Body
+│     ├──VariableDeclaration
+│     │  ├──Identifier
+│     │  │  └──Identifier
+│     │  │     └──num
+│     │  └──Value
+│     │     └──FunctionCall
+│     │        ├──Identifier
+│     │        │  └──Identifier
+│     │        │     └──input
+│     │        └──Arguments
+│     │           └──None
+│     └──IfStatement
+│        ├──Condition
+│        │  └──BinaryOperation
+│        │     ├──Left
+│        │     │  └──FunctionCall
+│        │     │     ├──Identifier
+│        │     │     │  └──Identifier
+│        │     │     │     └──fib_rec
+│        │     │     └──Arguments
+│        │     │        └──Identifier
+│        │     │           └──num
+│        │     ├──Operator
+│        │     │  └──==
+│        │     └──Right
+│        │        └──FunctionCall
+│        │           ├──Identifier
+│        │           │  └──Identifier
+│        │           │     └──fib_while
+│        │           └──Arguments
+│        │              └──Identifier
+│        │                 └──num
+│        ├──Body
+│        │  └──FunctionCall
+│        │     ├──Identifier
+│        │     │  └──Identifier
+│        │     │     └──print
+│        │     └──Arguments
+│        │        └──IntLiteral
+│        │           └──0
+│        └──ElseBody
+│           └──FunctionCall
+│              ├──Identifier
+│              │  └──Identifier
+│              │     └──print
+│              └──Arguments
+│                 └──UnaryOperation
+│                    ├──Operator
+│                    │  └──-
+│                    └──Expression
+│                       └──IntLiteral
+│                          └──1
+└──FunctionCall
+   ├──Identifier
+   │  └──Identifier
+   │     └──main
+   └──Arguments
+      └──None
+```

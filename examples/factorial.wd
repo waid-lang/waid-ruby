@@ -1,8 +1,11 @@
 factorial_while: func(n) =>
     fact => 1
     while n > 0 =>
-        fact *> n
-        n -> 1
+        # Todavía no sé cómo implementar estos operadores
+        #fact *> n
+        #n -> 1
+        fact => fact * n
+        n => n - 34.55553434
     endwl
     <- fact
 endfn
@@ -14,19 +17,20 @@ factorial_rec: func(n) =>
     <- n * !(factorial_rec n - 1)
 endfn
 
-factorial_dp: func(n) =>
-    arr = []
-    if n in arr =>
-        <- arr @ n
-    elif n == 0 or n == 1 =>
-        arr @ n => 1
-        <- 1
-    else =>
-        fact => n * !(factorial_dp n - 1)
-        arr @ n => fact
-    endif
-    <- fact
-endfn
+# Con las características actuales del lenguaje no podemos hacer esta :(
+#factorial_dp: func(n) =>
+#    arr = []
+#    if n in arr =>
+#        <- arr @ n
+#    elif n == 0 or n == 1 =>
+#        arr @ n => 1
+#        <- 1
+#    else =>
+#        fact => n * !(factorial_dp n - 1)
+#        arr @ n => fact
+#    endif
+#    <- fact
+#endfn
 
 equal: func(x, y, z) =>
     <- x == y and y == z
@@ -34,7 +38,8 @@ endfn
 
 main: func() =>
     num => !input
-    if !equal(!(factorial_while num) !(factorial_rec num) !(factorial_dp num)) =>
+    #if !equal(!(factorial_while num) !(factorial_rec num) !(factorial_dp num)) =>
+    if !(factorial_while num) == !(factorial_rec num) =>
         !(print 0)
     else =>
         !(print -1)

@@ -385,6 +385,9 @@ class Parser
     when TokenKind::LITERAL_INT
       consumePeek(TokenKind::LITERAL_INT)
       operand = IntLiteral.new(@current_token.value)
+    when TokenKind::LITERAL_FLOAT
+      consumePeek(TokenKind::LITERAL_FLOAT)
+      operand = FloatLiteral.new(@current_token.value)
     when TokenKind::KEY_TRUE
       consumePeek(TokenKind::KEY_TRUE)
       operand = BooleanLiteral.new(@current_token.value)

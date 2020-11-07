@@ -267,6 +267,21 @@ class IntLiteral
   end
 end
 
+class FloatLiteral
+  attr_accessor :Value
+  def initialize(val=nil)
+    @Value = val
+  end
+
+  def print_tree(indent, last)
+    print indent
+    indent += indentation(last)
+
+    puts "FloatLiteral"
+    puts indent + $AST_LAST + @Value.to_s
+  end
+end
+
 class BooleanLiteral
   attr_accessor :Value
   def initialize(val=nil)

@@ -192,6 +192,13 @@ class Tokenizer
           else
             TokenKind::OP_LESS
           end
+        when '>'
+          if @peek_char == "="
+            pushChar
+            TokenKind::OP_GREATER_EQUAL
+          else
+            TokenKind::OP_GREATER
+          end
         when '!'
           TokenKind::OP_EXCLAMATION
         when ','
@@ -223,7 +230,6 @@ class Tokenizer
       while @peek_char.is_number?
         pushChar
         num += @current_char
-        pushChar
       end
       if @peek_char == "."
         num += @peek_char

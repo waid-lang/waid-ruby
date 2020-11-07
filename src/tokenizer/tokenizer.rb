@@ -163,8 +163,12 @@ class Tokenizer
             TokenKind::OP_ASTERISK
           end
         when '/'
-          @peek_char == '>'? TokenKind::OP_SLASH_ASSIGN : TokenKind::OP_SLASH
-          pushChar
+          if @peek_char == '>'
+            pushChar
+            TokenKind::OP_SLASH_ASSIGN
+          else
+            TokenKind::OP_SLASH
+          end
         when '%'
           @peek_char == '>'? TokenKind::OP_MODULUS_ASSIGN : TokenKind::OP_MODULUS
           pushChar

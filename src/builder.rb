@@ -3,6 +3,8 @@ require_relative 'common/waid_exception'
 require_relative 'common/file_util'
 require_relative 'tokenizer/tokenizer'
 require_relative 'parser/parser'
+require_relative 'exec/enviroment'
+require_relative 'exec/eval'
 
 class Builder
   attr_writer :source_path
@@ -48,6 +50,14 @@ class Builder
 
     if error_collector.hasErrors
       error_collector.showErrors
+    end
+
+    if not @show_tokens and not @show_ast
+      env = Enviroment.new
+      res = eval_node(parser.ast, env)
+      env.env.each do |k, v|
+        puts "#{k} => #{v.inspect}"
+      end
     end
   end
 end

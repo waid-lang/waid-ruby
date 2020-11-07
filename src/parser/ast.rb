@@ -14,7 +14,7 @@ def indentation(last)
   end
 end
 
-class Programa
+class Program
   attr_accessor :Statements
   def initialize
     @Statements = Array.new
@@ -210,6 +210,7 @@ class Identifier
 end
 
 class BinaryOperatorExpression
+  attr_accessor :Left, :Operator, :Right
   def initialize(l, o, r)
     @Left = l
     @Operator = o
@@ -255,7 +256,7 @@ end
 class IntLiteral
   attr_accessor :Value
   def initialize(val=nil)
-    @Value = val
+    @Value = val.to_i
   end
 
   def print_tree(indent, last)
@@ -270,7 +271,7 @@ end
 class FloatLiteral
   attr_accessor :Value
   def initialize(val=nil)
-    @Value = val
+    @Value = val.to_f
   end
 
   def print_tree(indent, last)

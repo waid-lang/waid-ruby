@@ -11,7 +11,7 @@ class Parser
     @current_token = nil
     @peek_token = nil
 
-    @ast = Programa.new
+    @ast = Program.new
 
     pushToken
     pushToken

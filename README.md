@@ -19,33 +19,33 @@ Usage: main [options] filename
 ```py
 # Recursive function to calculate nth fibonacci number
 fib_rec: func(n) =>
-  if n < 2 =>
-    <- n
-  endif
-  <- !(fib_rec n - 1) + !(fib_rec n - 2)
+    if n < 2 =>
+        <- n
+    endif
+    <- !(fib_rec n - 1) + !(fib_rec n - 2)
 endfn
 
 # Iterative Function to calculate nth fibonacci number
 fib_while: func(n) =>
-  a => 0
-  b => 1
-  while b <= n =>
-    prev_a => a
-    a => b
-    b => prev_a + b
-  endwl
-  <- a
+    a => 0
+    b => 1
+    while b <= n =>
+        prev_a => a
+        a => b
+        b => prev_a + b
+    endwl
+    <- a
 endfn
 
 main: func() =>
-  num => !input
+    num => !input
   
-  # Checks if both functions return the same value
-  if !(fib_rec num) == !(fib_while num) =>
-    !(print 0)
-  else =>
-    !(print -1)
-  endif
+    # Checks if both functions return the same value
+    if !(fib_rec num) == !(fib_while num) =>
+        !(print 0)
+    else =>
+        !(print -1)
+    endif
 endfn
 
 !main

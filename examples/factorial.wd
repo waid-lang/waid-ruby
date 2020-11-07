@@ -1,0 +1,42 @@
+factorial_while: func(n) =>
+    fact => 1
+    while n > 0 =>
+        fact *> n
+        n -> 1
+    endwl
+    <- fact
+endfn
+
+factorial_rec: func(n) =>
+    if n == 1 =>
+        <- n
+    endif
+    <- n * !(factorial_rec n - 1)
+endfn
+
+factorial_dp: func(n) =>
+    arr = []
+    if n in arr =>
+        <- arr @ n
+    elif n == 0 or n == 1 =>
+        arr @ n => 1
+        <- 1
+    else =>
+        fact => n * !(factorial_dp n - 1)
+        arr @ n => fact
+    endif
+    <- fact
+endfn
+
+equal: func(x, y, z) =>
+    <- x == y and y == z
+endfn
+
+main: func() =>
+    num => !input
+    if !equal(!(factorial_while num) !(factorial_rec num) !(factorial_dp num)) =>
+        !(print 0)
+    else =>
+        !(print -1)
+    endif
+endfn

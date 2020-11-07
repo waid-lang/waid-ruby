@@ -1,25 +1,23 @@
-$AST_INDENTATION = 3
+$AST_INDENTATION = 4
 $AST_LAST = "└" + "─" * ($AST_INDENTATION - 1)
 $AST_MIDDLE = "├" + "─" * ($AST_INDENTATION - 1)
 $AST_LINE = "│" + " " * ($AST_INDENTATION - 1)
 $AST_SPACE = " " * $AST_INDENTATION
 
-def indent(level, text)
-  " " * $AST_INDENTATION * (level) + text
+def indentation(last)
+  if last
+    print $AST_LAST
+    return $AST_SPACE
+  else
+    print $AST_MIDDLE
+    return $AST_LINE
+  end
 end
 
 class Programa
   attr_accessor :Statements
   def initialize
     @Statements = Array.new
-  end
-
-  def to_string
-    level = 0
-    puts "Program"
-    @Statements.each do |stmt|
-      stmt.to_string(level + 1)
-    end
   end
 
   def print_tree(indent, last)
@@ -51,21 +49,10 @@ class ReturnStatement
     @ReturnValue = nil
   end
 
-  def to_string(level)
-    puts indent(level, "ReturnStatement")
-    puts indent(level + 1, "ReturnValue")
-    @ReturnValue.to_string(level + 2)
-  end
-
   def print_tree(indent, last)
     print indent
-    if last
-      print $AST_LAST
-      indent += $AST_SPACE
-    else
-      print $AST_MIDDLE
-      indent += $AST_LINE
-    end
+    indent += indentation(last)
+
     puts "ReturnStatement"
     @ReturnValue.print_tree(indent, true)
   end
@@ -79,31 +66,17 @@ class VarDeclarationStatement
     @Value = val
   end
 
-  def to_string(level)
-    puts indent(level, "VariableDeclaration")
-    puts indent(level + 1, "Identifier")
-    @Identifier.to_string(level + 2)
-
-    puts indent(level + 1, "Value")
-    @Value.to_string(level + 2)
-  end
-
   def print_tree(indent, last)
     print indent
-    if last
-      print $AST_LAST
-      indent += $AST_SPACE
-    else
-      print $AST_MIDDLE
-      indent += $AST_LINE
-    end
+    indent += indentation(last)
+
     puts "VariableDeclaration"
     puts indent + $AST_MIDDLE + "Identifier"
     @Identifier.print_tree(indent + $AST_LINE, true)
 
     puts indent + $AST_LAST + "Value"
     @Value.print_tree(indent + $AST_SPACE, true)
-    end
+  end
 end
 
 class FuncDeclarationStatement
@@ -116,31 +89,10 @@ class FuncDeclarationStatement
     @Body = nil
   end
 
-  def to_string(level)
-    puts indent(level, "FunctionDeclarationStatement")
-    puts indent(level + 1, "Identifier")
-    @Identifier.to_string(level + 2)
-
-    puts indent(level + 1, "Paramenters")
-    @Parameters.each do |id|
-      id.to_string(level + 2)
-    end
-
-    puts indent(level + 1, "Body")
-    @Body.Statements.each do |stmt|
-      stmt.to_string(level + 2)
-    end
-  end
-
   def print_tree(indent, last)
     print indent
-    if last
-      print $AST_LAST
-      indent += $AST_SPACE
-    else
-      print $AST_MIDDLE
-      indent += $AST_LINE
-    end
+    indent += indentation(last)
+
     puts "FuncDecl"
     puts indent + $AST_MIDDLE + "Identifier"
     @Identifier.print_tree(indent + $AST_LINE, true)
@@ -164,26 +116,10 @@ class FunctionCall
     @Arguments = a
   end
 
-  def to_string(level)
-    puts indent(level, "FunctionCall")
-    puts indent(level + 1, "FunctionName")
-    @Function.to_string(level + 2)
-
-    puts indent(level + 1, "Arguments")
-    @Arguments.each do |arg|
-      arg.to_string(level + 2)
-    end
-  end
-
   def print_tree(indent, last)
     print indent
-    if last
-      print $AST_LAST
-      indent += $AST_SPACE
-    else
-      print $AST_MIDDLE
-      indent += $AST_LINE
-    end
+    indent += indentation(last)
+
     puts "FunctionCall"
     puts indent + $AST_MIDDLE + "Identifier"
     @Function.print_tree(indent + $AST_LINE, true)
@@ -196,19 +132,11 @@ class FunctionCall
 end
 
 class Empty
-  def to_string(level)
-    puts indent(level, "Empty")
-  end
 
   def print_tree(indent, last)
     print indent
-    if last
-      print $AST_LAST
-      indent += $AST_SPACE
-    else
-      print $AST_MIDDLE
-      indent += $AST_LINE
-    end
+    indent += indentation(last)
+
     puts "None"
   end
 end
@@ -221,25 +149,10 @@ class IfStatement
     @ElseBody = nil
   end
 
-  def to_string(level)
-    puts indent(level, "IfStatement")
-    puts indent(level + 1, "Condition")
-    @Condition.to_string(level + 2)
-
-    puts indent(level + 1, "Body")
-    @Body.Statements.each do |stmt|
-      stmt.to_string(level + 2)
-    end
-  end
   def print_tree(indent, last)
     print indent
-    if last
-      print $AST_LAST
-      indent += $AST_SPACE
-    else
-      print $AST_MIDDLE
-      indent += $AST_LINE
-    end
+    indent += indentation(last)
+
     puts "IfStatement"
     puts indent + $AST_MIDDLE + "Condition"
     @Condition.print_tree(indent + $AST_LINE, true)
@@ -266,26 +179,10 @@ class WhileStatement
     @Body = nil
   end
 
-  def to_string(level)
-    puts indent(level, "WhileStatement")
-    puts indent(level + 1, "Condition")
-    @Condition.to_string(level + 2)
-
-    puts indent(level + 1, "Body")
-    @Body.Statements.each do |stmt|
-      stmt.to_string(level + 2)
-    end
-  end
-
   def print_tree(indent, last)
     print indent
-    if last
-      print $AST_LAST
-      indent += $AST_SPACE
-    else
-      print $AST_MIDDLE
-      indent += $AST_LINE
-    end
+    indent += indentation(last)
+
     puts "WhileStatement"
     puts indent + $AST_MIDDLE + "Condition"
     @Condition.print_tree(indent + $AST_LINE, true)
@@ -303,20 +200,10 @@ class Identifier
     @Value = value
   end
 
-  def to_string(level)
-    puts indent(level, "Identifier")
-    puts indent(level + 1, @Value)
-  end
-
   def print_tree(indent, last)
     print indent
-    if last
-      print $AST_LAST
-      indent += $AST_SPACE
-    else
-      print $AST_MIDDLE
-      indent += $AST_LINE
-    end
+    indent += indentation(last)
+
     puts "Identifier"
     puts indent + $AST_LAST + @Value
   end
@@ -329,27 +216,10 @@ class BinaryOperatorExpression
     @Right = r
   end
 
-  def to_string(level)
-    puts indent(level, "BinaryOperation")
-    puts indent(level + 1, "Left")
-    @Left.to_string(level + 2)
-
-    puts indent(level + 1, "Operator")
-    puts indent(level + 2, @Operator.to_s)
-
-    puts indent(level + 1, "Right")
-    @Right.to_string(level + 2)
-  end
-
   def print_tree(indent, last)
     print indent
-    if last
-      print $AST_LAST
-      indent += $AST_SPACE
-    else
-      print $AST_MIDDLE
-      indent += $AST_LINE
-    end
+    indent += indentation(last)
+
     puts "BinaryOperation"
     puts indent + $AST_MIDDLE + "Left"
     @Left.print_tree(indent + $AST_LINE, true)
@@ -371,13 +241,8 @@ class UnaryOperatorExpression
 
   def print_tree(indent, last)
     print indent
-    if last
-      print $AST_LAST
-      indent += $AST_SPACE
-    else
-      print $AST_MIDDLE
-      indent += $AST_LINE
-    end
+    indent += indentation(last)
+
     puts "UnaryOperation"
     puts indent + $AST_MIDDLE + "Operator"
     puts indent + $AST_LINE + $AST_LAST + @Operator.to_s
@@ -393,20 +258,10 @@ class IntLiteral
     @Value = val
   end
 
-  def to_string(level)
-    puts indent(level, "IntLiteral")
-    puts indent(level + 1, @Value.to_s)
-  end
-
   def print_tree(indent, last)
     print indent
-    if last
-      print $AST_LAST
-      indent += $AST_SPACE
-    else
-      print $AST_MIDDLE
-      indent += $AST_LINE
-    end
+    indent += indentation(last)
+
     puts "IntLiteral"
     puts indent + $AST_LAST + @Value.to_s
   end
@@ -418,20 +273,10 @@ class BooleanLiteral
     @Value = val
   end
 
-  def to_string(level)
-    puts indent(level, "BooleanLiteral")
-    puts indent(level + 1, @Value.to_s)
-  end
-
   def print_tree(indent, last)
     print indent
-    if last
-      print $AST_LAST
-      indent += $AST_SPACE
-    else
-      print $AST_MIDDLE
-      indent += $AST_LINE
-    end
+    indent += indentation(last)
+
     puts "BooleanLiteral"
     puts indent + $AST_LAST + @Value.to_s
   end

@@ -17,9 +17,9 @@ max: func(nombres_arbitrariamente_largos_punto_com, i) =>
     <- i
 endfn
 
-!(print !(ejecutador suma 2 3))
-!(print !(ejecutador resta 10 7))
-!(print !(ejecutador max 22.8 30))
+!(print !(ejecutador suma 2 3) == 5)
+!(print !(ejecutador resta 10 7) == 3)
+!(print !(ejecutador max 22.8 30.78881) == 30.78881)
 
 
 # Porque puedo (ojalá):
@@ -27,4 +27,4 @@ endfn
     max
     !(ejecutador suma 2 3)
     !(ejecutador resta 4 5)
-))
+) == 5)

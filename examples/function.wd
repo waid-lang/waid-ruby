@@ -12,14 +12,17 @@ endfn
 main: func() =>
     add_5 => !(generate_add 5)
     add_8 => !(generate_add 8)
-
-    while true =>
-        in => !input
-        if in % 2 == 0 =>
-            !(print !(add_5 in))
+    
+    count => 0
+    while count < 20 =>
+        if count % 2 == 0 =>
+            !(print true)
+            !(print !(add_5 count))
         else =>
-            !(print !(add_8 in))
+            !(print false)
+            !(print !(add_8 count))
         endif
+        count => count + 1
     endwl
 endfn
 

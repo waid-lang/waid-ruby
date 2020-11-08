@@ -127,6 +127,10 @@ def evalFloatBinaryOperatorexpression(operator, left, right)
     return WaidFloat.new(left.Value * right.Value)
   when TokenKind::OP_SLASH
     return WaidFloat.new(left.Value / right.Value)
+  when TokenKind::OP_GREATER
+    return boolToWaidBoolean(left.Value > right.Value)
+  when TokenKind::OP_EQUAL
+    return boolToWaidBoolean(left.Value == right.Value)
   end
 end
 
@@ -140,6 +144,8 @@ def evalIntegerBinaryOperatorexpression(operator, left, right)
     return WaidInteger.new(left.Value * right.Value)
   when TokenKind::OP_SLASH
     return WaidFloat.new(left.Value / right.Value)
+  when TokenKind::OP_MODULUS
+    return WaidInteger.new(left.Value % right.Value)
   when TokenKind::OP_LESS
     return boolToWaidBoolean(left.Value < right.Value)
   when TokenKind::OP_LESS_EQUAL
@@ -165,6 +171,11 @@ def newFunctionEnv(funcs, func, args)
   func.Parameters.each_with_index do |par, index|
     env.set_ob(par.Value, args[index])
   end
+
+  func.Env.Objects.each do |id, val|
+    env.set_ob(id, val)
+  end
+
   funcs.Functions.each do |id, val|
     env.set_func(id, val)
   end
@@ -172,6 +183,7 @@ def newFunctionEnv(funcs, func, args)
 end
 
 def callFunction(funcs, func, arguments)
+  # ENV = func.Env
   case func
   when WaidFunction
     func_env = newFunctionEnv(funcs, func, arguments)
@@ -221,19 +233,22 @@ def evalStatementList(node, env)
   result = WaidObject.new
   node.Statements.each do |stmt|
     result = eval_node(stmt, env)
+    if result.is_a?(ReturnStatement)
+      break
+    end
     if stmt.is_a?(ReturnStatement)
       return stmt
     end
   end
-  return result
+  result
 end
 
-def evalFunctionStatementList(node, env)
+def evalFunctionStatementList(node, func_env)
   result = WaidObject.new
   node.Statements.each do |stmt|
-    result = eval_node(stmt, env)
+    result = eval_node(stmt, func_env)
     if result.is_a?(ReturnStatement)
-      result = eval_node(result, env)
+      result = eval_node(result, func_env)
       break
     end
   end

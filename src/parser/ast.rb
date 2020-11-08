@@ -285,7 +285,7 @@ end
 class BooleanLiteral
   attr_accessor :Value
   def initialize(val=nil)
-    @Value = val
+    @Value = val == "true"
   end
 
   def print_tree(indent, last)

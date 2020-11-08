@@ -3,6 +3,7 @@ false_val => false
 falsey_val => null
 truthy_val => 1
 
+
 true_check => 0
 false_check => 0
 falsey_check => 0
@@ -24,3 +25,7 @@ if truthy_val =>
     truthy_check => 1
 endif
 
+!(print true_check)
+!(print false_check)
+!(print falsey_check)
+!(print truthy_check)

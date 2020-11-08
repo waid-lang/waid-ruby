@@ -95,7 +95,9 @@ class WaidBoolean < WaidObject
 end
 
 class WaidNull < WaidObject
+  attr_accessor :Value
   def initialize
+    @Value = nil
   end
 
   def type

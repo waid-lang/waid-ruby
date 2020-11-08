@@ -1,9 +1,8 @@
 fib_rec: func(n) =>
     if n < 2 =>
         <- n
-    else =>
-        <- !(fib_rec n - 1) + !(fib_rec n - 2)
     endif
+    <- !(fib_rec n - 1) + !(fib_rec n - 2)
 endfn
 
 fib_while: func(n) =>

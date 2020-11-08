@@ -1,42 +1,61 @@
 require_relative '../parser/ast'
 require_relative 'object'
 require_relative '../tokenizer/tokenizer'
+require_relative 'builtin'
+
+NullValue = WaidNull.new
+TrueValue = WaidBoolean.new(true)
+FalseValue = WaidBoolean.new(false)
 
 def eval_node(node, env)
   case node
   when Program
     return evalProgram(node, env)
-  
-  # STATEMENTS
+
+    # STATEMENTS
   when VarDeclarationStatement
     value = eval_node(node.Value, env)
-    env.set(node.Identifier.Value, value)
+    env.set_ob(node.Identifier.Value, value)
+
+  when IfStatement
+    return evalIfStatement(node, env)
+
+  when WhileStatement
+    return evalWhileStatement(node, env)
 
   when FuncDeclarationStatement
+    env.set_func(node.Identifier.Value, nil)
     func_literal = WaidFunction.new(
       node.Parameters,
       node.Body,
       env
     )
-    env.set(node.Identifier.Value, func_literal)
+    env.set_func(node.Identifier.Value, func_literal)
+    return func_literal
 
   when FunctionCall
     func = eval_node(node.Function, env)
     arguments = evalExpressions(node.Arguments, env)
-    return callFunction(func, arguments)
+    return callFunction(env, func, arguments)
 
   when ReturnStatement
     return eval_node(node.ReturnValue, env)
 
   when StatementList
     return evalStatementList(node, env)
-    
-  # EXPRESSIONS
+
+    # EXPRESSIONS
   when IntLiteral
     return WaidInteger.new(node.Value)
 
   when FloatLiteral
     return WaidFloat.new(node.Value)
+
+  when BooleanLiteral
+    return WaidBoolean.new(node.Value)
+
+  when NullLiteral
+    return WaidNull.new
 
   when UnaryOperatorExpression
     expr = eval_node(node.Expression, env)
@@ -53,6 +72,10 @@ def eval_node(node, env)
   end
 end
 
+def isFalse(obj)
+  obj == NullValue or obj == FalseValue
+end
+
 def evalProgram(program, env)
   res = WaidObject.new
   program.Statements.each do |stmt|
@@ -61,12 +84,19 @@ def evalProgram(program, env)
   res
 end
 
+def boolToWaidBoolean(val)
+  if val
+    return TrueValue
+  end
+  FalseValue
+end
+
 def evalUnaryOperatorExpression(operator, expr)
   case operator.kind
   when TokenKind::OP_MINUS
     return evalMinusOperatorExpression(expr)
   when TokenKind::KEY_NOT
-    # TODO
+    return boolToWaidBoolean(!expr.Value)
   end
 end
 
@@ -110,6 +140,14 @@ def evalIntegerBinaryOperatorexpression(operator, left, right)
     return WaidInteger.new(left.Value * right.Value)
   when TokenKind::OP_SLASH
     return WaidFloat.new(left.Value / right.Value)
+  when TokenKind::OP_LESS
+    return boolToWaidBoolean(left.Value < right.Value)
+  when TokenKind::OP_LESS_EQUAL
+    return boolToWaidBoolean(left.Value <= right.Value)
+  when TokenKind::OP_EQUAL
+    return boolToWaidBoolean(left.Value == right.Value)
+  when TokenKind::OP_GREATER
+    return boolToWaidBoolean(left.Value > right.Value)
   end
 end
 
@@ -122,18 +160,47 @@ def evalExpressions(expressions, env)
   res
 end
 
-def newFunctionEnv(func, args)
-  env = newInnerEnv(func.Env)
+def newFunctionEnv(funcs, func, args)
+  env = newInnerEnv
   func.Parameters.each_with_index do |par, index|
-    env.set(par.Value, args[index])
+    env.set_ob(par.Value, args[index])
+  end
+  funcs.Functions.each do |id, val|
+    env.set_func(id, val)
   end
   env
 end
 
-def callFunction(func, arguments)
-  func_env = newFunctionEnv(func, arguments)
-  func_res = eval_node(func.Body, func_env)
-  func_res
+def callFunction(funcs, func, arguments)
+  case func
+  when WaidFunction
+    func_env = newFunctionEnv(funcs, func, arguments)
+    return evalFunctionStatementList(func.Body, func_env)
+  when WaidBuiltin
+    return func.Function.call(arguments[0])
+  end
+end
+
+def evalIfStatement(node, env)
+  condition = eval_node(node.Condition, env)
+
+  if not isFalse(condition)
+    return eval_node(node.Body, env)
+  elsif node.ElseBody != Empty
+    return eval_node(node.ElseBody, env)
+  end
+  return NullValue
+end
+
+def evalWhileStatement(node, env)
+  res = WaidObject.new
+  while not isFalse(eval_node(node.Condition, env))
+    res = eval_node(node.Body, env)
+    if res.is_a?(ReturnStatement)
+      return res
+    end
+  end
+  res
 end
 
 def evalIdentifier(node, env)
@@ -141,8 +208,11 @@ def evalIdentifier(node, env)
   if value
     return value
   end
+  if $builtins.key?(node.Value)
+    return $builtins[node.Value]
+  end
   # Debería tener un sistema de error
-  puts "Identifier not found #{node.Value}"
+  puts "NameError: Undefined variable '#{node.Value}'"
   exit() # Salida floja por ahora. TODO: Crear sistema de manjeo de excepciones en runtime
   return nil
 end
@@ -151,6 +221,21 @@ def evalStatementList(node, env)
   result = WaidObject.new
   node.Statements.each do |stmt|
     result = eval_node(stmt, env)
+    if stmt.is_a?(ReturnStatement)
+      return stmt
+    end
   end
-  result
+  return result
+end
+
+def evalFunctionStatementList(node, env)
+  result = WaidObject.new
+  node.Statements.each do |stmt|
+    result = eval_node(stmt, env)
+    if result.is_a?(ReturnStatement)
+      result = eval_node(result, env)
+      break
+    end
+  end
+  return result
 end

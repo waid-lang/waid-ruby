@@ -391,6 +391,12 @@ class Parser
     when TokenKind::KEY_TRUE
       consumePeek(TokenKind::KEY_TRUE)
       operand = BooleanLiteral.new(@current_token.value)
+    when TokenKind::KEY_FALSE
+      consumePeek(TokenKind::KEY_FALSE)
+      operand = BooleanLiteral.new(@current_token.value)
+    when TokenKind::KEY_NULL
+      consumePeek(TokenKind::KEY_NULL)
+      operand = NullLiteral.new
     else
       return nil
     end

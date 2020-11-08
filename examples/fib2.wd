@@ -2,7 +2,7 @@ fib_rec: func(n) =>
     if n < 2 =>
         <- n
     else =>
-        <- !(fib_rec n - 1)+ !(fib_rec n - 2)
+        <- !(fib_rec n - 1) + !(fib_rec n - 2)
     endif
 endfn
 
@@ -20,12 +20,18 @@ fib_while: func(n) =>
 endfn
 
 main: func() =>
-    num => 10
-    if !(fib_rec num) == !(fib_while num) =>
-        !(print 0)
-    else =>
-        !(print -1)
-    endif
+    num => 20
+    count => 0
+    while count < num =>
+        !(print !(fib_while count))
+        count => count + 1
+    endwl
+    
+    count => 0
+    while count < num =>
+        !(print !(fib_rec count))
+        count => count + 1
+    endwl
 endfn
 
 !main

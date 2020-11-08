@@ -1,23 +1,30 @@
 class Enviroment
-  attr_reader :env
-  def initialize(e=Hash.new, o=nil)
-    @env = Hash.new
-    @outer = o
+  attr_reader :Objects, :Functions
+  def initialize(e=Hash.new)
+    @Objects = e
+    @Functions = Hash.new
   end
 
   def get(name)
-    if @env.key?(name)
-      return @env[name]
+    if @Objects.key?(name)
+      return @Objects[name]
+    elsif @Functions.key?(name)
+      return @Functions[name]
     end
     nil
   end
 
-  def set(name, obj)
-    @env[name] = obj
+  def set_ob(name, obj)
+    @Objects[name] = obj
     obj
   end 
+
+  def set_func(name, func)
+    @Functions[name] = func
+    func
+  end
 end
 
-def newInnerEnv(outer)
-  return Enviroment.new(o: outer)
+def newInnerEnv
+  return Enviroment.new
 end

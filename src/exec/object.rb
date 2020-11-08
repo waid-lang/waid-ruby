@@ -34,6 +34,21 @@ class WaidFunction < WaidObject
   end
 end
 
+class WaidBuiltin < WaidObject
+  attr_accessor :Function
+  def initialize(fn=nil)
+    @Function = fn
+  end
+  
+  def type
+    "Builtin"
+  end
+
+  def inspect
+    "Builtin function"
+  end
+end
+
 class WaidInteger < WaidObject
   attr_accessor :Value
   def initialize(val=nil)
@@ -80,7 +95,6 @@ class WaidBoolean < WaidObject
 end
 
 class WaidNull < WaidObject
-  attr_accessor :Value
   def initialize
   end
 
@@ -92,4 +106,3 @@ class WaidNull < WaidObject
     "null"
   end
 end
-

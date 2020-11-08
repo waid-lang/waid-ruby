@@ -45,3 +45,5 @@ main: func() =>
         !(print -1)
     endif
 endfn
+
+!main

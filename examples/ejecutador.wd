@@ -10,5 +10,21 @@ resta: func(x, y) =>
     <- x - y
 endfn
 
-resultado1 => !(ejecutador suma 2 3)
-resultado2 => !(ejecutador resta 10 7)
+max: func(nombres_arbitrariamente_largos_punto_com, i) =>
+    if nombres_arbitrariamente_largos_punto_com > i =>
+        <- nombres_arbitrariamente_largos_punto_com
+    endif
+    <- i
+endfn
+
+!(print !(ejecutador suma 2 3))
+!(print !(ejecutador resta 10 7))
+!(print !(ejecutador max 22.8 30))
+
+
+# Porque puedo (ojalá):
+!(print !(ejecutador
+    max
+    !(ejecutador suma 2 3)
+    !(ejecutador resta 4 5)
+))

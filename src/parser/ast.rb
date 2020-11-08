@@ -132,7 +132,6 @@ class FunctionCall
 end
 
 class Empty
-
   def print_tree(indent, last)
     print indent
     indent += indentation(last)
@@ -298,3 +297,15 @@ class BooleanLiteral
   end
 end
 
+class NullLiteral
+  def initialize
+  end
+
+  def print_tree(indent, last)
+    print indent
+    indent += indentation(last)
+
+    puts "NullLiteral"
+    puts indent + $AST_LAST + "Null"
+  end
+end

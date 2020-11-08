@@ -52,10 +52,10 @@ class Builder
       error_collector.showErrors
     end
 
-    if not @show_tokens and not @show_ast
-      env = Enviroment.new
-      res = eval_node(parser.ast, env)
-      env.env.each do |k, v|
+    env = Enviroment.new
+    res = eval_node(parser.ast, env)
+    if not @show_tokens and not @show_ast and @show_env
+      env.Objects.each do |k, v|
         puts "#{k} => #{v.inspect}"
       end
     end

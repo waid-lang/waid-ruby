@@ -16,7 +16,8 @@ $keywords = {
   "or" => TokenKind::KEY_OR,
   "not" => TokenKind::KEY_NOT,
   "true" => TokenKind::KEY_TRUE,
-  "false" => TokenKind::KEY_FALSE
+  "false" => TokenKind::KEY_FALSE,
+  "null" => TokenKind::KEY_NULL
 }
 
 def is_keyword(word)

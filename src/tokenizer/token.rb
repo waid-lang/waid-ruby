@@ -26,34 +26,35 @@ module TokenKind
   KEY_NOT              = 0x13
   KEY_TRUE             = 0x14
   KEY_FALSE            = 0x15
+  KEY_NULL             = 0x16
 
-  OP_PLUS              = 0x16
-  OP_MINUS             = 0x17
-  OP_ASTERISK          = 0x18
-  OP_SLASH             = 0x19
-  OP_MODULUS           = 0x1A
-  OP_ASSIGN            = 0x1B
-  OP_PLUS_ASSIGN       = 0x1C
-  OP_MINUS_ASSIGN      = 0x1D
-  OP_ASTERISK_ASSIGN   = 0x1E
-  OP_SLASH_ASSIGN      = 0x1F
-  OP_MODULUS_ASSIGN    = 0x20
-  OP_LESS              = 0x21
-  OP_GREATER           = 0x22
-  OP_EQUAL             = 0x23
-  OP_NOT_EQUAL         = 0x24
-  OP_LESS_EQUAL        = 0x25
-  OP_GREATER_EQUAL     = 0x26
-  OP_RETURN            = 0x27
-  OP_EXCLAMATION       = 0x28
+  OP_PLUS              = 0x17
+  OP_MINUS             = 0x18
+  OP_ASTERISK          = 0x19
+  OP_SLASH             = 0x1A
+  OP_MODULUS           = 0x1B
+  OP_ASSIGN            = 0x1C
+  OP_PLUS_ASSIGN       = 0x1D
+  OP_MINUS_ASSIGN      = 0x1E
+  OP_ASTERISK_ASSIGN   = 0x1F
+  OP_SLASH_ASSIGN      = 0x20
+  OP_MODULUS_ASSIGN    = 0x21
+  OP_LESS              = 0x22
+  OP_GREATER           = 0x23
+  OP_EQUAL             = 0x24
+  OP_NOT_EQUAL         = 0x25
+  OP_LESS_EQUAL        = 0x26
+  OP_GREATER_EQUAL     = 0x27
+  OP_RETURN            = 0x28
+  OP_EXCLAMATION       = 0x29
 
-  OP_COMMA             = 0x29
-  OP_COLON             = 0x2A
-  OP_DOT               = 0x2B
-  OP_OPEN_PARENTHESIS  = 0x2C
-  OP_CLOSE_PARENTHESIS = 0x2D
-  OP_OPEN_BRACKETS     = 0x2E
-  OP_CLOSE_BRACKETS    = 0x2F
+  OP_COMMA             = 0x2A
+  OP_COLON             = 0x2B
+  OP_DOT               = 0x2C
+  OP_OPEN_PARENTHESIS  = 0x2D
+  OP_CLOSE_PARENTHESIS = 0x2E
+  OP_OPEN_BRACKETS     = 0x2F
+  OP_CLOSE_BRACKETS    = 0x30
 end
 
 def token_string(tok)
@@ -103,6 +104,8 @@ def token_string(tok)
         "TRUE"
       when TokenKind::KEY_FALSE
         "FALSE"
+      when TokenKind::KEY_NULL
+        "NULL"
       when TokenKind::OP_PLUS
         "+"
       when TokenKind::OP_MINUS

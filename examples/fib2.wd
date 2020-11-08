@@ -21,16 +21,23 @@ endfn
 main: func() =>
     num => 20
     count => 0
+    !(printLine "Iterative Fibonacci:")
     while count < num =>
         !(print !(fib_while count))
+        !(print " ")
         count => count + 1
     endwl
-    
+
+    !printLine
+
     count => 0
+    !(printLine "Recursive Fibonacci:")
     while count < num =>
         !(print !(fib_rec count))
+        !(print " ")
         count => count + 1
     endwl
+    !printLine
 endfn
 
 !main

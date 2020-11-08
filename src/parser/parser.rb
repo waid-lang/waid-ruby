@@ -308,7 +308,7 @@ class Parser
     #         | "%"
     expr = parseNegativeExpression
     while peekTokenEquals(TokenKind::OP_ASTERISK) or peekTokenEquals(TokenKind::OP_SLASH) \
-        or peekTokenEquals(TokenKind::OP_MODULUS)
+        or peekTokenEquals(TokenKind::OP_MODULUS) or peekTokenEquals(TokenKind::OP_DOT)
       pushToken
       expr = BinaryOperatorExpression.new(expr, @current_token, parseNegativeExpression)
     end
@@ -388,6 +388,9 @@ class Parser
     when TokenKind::LITERAL_FLOAT
       consumePeek(TokenKind::LITERAL_FLOAT)
       operand = FloatLiteral.new(@current_token.value)
+    when TokenKind::LITERAL_STRING
+      consumePeek(TokenKind::LITERAL_STRING)
+      operand = StringLiteral.new(@current_token.value)
     when TokenKind::KEY_TRUE
       consumePeek(TokenKind::KEY_TRUE)
       operand = BooleanLiteral.new(@current_token.value)

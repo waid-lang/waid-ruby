@@ -25,7 +25,14 @@ if truthy_val =>
     truthy_check => 1
 endif
 
-!(print true_check)
-!(print false_check)
-!(print falsey_check)
-!(print truthy_check)
+int_to_strbool: func(int) =>
+    if int == 1 =>
+        <- "All good :)"
+    endif
+    <- "Something went wrong :("
+endfn
+
+!(printLine !(int_to_strbool true_check))
+!(printLine !(int_to_strbool false_check))
+!(printLine !(int_to_strbool falsey_check))
+!(printLine !(int_to_strbool truthy_check))

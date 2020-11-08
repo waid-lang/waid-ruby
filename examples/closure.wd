@@ -8,5 +8,5 @@ endfn
 add_2 => !(make_adder 2)
 add_7 => !(make_adder 7)
 
-!(print !(add_2 2))
-!(print !(add_7 3))
+!(printLine !(add_2 2))
+!(printLine !(add_7 3))

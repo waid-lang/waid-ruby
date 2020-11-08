@@ -39,7 +39,7 @@ endfn
 main: func() =>
     num => 10
     #if !equal(!(factorial_while num) !(factorial_rec num) !(factorial_dp num)) =>
-    !(print !(factorial_while num) == !(factorial_rec num))
+    !(printLine !(factorial_while num) == !(factorial_rec num))
 endfn
 
 !main

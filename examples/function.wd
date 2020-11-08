@@ -16,11 +16,13 @@ main: func() =>
     count => 0
     while count < 20 =>
         if count % 2 == 0 =>
-            !(print true)
-            !(print !(add_5 count))
+            !(print "Is even. Adding 5:")
+            !(print " ")
+            !(printLine !(add_5 count))
         else =>
-            !(print false)
-            !(print !(add_8 count))
+            !(print "Is odd.  Adding 8:")
+            !(print " ")
+            !(printLine !(add_8 count))
         endif
         count => count + 1
     endwl

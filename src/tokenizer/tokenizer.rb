@@ -228,16 +228,30 @@ class Tokenizer
   end
 
   def checkLiteral
-    num = String.new
-    if @current_char.is_number?
+    lit = String.new
+    if @current_char == '"'
+      tt = TokenKind::LITERAL_STRING
+      pushChar
+      while @current_char != '"'
+        lit += @current_char
+        if @peek_char == "\n"
+          addSyntaxError("Unexpected EOL reading string literal")
+          pushChar
+          return
+        end
+        pushChar
+      end
+      addToken(tt, lit)
+      return true
+    elsif @current_char.is_number?
       tt = -1
-      num += @current_char
+      lit += @current_char
       while @peek_char.is_number?
         pushChar
-        num += @current_char
+        lit += @current_char
       end
       if @peek_char == "."
-        num += @peek_char
+        lit += @peek_char
         pushChar
 
         if not @peek_char.is_number?
@@ -247,13 +261,13 @@ class Tokenizer
 
         while @peek_char.is_number?
           pushChar
-          num += @current_char
+          lit += @current_char
         end
         tt = TokenKind::LITERAL_FLOAT       
       else
         tt = TokenKind::LITERAL_INT
       end
-      addToken(tt, num)
+      addToken(tt, lit)
       return true
     end
     false

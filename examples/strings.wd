@@ -1,0 +1,11 @@
+a => "Hello"
+b => "World"
+#c => "error
+
+!(printLine a . " " . b)
+!(printLine "")
+!(printLine "Adiós...")
+
+!(printLine !(length a . "Everyone") + 4)
+!(printLine !(length 5))
+!(printLine !(length null))

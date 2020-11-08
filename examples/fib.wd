@@ -22,9 +22,9 @@ endfn
 main: func() =>
     num => 10
     if !(fib_rec num) == !(fib_while num) =>
-        !(print true)
+        !(printLine true)
     else =>
-        !(print false)
+        !(printLine false)
     endif
 endfn
 

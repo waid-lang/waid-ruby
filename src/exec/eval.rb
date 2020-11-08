@@ -54,6 +54,9 @@ def eval_node(node, env)
   when BooleanLiteral
     return WaidBoolean.new(node.Value)
 
+  when StringLiteral
+    return WaidString.new(node.Value)
+
   when NullLiteral
     return WaidNull.new
 
@@ -114,6 +117,11 @@ def evalBinaryOperatorExpression(operator, left, right)
     return evalIntegerBinaryOperatorexpression(operator, left, right)
   elsif left.is_a?(WaidFloat) or right.is_a?(WaidFloat)
     return evalFloatBinaryOperatorexpression(operator, left, right)
+  elsif left.is_a?(WaidString) and right.is_a?(WaidString)
+    return WaidString.new(left.Value + right.Value)
+  else
+    puts "Error: Type mismatch. Can not operate #{left.type} with #{right.type}"
+    exit()
   end
 end
 

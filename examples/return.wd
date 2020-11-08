@@ -1,31 +1,32 @@
 ret: func() =>
     if true =>
-        !(print 0)
+        !(printLine 0)
         <- 77777
-        !(print -1)
+        !(printLine -1)
     endif
-    !(print 1)
+    !(printLine 1)
     <- -2
 endfn
 
 ret2: func() =>
     if true =>
-        !(print 0)
+        !(printLine 0)
         if true =>
-            !(print 1)
+            !(printLine 1)
             if true =>
-                !(print 2)
+                !(printLine 2)
                 <- 8888
-                !(print -1)
+                !(printLine -1)
             endif
-            !(print 3)
+            !(printLine 3)
         endif
-        !(print 4)
+        !(printLine 4)
     endif
-    !(print 5)
+    !(printLine 5)
     <- -2
 endfn
 
-!(print !ret)
-!(print 555555555)
-!(print !ret2)
+!(printLine "Return 1")
+!(printLine !ret)
+!(printLine "Return 2:")
+!(printLine !ret2)

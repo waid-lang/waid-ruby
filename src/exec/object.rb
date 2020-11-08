@@ -64,6 +64,22 @@ class WaidInteger < WaidObject
   end
 end
 
+class WaidString < WaidObject
+  attr_accessor :Value
+  def initialize(val=nil)
+    @Value = val
+  end
+
+  def type
+    "String"
+  end
+
+  def inspect
+    @Value
+  end
+end
+
+
 class WaidFloat < WaidObject
   attr_accessor :Value
   def initialize(val=nil)

@@ -11,6 +11,7 @@ class Builder
   def initialize()
     @show_tokens = false
     @show_ast = false
+    @show_env = false
     @source_path = String.new
   end
 
@@ -20,6 +21,10 @@ class Builder
 
   def set_show_ast
     @show_ast = true
+  end
+
+  def set_show_env
+    @show_env = true
   end
 
   def run
@@ -38,6 +43,7 @@ class Builder
       tokenizer.tokens.each do |tok|
         puts "#{tok.get_line_number}| #{tok.to_s} #{tok.value}"
       end
+      puts
     end
 
     parser = Parser.new(tokenizer.tokens, error_collector)
@@ -46,6 +52,7 @@ class Builder
     if @show_ast
       #parser.ast.to_string
       parser.ast.print_tree("", true)
+      puts
     end
 
     if error_collector.hasErrors
@@ -54,9 +61,21 @@ class Builder
 
     env = Enviroment.new
     res = eval_node(parser.ast, env)
-    if not @show_tokens and not @show_ast and @show_env
-      env.Objects.each do |k, v|
-        puts "#{k} => #{v.inspect}"
+    if @show_env
+      puts " \nEnviroment:"
+      if not env.Objects.empty?
+        puts "Global variables"
+        puts "----------------"
+        env.Objects.each do |k, v|
+          puts "#{k} => #{v.inspect}"
+        end
+      end
+    if not env.Functions.empty?
+        puts "Functions"
+        puts "---------"
+        env.Functions.each do |k, v|
+          puts "#{k} => #{v.inspect}"
+        end
       end
     end
   end

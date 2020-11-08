@@ -12,12 +12,12 @@ $ ./main.rb
 Usage: main [options] filename
     -t, --show-tokens                Print the tokens produced by the scanner
     -a, --show-ast                   Print the AST produced by the parser
+    -e, --show-final-env             Print the final state of the global enviroment
 ```
 
 
 ***main.wd***
 ```py
-# Recursive function to calculate nth fibonacci number
 fib_rec: func(n) =>
     if n < 2 =>
         <- n
@@ -25,7 +25,6 @@ fib_rec: func(n) =>
     <- !(fib_rec n - 1) + !(fib_rec n - 2)
 endfn
 
-# Iterative Function to calculate nth fibonacci number
 fib_while: func(n) =>
     a => 0
     b => 1
@@ -40,23 +39,31 @@ fib_while: func(n) =>
 endfn
 
 main: func() =>
-    num => 10
+    num => 20
     count => 0
+    !(printLine "Iterative Fibonacci:")
     while count < num =>
         !(print !(fib_while count))
+        !(print " ")
         count => count + 1
     endwl
-    
+
+    !printLine
+
     count => 0
+    !(printLine "Recursive Fibonacci:")
     while count < num =>
         !(print !(fib_rec count))
+        !(print " ")
         count => count + 1
     endwl
+    !printLine
 endfn
 
 !main
 ```
 
+### Output
 ```
 $ ./main.rb main.wd
 0

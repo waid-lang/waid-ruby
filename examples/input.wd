@@ -9,8 +9,9 @@ num1 => !(toNum !input)
 !(print "Write another number: ")
 num2 => !(toNum !input)
 
-sum => num1 + num2
+sum => !(toStr num1 + num2)
 !(printLine "The sum of both numbers is: " . !(toStr sum))
 
 # Test 3
-!(printLine "I just printed the number " . !(toStr sum))
+num3 => !(toNum sum) * 5
+!(printLine "I just printed the number " . !(toStr num3) . "/5")

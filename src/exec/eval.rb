@@ -197,7 +197,7 @@ def callFunction(funcs, func, arguments)
     func_env = newFunctionEnv(funcs, func, arguments)
     return evalFunctionStatementList(func.Body, func_env)
   when WaidBuiltin
-    return func.Function.call(arguments[0])
+    return func.Function.call(*arguments)
   end
 end
 

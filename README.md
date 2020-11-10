@@ -1,76 +1,83 @@
-# WaidLang
+<p align="center" >
+<img src="assets/WaidLogo.png" height="150px" alt="Waid Programming language" title="Waid Programming Language" style="border-radius:30px" >
+</p>
+
 My personal attempt at writing a programming language from scratch.
 
-Waid is everything you never wanted. It's ugly, verbose, and it doesn't even work yet.
+Waid is everything you never wanted. It's ugly, verbose and has a lot of arrows.
 It's currently implemented with a custom lexer and a LL(1) parser (recursive descent), although I would like to write a LL(1) parsing table in the future.
 
-I'm working on a tree walking interpreter at the moment, but I'm planning to write a VM in C or C++ in the future.
+I'm working on a tree walking interpreter at the moment, but I'm planning to write a VM in C or C++ eventually.
 
 ## Usage
 ```bash
-$ ./main.rb
+$ ./waid.rb
 Usage: main [options] filename
     -t, --show-tokens                Print the tokens produced by the scanner
     -a, --show-ast                   Print the AST produced by the parser
     -e, --show-final-env             Print the final state of the global enviroment
 ```
 
-
-***main.wd***
-```py
-fib_rec: func(n) =>
-    if n < 2 =>
-        <- n
-    endif
-    <- !(fib_rec n - 1) + !(fib_rec n - 2)
-endfn
-
-fib_while: func(n) =>
-    a => 0
-    b => 1
-    count => 0
-    while count < n =>
-        prev_a => a
-        a => b
-        b => prev_a + b
-        count => count + 1
-    endwl
-    <- a
-endfn
-
-main: func() =>
-    num => 20
-    count => 0
-    !(printLine "Iterative Fibonacci:")
-    while count < num =>
-        !(print !(fib_while count))
-        !(print " ")
-        count => count + 1
-    endwl
-
-    !printLine
-
-    count => 0
-    !(printLine "Recursive Fibonacci:")
-    while count < num =>
-        !(print !(fib_rec count))
-        !(print " ")
-        count => count + 1
-    endwl
-    !printLine
-endfn
-
-!main
+## Language
+### Variables
+variables are declared using the ***=>*** operator.
+```
+var_1 => 10
+var_2 => 5.7
+var_1 => "Variables can change and store values of any type!"
 ```
 
-### Output
+### Functions
+To declare a function you need to use the *func* keyword. The body of the function starts at the ***=>*** operator and ends at the *endfn* keyword.
+Values are returned with the ***<-*** operator.
 ```
-$ ./main.rb main.wd
-Iterative Fibonacci:
-0 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 2584 4181 
-Recursive Fibonacci:
-0 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 2584 4181
+add: func(num1, num2) =>
+    <- num1 + num2
+endfn
+
+no_args: func() =>
+    <- "Znqrlbhybfrgvzrunun"
+endfn
 ```
+
+And to call it the ***!*** operator is used.
+```
+# Functions with arguments use parenthesis. Arguments are separated by spaces.
+!(add 24 45)
+
+# If the function doesn't take any arguments, parenthesis can be ommited.
+secret_string => !no_args
+```
+#### First Class Objects
+In Waid, functions are first class objects. This means that they can be passed as arguments to other functions and returned by other functions aswell.
+##### Returning a function
+```
+make_adder: func(num) =>
+    adder: func(x) =>
+        <- x + num
+    endfn
+    <- adder
+endfn
+
+add_2 => !(make_adder 2)
+!(print !(add_2 4)) # 6
+```
+##### Passing a function as an argument
+```
+call: func(function, arg1, arg2) =>
+    <- !(function arg1 arg2)
+endfn
+
+add: func(x, y) =>
+    <- x + y
+endfn
+
+sum => !(call add 382 284)
+!(print sum)
+```
+
+### Conditionals
+### Builtin Functions
 
 ## TODO
 - Arrays

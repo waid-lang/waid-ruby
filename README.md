@@ -49,7 +49,7 @@ And to call it the ***!*** operator is used.
 secret_string => !no_args
 ```
 #### First Class Objects
-In Waid, functions are first class objects. This means that they can be passed as arguments to other functions and returned by other functions aswell.
+In Waid, functions are first class objects. This means that they can be passed as arguments to and returned by other functions.
 ##### Returning a function
 ```
 make_adder: func(num) =>

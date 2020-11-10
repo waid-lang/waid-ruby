@@ -21,7 +21,7 @@ Usage: main [options] filename
 ## Language
 ### Variables
 variables are declared using the ***=>*** operator.
-```
+```go
 var_1 => 10
 var_2 => 5.7
 var_1 => "Variables can change and store values of any type!"
@@ -30,7 +30,7 @@ var_1 => "Variables can change and store values of any type!"
 ### Functions
 To declare a function you need to use the *func* keyword. The body of the function starts at the ***=>*** operator and ends at the *endfn* keyword.
 Values are returned with the ***<-*** operator.
-```
+```go
 add: func(num1, num2) =>
     <- num1 + num2
 endfn
@@ -41,7 +41,7 @@ endfn
 ```
 
 And to call it the ***!*** operator is used.
-```
+```go
 # Functions with arguments use parenthesis. Arguments are separated by spaces.
 !(add 24 45)
 
@@ -51,7 +51,7 @@ secret_string => !no_args
 #### First Class Objects
 In Waid, functions are first class objects. This means that they can be passed as arguments to and returned by other functions.
 ##### Returning a function
-```
+```go
 make_adder: func(num) =>
     adder: func(x) =>
         <- x + num
@@ -63,7 +63,7 @@ add_2 => !(make_adder 2)
 !(print !(add_2 4)) # 6
 ```
 ##### Passing a function as an argument
-```
+```go
 call: func(function, arg1, arg2) =>
     <- !(function arg1 arg2)
 endfn

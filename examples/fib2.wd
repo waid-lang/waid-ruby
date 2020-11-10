@@ -19,7 +19,7 @@ fib_while: func(n) =>
 endfn
 
 main: func() =>
-    num => 20
+    num => !(toNum !input)
     count => 0
     !(printLine "Iterative Fibonacci:")
     while count < num =>

@@ -5,30 +5,30 @@ falsey_val_str => ""
 truthy_val => 1
 
 
-true_check => 0
-false_check => 0
-falsey_check => 0
-falsey_check_str => 0
-truthy_check => 0
+true_check => 1
+false_check => 1
+falsey_check => 1
+falsey_check_str => 1
+truthy_check => 1
 
-if true_val =>
-    true_check => 1
+if not true_val =>
+    true_check => 0
 endif
 
-if not false_val =>
-    false_check => 1
+if false_val =>
+    false_check => 0
 endif
 
-if not falsey_val =>
-    falsey_check => 1
+if falsey_val =>
+    falsey_check => 0
 endif
 
-if not falsey_val_str =>
-    falsey_check_str => 1
+if falsey_val_str =>
+    falsey_check_str => 0
 endif
 
-if truthy_val =>
-    truthy_check => 1
+if not truthy_val =>
+    truthy_check => 0
 endif
 
 int_to_strbool: func(int) =>

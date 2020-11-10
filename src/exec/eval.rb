@@ -76,7 +76,19 @@ def eval_node(node, env)
 end
 
 def isFalse(obj)
-  obj == NullValue or obj == FalseValue
+  if obj.is_a?(WaidString)
+    if obj.Value == ""
+      return true
+    end
+    return false
+  end
+  if obj.is_a?(WaidBoolean)
+    if obj.Value
+      return false
+    end
+    return true
+  end
+  obj.is_a?(WaidNull)
 end
 
 def evalProgram(program, env)
@@ -99,6 +111,10 @@ def evalUnaryOperatorExpression(operator, expr)
   when TokenKind::OP_MINUS
     return evalMinusOperatorExpression(expr)
   when TokenKind::KEY_NOT
+    if expr.is_a?(WaidString) or expr.is_a?(WaidNull)
+      expr.Value = isFalse(expr)
+      return boolToWaidBoolean(expr.Value)
+    end
     return boolToWaidBoolean(!expr.Value)
   end
 end
@@ -117,10 +133,14 @@ def evalBinaryOperatorExpression(operator, left, right)
     return evalIntegerBinaryOperatorexpression(operator, left, right)
   elsif left.is_a?(WaidFloat) or right.is_a?(WaidFloat)
     return evalFloatBinaryOperatorexpression(operator, left, right)
+  elsif left.is_a?(WaidBoolean) and right.is_a?(WaidBoolean)
+    return evalBooleanBinaryOperation(operator, left, right)
   elsif left.is_a?(WaidString) and right.is_a?(WaidString)
     return WaidString.new(left.Value + right.Value)
+  elsif left.is_a?(WaidNull) and right.is_a?(WaidNull) and operator.kind == TokenKind::OP_EQUAL
+    return WaidBoolean.new(true)
   else
-    puts "Error: Type mismatch. Can not operate #{left.type} with #{right.type}"
+    puts "Error: Type mismatch. Can not operate #{left.type} #{operator} #{right.type}"
     exit()
   end
 end
@@ -165,6 +185,13 @@ def evalIntegerBinaryOperatorexpression(operator, left, right)
   end
 end
 
+def evalBooleanBinaryOperation(operator, left, right)
+  case operator.kind
+  when TokenKind::KEY_AND
+    return boolToWaidBoolean(left.Value && right.Value)
+  end
+end
+
 def evalExpressions(expressions, env)
   res = Array.new
   expressions.each do |expr|
@@ -203,10 +230,9 @@ end
 
 def evalIfStatement(node, env)
   condition = eval_node(node.Condition, env)
-
-  if not isFalse(condition)
+  if !isFalse(condition)
     return eval_node(node.Body, env)
-  elsif node.ElseBody != Empty
+  elsif not node.ElseBody.Statements.empty?
     return eval_node(node.ElseBody, env)
   end
   return NullValue

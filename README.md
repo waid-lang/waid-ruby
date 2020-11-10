@@ -1,6 +1,6 @@
 <div>
     </br>
-    <img src="assets/WaidLogo.png"
+    <img src="https://raw.githubusercontent.com/TaconeoMental/WaidLang/main/assets/WaidLogo.png"
     height="150px"
     alt="Waid Programming language"
     title="Waid Programming Language"

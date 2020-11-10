@@ -1,5 +1,5 @@
 <p align="center" >
-<img src="assets/WaidLogo.png" height="150px" alt="Waid Programming language" title="Waid Programming Language" style="border-radius:30px" >
+<img src="https://raw.githubusercontent.com/TaconeoMental/WaidLang/main/assets/WaidLogo.png" height="150px" alt="Waid Programming language" title="Waid Programming Language" style="border-radius:30px" >
 </p>
 
 My personal attempt at writing a programming language from scratch.

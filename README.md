@@ -1,13 +1,14 @@
 <div>
-    <h1><img src="assets/WaidLogo.png"
+    <img src="assets/WaidLogo.png"
     height="150px"
     alt="Waid Programming language"
     title="Waid Programming Language"
-    style="border-radius:30px;margin-right:10px;float:left">
-    The Waid Programming Language</h1>
-    <h3>My personal attempt at writing a programming language from scratch</h3>
+    style="border-radius:30px;margin-right:10px"
+    align="left">
+    <h1>The Waid Programming Language</h1>
+    <h4>My personal attempt at writing a programming language from scratch</h4>
 </div>
-
+</br>
 Waid is everything you never wanted. It's ugly, verbose and has a lot of arrows.
 It's currently implemented with a custom lexer and a LL(1) parser (recursive descent), although I would like to write a LL(1) parsing table in the future.
 

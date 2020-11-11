@@ -47,14 +47,15 @@ module TokenKind
   OP_GREATER_EQUAL     = 0x27
   OP_RETURN            = 0x28
   OP_EXCLAMATION       = 0x29
+  OP_AT                = 0x2A
 
-  OP_COMMA             = 0x2A
-  OP_COLON             = 0x2B
-  OP_DOT               = 0x2C
-  OP_OPEN_PARENTHESIS  = 0x2D
-  OP_CLOSE_PARENTHESIS = 0x2E
-  OP_OPEN_BRACKETS     = 0x2F
-  OP_CLOSE_BRACKETS    = 0x30
+  OP_COMMA             = 0x2B
+  OP_COLON             = 0x2C
+  OP_DOT               = 0x2D
+  OP_OPEN_PARENTHESIS  = 0x2E
+  OP_CLOSE_PARENTHESIS = 0x2F
+  OP_OPEN_BRACKETS     = 0x30
+  OP_CLOSE_BRACKETS    = 0x31
 end
 
 def token_string(tok)
@@ -144,9 +145,8 @@ def token_string(tok)
         "<-"
       when TokenKind::OP_EXCLAMATION
         "!"
-        #when TokenKind::OP_AT
-        #  "@"
-
+      when TokenKind::OP_AT
+        "@"
       when TokenKind::OP_COMMA
         ","
       when TokenKind::OP_COLON

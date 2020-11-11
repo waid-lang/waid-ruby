@@ -1,0 +1,43 @@
+function_1: func() =>
+    <- "Dentro de function_1"
+endfn
+
+function_2: func() =>
+    <- "Dentro de function_2 :)"
+endfn
+
+add: func(x, y) =>
+    <- x + y
+endfn
+
+string_var => "hola"
+array => [
+    10.9999998,
+    46,
+    "chao",
+    string_var,
+    2 + 4,
+    !function_1,
+    function_2,
+    add 
+]
+
+array => array . [1, 2, 3]
+array => array . "Hola de nuevo"
+
+!(printLine 3 @ array)
+!(printLine 4 @ array)
+!(printLine 5 @ array)
+
+func_name => 6 @ array
+!(printLine !func_name)
+
+!(printLine "Length: " . !(toStr !(length array)))
+
+func_arr => 7 @ array
+!(printLine !(func_arr 2 3))
+
+(4 @ array) => 666
+(0 @ array) => ":)"
+!(printLine array == [":)", 46, "chao", "hola", 666, "Dentro de function_1", function_2, add, [1, 2, 3], "Hola de nuevo"])
+!(printLine "The array is: " . !(toStr array))

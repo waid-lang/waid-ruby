@@ -67,6 +67,8 @@ class Parser
     #           | WHILE_STMT
     #           | EXPR;
     case @current_token.kind
+    when TokenKind::OP_OPEN_PARENTHESIS
+      return parseArrayElementDeclarationStatement
     when TokenKind::IDENTIFIER # Puede ser declaración de función o de variable
       if peekTokenEquals(TokenKind::OP_COLON)
         return parseFunctionDeclStatement
@@ -82,22 +84,46 @@ class Parser
     when TokenKind::OP_EXCLAMATION
       return parseFunctionCall
     else
-      return nil
+      consumePeek(TokenKind::EOF)
     end
   end
 
+  def parseArrayElementDeclarationStatement
+    stmt = ArrayIndexDeclarationStatement.new
+    index_expr = parseExpression
+    if index_expr.Operator.kind != TokenKind::OP_AT
+       @error_collector.addError(CompilationError.new(
+        "Expected '@', but got '#{@peek_token}' instead.",
+        @error_collector.getLine(@peek_token.source_position),
+        @peek_token.source_position
+      ))
+      @error_collector.showErrors
+    elsif not index_expr.Right.is_a?(Identifier)
+      @error_collector.addError(CompilationError.new(
+        "Expected 'Identifier', but got '#{@current_token}' instead.",
+        @error_collector.getLine(@current_token.source_position),
+        @current_token.source_position
+      ))
+      @error_collector.showErrors
+    end
+
+    consumePeek(TokenKind::OP_CLOSE_PARENTHESIS)
+    consumePeek(TokenKind::OP_ASSIGN)
+
+    stmt.IndexExpression = index_expr.Left
+    stmt.ArrayIdentifier = index_expr.Right
+    stmt.Value = parseExpression
+    stmt
+  end
+
   def parseVarDeclStatement
-    # DECL_VARIABLE = IDENTIFICADOR, "=>", EXPR;
+    # DECcurrentRIABLE = IDENTIFICADOR, "=>", EXPR;
     statement = VarDeclarationStatement.new
-    #if not consumePeek(TokenKind::IDENTIFIER)
-    #return nil
     #end
     statement.Identifier = Identifier.new(@current_token.value)
 
     # TODO: Implementar todo esto como un método y que lo añada como error
-    if not consumePeek(TokenKind::OP_ASSIGN)
-      return nil
-    end
+    consumePeek(TokenKind::OP_ASSIGN)
     #pushToken
 
     statement.Value = parseExpression
@@ -113,25 +139,17 @@ class Parser
 
     statement.Identifier = Identifier.new(@current_token.value)
 
-    if not consumePeek(TokenKind::OP_COLON)
-      return nil
-    end
+    consumePeek(TokenKind::OP_COLON)
 
-    if not consumePeek(TokenKind::KEY_FUNC)
-      return nil
-    end
+    consumePeek(TokenKind::KEY_FUNC)
 
     statement.Parameters = parseFunctionParameters
 
-    if not consumePeek(TokenKind::OP_ASSIGN)
-      return nil
-    end
+    consumePeek(TokenKind::OP_ASSIGN)
 
     statement.Body = parseStatementList
 
-    if not consumePeek(TokenKind::KEY_ENDFN)
-      return nil
-    end
+    consumePeek(TokenKind::KEY_ENDFN)
     statement
   end
 
@@ -142,18 +160,14 @@ class Parser
     # VALOR_DEFECTO    = "=>", OPERANDO; // TODO
     identifiers = Array.new
 
-    if not consumePeek(TokenKind::OP_OPEN_PARENTHESIS)
-      return nil
-    end
+    consumePeek(TokenKind::OP_OPEN_PARENTHESIS)
 
     if peekTokenEquals(TokenKind::OP_CLOSE_PARENTHESIS)
       pushToken
       return identifiers
     end
 
-    if not consumePeek(TokenKind::IDENTIFIER)
-      return nil
-    end
+    consumePeek(TokenKind::IDENTIFIER)
 
     identifiers.push(Identifier.new(@current_token.value))
 
@@ -165,9 +179,7 @@ class Parser
       identifiers.push(Identifier.new(@current_token.value))
     end
 
-    if not consumePeek(TokenKind::OP_CLOSE_PARENTHESIS)
-      return nil
-    end
+    consumePeek(TokenKind::OP_CLOSE_PARENTHESIS)
     identifiers
   end
 
@@ -202,9 +214,7 @@ class Parser
     # Definimos elsebody al tiro por si no sale nada
     stmt.ElseBody = StatementList.new
 
-    if not consumePeek(TokenKind::OP_ASSIGN)
-      return nil
-    end
+    consumePeek(TokenKind::OP_ASSIGN)
 
     stmt.Body = parseStatementList
 
@@ -214,9 +224,7 @@ class Parser
       stmt.ElseBody = parseStatementList
     end
 
-    if not consumePeek(TokenKind::KEY_ENDIF)
-      return nil
-    end
+    consumePeek(TokenKind::KEY_ENDIF)
     stmt
   end
 
@@ -224,15 +232,11 @@ class Parser
     stmt = WhileStatement.new
     stmt.Condition = parseExpression
 
-    if not consumePeek(TokenKind::OP_ASSIGN)
-      return nil
-    end
+    consumePeek(TokenKind::OP_ASSIGN)
 
     stmt.Body = parseStatementList
 
-    if not consumePeek(TokenKind::KEY_ENDWL)
-      return nil
-    end
+    consumePeek(TokenKind::KEY_ENDWL)
     stmt
   end
 
@@ -306,9 +310,29 @@ class Parser
     # OP_MULT = "*"
     #         | "/"
     #         | "%"
-    expr = parseNegativeExpression
+    expr = parseAtExpression
     while peekTokenEquals(TokenKind::OP_ASTERISK) or peekTokenEquals(TokenKind::OP_SLASH) \
-        or peekTokenEquals(TokenKind::OP_MODULUS) or peekTokenEquals(TokenKind::OP_DOT)
+        or peekTokenEquals(TokenKind::OP_MODULUS)
+      pushToken
+      expr = BinaryOperatorExpression.new(expr, @current_token, parseAtExpression)
+    end
+    expr
+  end
+
+  def parseAtExpression
+    expr = parseDotExpression
+    while peekTokenEquals(TokenKind::OP_AT)
+      pushToken
+      expr = BinaryOperatorExpression.new(expr, @current_token, parseDotExpression)
+    end
+    expr
+  end
+
+
+
+  def parseDotExpression
+    expr = parseNegativeExpression
+    while peekTokenEquals(TokenKind::OP_AT) or peekTokenEquals(TokenKind::OP_DOT)
       pushToken
       expr = BinaryOperatorExpression.new(expr, @current_token, parseNegativeExpression)
     end
@@ -338,7 +362,6 @@ class Parser
   def parseFunctionCall
     expr = FunctionCall.new
     #consumePeek(TokenKind::OP_EXCLAMATION)
-
     if peekTokenEquals(TokenKind::OP_OPEN_PARENTHESIS)
       # Tiene argumentos
       pushToken
@@ -373,6 +396,27 @@ class Parser
     expr
   end
 
+  def parseArrayLiteral
+    elements = Array.new
+
+    expr_ = parseExpression
+
+    elements.push(expr_)
+
+    # TODO
+    while peekTokenEquals(TokenKind::OP_COMMA)
+      pushToken
+      expr_ = parseExpression
+      elements.push(expr_)
+    end
+
+    # Manera fea, horrenda, y perturbadora de hacerlo
+    if elements.length == 1 and elements[0].is_a?(NilClass)
+      elements = []
+    end
+    elements
+  end
+
   def parseOperand
     case @peek_token.kind
     when TokenKind::IDENTIFIER
@@ -382,6 +426,12 @@ class Parser
       consumePeek(TokenKind::OP_OPEN_PARENTHESIS)
       operand = parseExpression
       consumePeek(TokenKind::OP_CLOSE_PARENTHESIS)
+    when TokenKind::OP_OPEN_BRACKETS
+      consumePeek(TokenKind::OP_OPEN_BRACKETS)
+      operand = ArrayLiteral.new
+
+      operand.Values = parseArrayLiteral
+      consumePeek(TokenKind::OP_CLOSE_BRACKETS)
     when TokenKind::LITERAL_INT
       consumePeek(TokenKind::LITERAL_INT)
       operand = IntLiteral.new(@current_token.value)

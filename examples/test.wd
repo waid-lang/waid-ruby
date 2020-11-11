@@ -4,18 +4,23 @@ endfn
 
 # Pseudo range function
 range: func(start, end, step) =>
-    arr => [..end] # Array of length "end"
+    arr => []
     i => start
     while i < end =>
-        arr[i] => i * step
-        i +> 1
+        (i @ arr) => i * step
+        i => i + 1
     endwl
     <- arr
 endfn
 
 main: func() =>
-    for elem in !(range 0 !(add !input 1) 2) =>
-        !print !(add elem !input)
-    endfr
+    count => 0
+    range => !(range 0 !(add !(toNum !input) 1) 2)
+    !(printLine range)
+    while count < !(length range) =>
+        !(printLine !(add count @ range !(toNum !input)))
+        count => count + 1
+    endwl
 endfn
 
+!main

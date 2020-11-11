@@ -134,8 +134,8 @@ def evalUnaryOperatorExpression(operator, expr)
     return evalMinusOperatorExpression(expr)
   when TokenKind::KEY_NOT
     if expr.is_a?(WaidString) or expr.is_a?(WaidNull)
-      expr.Value = isFalse(expr)
-      return boolToWaidBoolean(expr.Value)
+      val = isFalse(expr)
+      return boolToWaidBoolean(val)
     end
     return boolToWaidBoolean(!expr.Value)
   end
@@ -157,10 +157,8 @@ def evalBinaryOperatorExpression(operator, left, right, env)
     return evalFloatBinaryOperatorexpression(operator, left, right)
   elsif left.is_a?(WaidBoolean) and right.is_a?(WaidBoolean)
     return evalBooleanBinaryOperation(operator, left, right)
-  elsif left.is_a?(WaidString) and right.is_a?(WaidString) and operator.kind == TokenKind::OP_DOT # TODO: Hacer evalStringBinaryOperation
-    return WaidString.new(left.Value + right.Value)
-  elsif left.is_a?(WaidString) and right.is_a?(WaidString) and operator.kind == TokenKind::OP_EQUAL
-    return boolToWaidBoolean(left.Value == right.Value)
+  elsif left.is_a?(WaidString) and right.is_a?(WaidString)
+    return evalStringBinaryOperationExpression(operator, left, right)
   elsif left.is_a?(WaidArray) and right.is_a?(WaidArray) and operator.kind == TokenKind::OP_PLUS
     return right.Values + left.Values
   elsif left.is_a?(WaidInteger) and right.is_a?(WaidArray) and operator.kind == TokenKind::OP_AT
@@ -170,7 +168,7 @@ def evalBinaryOperatorExpression(operator, left, right, env)
   elsif left.is_a?(WaidNull) and right.is_a?(WaidNull) and operator.kind == TokenKind::OP_EQUAL
     return WaidBoolean.new(true)
   elsif left.is_a?(WaidArray) and right.is_a?(WaidArray) and operator.kind == TokenKind::OP_DOT
-    left.Values.push(right.Values)
+    left.Values.push(right)
     return left
   elsif left.is_a?(WaidArray) and right.is_a?(WaidArray) and operator.kind == TokenKind::OP_EQUAL
     val = true
@@ -178,7 +176,6 @@ def evalBinaryOperatorExpression(operator, left, right, env)
       val = false
     else
       left.Values.zip(right.Values).each do |l, r|
-        puts "l: #{l.class}, r: #{r}"
         if l.class != r.class
           val = false
           break
@@ -244,6 +241,15 @@ def evalBooleanBinaryOperation(operator, left, right)
   end
 end
 
+def evalStringBinaryOperationExpression(operator, left, right)
+  case operator.kind
+  when TokenKind::OP_DOT
+    return WaidString.new(left.Value + right.Value)
+  when TokenKind::OP_EQUAL
+    return boolToWaidBoolean(left.Value == right.Value)
+  end
+end
+
 def evalExpressions(expressions, env)
   res = Array.new
   expressions.each do |expr|
@@ -303,9 +309,6 @@ end
 
 def evalIdentifier(node, env)
   value = env.get(node.Value)
-  if not value.is_a?(WaidFunction)
-    puts "#{node.Value} -> #{value.Values[1].class}"
-  end
   if value
     return value
   end

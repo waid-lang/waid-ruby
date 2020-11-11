@@ -79,6 +79,32 @@ class VarDeclarationStatement
   end
 end
 
+class ArrayIndexDeclarationStatement
+  attr_accessor :IndexExpression
+  attr_accessor :Value
+  attr_accessor :ArrayIdentifier
+  def initialize(ind=nil, name=nil, val=nil)
+    @IndexExpression = ind
+    @ArrayIdentifier = name
+    @Value = val
+  end
+
+  def print_tree(indent, last)
+    print indent
+    indent += indentation(last)
+
+    puts "ArrayIndexDeclaration"
+    puts indent + $AST_MIDDLE + "IndexExpression"
+    @IndexExpression.print_tree(indent + $AST_LINE, true)
+
+    puts indent + $AST_MIDDLE + "ArrayIdentifier"
+    @ArrayIdentifier.print_tree(indent + $AST_LINE, true)
+
+    puts indent + $AST_LAST + "Value"
+    @Value.print_tree(indent + $AST_SPACE, true)
+  end
+end
+
 class FuncDeclarationStatement
   attr_accessor :Identifier
   attr_accessor :Parameters
@@ -264,6 +290,27 @@ class IntLiteral
 
     puts "IntLiteral"
     puts indent + $AST_LAST + @Value.to_s
+  end
+end
+
+class ArrayLiteral
+  attr_accessor :Values
+  def initialize
+    @Values = Array.new
+  end
+
+  def print_tree(indent, last)
+    print indent
+    indent += indentation(last)
+
+    puts "ArrayLiteral"
+    if @Values.empty?
+      puts indent + $AST_LAST + "Empty"
+      return
+    end
+    @Values.each_with_index do |expr, index|
+      expr.print_tree(indent + $AST_SPACE, index == @Values.length - 1)
+    end
   end
 end
 

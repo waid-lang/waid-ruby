@@ -19,6 +19,11 @@ class Enviroment
     obj
   end 
 
+  def set_array_obj(id, index, value)
+    @Objects[id].Values[index] = value
+    value
+  end
+
   def set_func(name, func)
     @Functions[name] = func
     func

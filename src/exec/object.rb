@@ -110,6 +110,33 @@ class WaidBoolean < WaidObject
   end
 end
 
+class WaidArray < WaidObject
+  attr_accessor :Values
+  def initialize(val=Array.new)
+    @Values = val
+  end
+
+  def type
+    "Array"
+  end
+
+  def inspect
+    str = "["
+    @Values.each_with_index do |val, index|
+      if val.is_a?(WaidString)
+        str += '"' + val.inspect + '"'
+      else
+        str += val.inspect
+      end
+      if index != @Values.length - 1
+        str += ", "
+      end
+    end
+    str += "]"
+    str
+  end
+end
+
 class WaidNull < WaidObject
   attr_accessor :Value
   def initialize

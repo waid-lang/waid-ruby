@@ -186,6 +186,8 @@ class Tokenizer
           elsif @peek_char == '='
             pushChar
             TokenKind::OP_EQUAL
+          else
+            return
           end
         when '<'
           if @peek_char == "-"
@@ -206,6 +208,8 @@ class Tokenizer
           end
         when '!'
           TokenKind::OP_EXCLAMATION
+        when '@'
+          TokenKind::OP_AT
         when ','
           TokenKind::OP_COMMA
         when '.'

@@ -19,6 +19,8 @@ end
 builtin_length = Proc.new do |str|
   if str.is_a?(WaidString)
     next WaidInteger.new(str.Value.length)
+  elsif str.is_a?(WaidArray)
+    next WaidInteger.new(str.Values.length)
   end
   next WaidNull.new
 end

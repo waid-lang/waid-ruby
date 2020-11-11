@@ -17,6 +17,9 @@ def eval_node(node, env)
     value = eval_node(node.Value, env)
     env.set_ob(node.Identifier.Value, value)
 
+  when ArrayIndexDeclarationStatement
+    return evalArrayIndexDeclaration(node, env)
+
   when IfStatement
     return evalIfStatement(node, env)
 
@@ -57,6 +60,10 @@ def eval_node(node, env)
   when StringLiteral
     return WaidString.new(node.Value)
 
+  when ArrayLiteral
+    exprs = evalExpressions(node.Values, env)
+    return WaidArray.new(exprs)
+
   when NullLiteral
     return WaidNull.new
 
@@ -68,7 +75,7 @@ def eval_node(node, env)
     expr_l = eval_node(node.Left, env)
     # Acá debería revisar errores
     expr_r = eval_node(node.Right, env)
-    return evalBinaryOperatorExpression(node.Operator, expr_l, expr_r)
+    return evalBinaryOperatorExpression(node.Operator, expr_l, expr_r, env)
 
   when Identifier
     return evalIdentifier(node, env)
@@ -106,6 +113,21 @@ def boolToWaidBoolean(val)
   FalseValue
 end
 
+def evalArrayIndexDeclaration(node, env)
+  index = eval_node(node.IndexExpression, env)
+  if not index.is_a?(WaidInteger)
+    puts "Error: Array index must be an Integer, not of type #{index.type}"
+    exit()
+  elsif index.Value < 0
+    puts "Error: index #{index.Value} too small for array; minimum: 0"
+    exit()
+  end
+
+  eval_node(node.ArrayIdentifier, env) # Esto es para ver si existe el identificador
+  value = eval_node(node.Value, env)
+  env.set_array_obj(node.ArrayIdentifier.Value, index.Value, value)
+end
+
 def evalUnaryOperatorExpression(operator, expr)
   case operator.kind
   when TokenKind::OP_MINUS
@@ -128,17 +150,47 @@ def evalMinusOperatorExpression(expr)
   end
 end
 
-def evalBinaryOperatorExpression(operator, left, right)
+def evalBinaryOperatorExpression(operator, left, right, env)
   if left.is_a?(WaidInteger) and right.is_a?(WaidInteger)
     return evalIntegerBinaryOperatorexpression(operator, left, right)
   elsif left.is_a?(WaidFloat) or right.is_a?(WaidFloat)
     return evalFloatBinaryOperatorexpression(operator, left, right)
   elsif left.is_a?(WaidBoolean) and right.is_a?(WaidBoolean)
     return evalBooleanBinaryOperation(operator, left, right)
-  elsif left.is_a?(WaidString) and right.is_a?(WaidString)
+  elsif left.is_a?(WaidString) and right.is_a?(WaidString) and operator.kind == TokenKind::OP_DOT # TODO: Hacer evalStringBinaryOperation
     return WaidString.new(left.Value + right.Value)
+  elsif left.is_a?(WaidString) and right.is_a?(WaidString) and operator.kind == TokenKind::OP_EQUAL
+    return boolToWaidBoolean(left.Value == right.Value)
+  elsif left.is_a?(WaidArray) and right.is_a?(WaidArray) and operator.kind == TokenKind::OP_PLUS
+    return right.Values + left.Values
+  elsif left.is_a?(WaidInteger) and right.is_a?(WaidArray) and operator.kind == TokenKind::OP_AT
+    return right.Values[left.Value]
+  elsif left.is_a?(WaidFunction) and right.is_a?(WaidFunction) and operator.kind == TokenKind::OP_EQUAL
+    return boolToWaidBoolean(left == right)
   elsif left.is_a?(WaidNull) and right.is_a?(WaidNull) and operator.kind == TokenKind::OP_EQUAL
     return WaidBoolean.new(true)
+  elsif left.is_a?(WaidArray) and right.is_a?(WaidArray) and operator.kind == TokenKind::OP_DOT
+    left.Values.push(right.Values)
+    return left
+  elsif left.is_a?(WaidArray) and right.is_a?(WaidArray) and operator.kind == TokenKind::OP_EQUAL
+    val = true
+    if left.Values.length != right.Values.length
+      val = false
+    else
+      left.Values.zip(right.Values).each do |l, r|
+        puts "l: #{l.class}, r: #{r}"
+        if l.class != r.class
+          val = false
+          break
+        else
+          val = evalBinaryOperatorExpression(operator, l, r, env)
+        end
+      end
+    end
+    return boolToWaidBoolean(val)
+  elsif left.is_a?(WaidArray) and operator.kind == TokenKind::OP_DOT
+    left.Values.push(right)
+    return left
   else
     puts "Error: Type mismatch. Can not operate #{left.type} #{operator} #{right.type}"
     exit()
@@ -251,6 +303,9 @@ end
 
 def evalIdentifier(node, env)
   value = env.get(node.Value)
+  if not value.is_a?(WaidFunction)
+    puts "#{node.Value} -> #{value.Values[1].class}"
+  end
   if value
     return value
   end

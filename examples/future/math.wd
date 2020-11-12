@@ -1,0 +1,131 @@
+PI => 3.1415926535897931
+TAU => 6.2831853071795862
+e => 2.7182818284590451
+
+pow: func(base, exp) =>
+    if exp == 0 =>
+        <- 1
+    elseif exp > 0 =>
+        <- base * !(pow base exp - 1)
+    else =>
+        <- (1 / base) * !(pow base exp + 1)
+    endif
+endfn
+
+gcd: func(x, y) =>
+    # Algoritmo de Euclides
+    # Función recursiva:
+    # if (x == 0) => <- y
+    # <- !gcd(y % x, x)
+    z => 0
+    while x /= 0 =>
+        z => x
+        x => y % x
+        y => z
+    endwl
+    <- y
+endfn
+
+lcm: func(x, y) =>
+    <- (x * y) / !(gcd x y)
+endfn
+
+
+# Floor redondea hacia el infinito negativo
+# Ceil redondea arriba o abajo hacia el 0
+# Truncate trunca arriba o abajo hacia el 0
+#
+# Floor(-3.4)    = -4
+# Truncate(-3.4) = -3
+#
+# Floor(3.4)    = 3
+# Truncate(3.4) = 3
+
+floor: func(x) =>
+    <- x - x % 1
+endfn
+
+# HACK: Buscar manera de implementar esta función y 'ceil' (y tal vez floor)
+# de manera correcta.
+trunc: func(x) =>
+    if !(fabs x) == x =>
+        <- !(floor x)
+    endif
+    <- !(floor x) + 1
+endfn
+
+ceil: func(x) =>
+    <- !(floor x) + 1
+endfn
+
+# Valor absoluto con flotantes
+fabs: func(x) =>
+    if x < 0 =>
+        <- x * -1
+    endif
+    <- x
+endfn
+
+factorial: func(n) =>
+    arr => [1]
+    count => 1
+
+    while count <=n =>
+        (count @ arr) => count * (count - 1) @ arr
+        count +> 1
+    endwl
+    <- n @ arr
+endfn
+
+# Ángulos y trigonometría
+degrees: func(rad) =>
+  <- rad * 180 / PI
+endfn
+
+radians: func(deg) =>
+  <- deg * PI / 180
+endfn
+
+sin: func(rad) =>
+    # Serie de Taylor
+    res => 0
+    n => 0
+    while n => 0, n < 10, n +> 1 =>
+        signo => !(pow -1 n)
+        op => 2 * n + 1
+        numer => !(pow rad op)
+        den => !(factorial op)
+        res +> signo * (numer / den)
+    endwl
+    <- res
+endfn
+
+cos: func(rad: float64): float64 =>
+    res => 0
+    n => 0
+    while n => 0, n < 10, n +> 1 =>
+        signo => !(pow -1 n)
+        op => 2 * n
+        numer => !(pow rad op)
+        den => !(factorial op)
+        res +> signo * (numer / den)
+    endwl
+    <- res
+endfn
+
+tan: func(rad) =>
+    <- !(sin rad) / !(cos rad)
+endfn
+
+sec: func(rad) =>
+    <- 1 / !(cos rad)
+endfn
+
+cosec: func(rad) =>
+    <- 1 / !(sin rad)
+endfn
+
+cotan: func(rad) =>
+    <- !(cos rad) / !(sin rad)
+endfn
+

@@ -204,8 +204,12 @@ def evalFloatBinaryOperatorexpression(operator, left, right)
     return WaidFloat.new(left.Value * right.Value)
   when TokenKind::OP_SLASH
     return WaidFloat.new(left.Value / right.Value)
+  when TokenKind::OP_MODULUS
+    return WaidFloat.new(left.Value % right.Value)
   when TokenKind::OP_GREATER
     return boolToWaidBoolean(left.Value > right.Value)
+  when TokenKind::OP_LESS
+    return boolToWaidBoolean(left.Value < right.Value)
   when TokenKind::OP_EQUAL
     return boolToWaidBoolean(left.Value == right.Value)
   end

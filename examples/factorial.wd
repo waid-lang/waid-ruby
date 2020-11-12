@@ -17,29 +17,24 @@ factorial_rec: func(n) =>
     <- n * !(factorial_rec n - 1)
 endfn
 
-# Con las características actuales del lenguaje no podemos hacer esta :(
-#factorial_dp: func(n) =>
-#    arr = []
-#    if n in arr =>
-#        <- arr @ n
-#    elif n == 0 or n == 1 =>
-#        arr @ n => 1
-#        <- 1
-#    else =>
-#        fact => n * !(factorial_dp n - 1)
-#        n @ array => fact
-#    endif
-#    <- fact
-#endfn
+factorial_dp: func(n) =>
+    arr => [1]
+    count => 1
+
+    while count <=n =>
+        (count @ arr) => count * (count - 1) @ arr
+        count => count + 1
+    endwl
+    <- n @ arr
+endfn
 
 equal: func(x, y, z) =>
     <- x == y and y == z
 endfn
 
 main: func() =>
-    num => 10
-    #if !equal(!(factorial_while num) !(factorial_rec num) !(factorial_dp num)) =>
-    !(printLine !(factorial_while num) == !(factorial_rec num))
+    num => !(toNum !input)
+    !(printLine !(equal !(factorial_dp num) !(factorial_while num) !(factorial_rec num)))
 endfn
 
 !main

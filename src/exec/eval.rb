@@ -163,6 +163,8 @@ def evalBinaryOperatorExpression(operator, left, right, env)
     return right.Values + left.Values
   elsif left.is_a?(WaidInteger) and right.is_a?(WaidArray) and operator.kind == TokenKind::OP_AT
     return right.Values[left.Value]
+  elsif left.is_a?(WaidInteger) and right.is_a?(WaidString) and operator.kind == TokenKind::OP_AT
+    return WaidString.new(right.Value[left.Value])
   elsif left.is_a?(WaidFunction) and right.is_a?(WaidFunction) and operator.kind == TokenKind::OP_EQUAL
     return boolToWaidBoolean(left == right)
   elsif left.is_a?(WaidNull) and right.is_a?(WaidNull) and operator.kind == TokenKind::OP_EQUAL
@@ -188,6 +190,8 @@ def evalBinaryOperatorExpression(operator, left, right, env)
   elsif left.is_a?(WaidArray) and operator.kind == TokenKind::OP_DOT
     left.Values.push(right)
     return left
+  elsif [TokenKind::KEY_AND, TokenKind::KEY_OR].include? operator.kind
+    return evalBooleanBinaryOperation(operator, left, right)
   else
     puts "Error: Type mismatch. Can not operate #{left.type} #{operator} #{right.type}"
     exit()
@@ -241,7 +245,9 @@ end
 def evalBooleanBinaryOperation(operator, left, right)
   case operator.kind
   when TokenKind::KEY_AND
-    return boolToWaidBoolean(left.Value && right.Value)
+    return boolToWaidBoolean(!isFalse(left) && !isFalse(right))
+  when TokenKind::KEY_OR
+    return boolToWaidBoolean(!isFalse(left) || !isFalse(right))
   end
 end
 

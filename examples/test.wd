@@ -6,7 +6,7 @@ endfn
 range: func(start, end, step) =>
     arr => []
     i => start
-    while i < end =>
+    while i < end:
         (i @ arr) => i * step
         i => i + 1
     endwl
@@ -17,7 +17,7 @@ main: func() =>
     count => 0
     range => !(range 0 !(add !(toNum !input) 1) 2)
     !(printLine range)
-    while count < !(length range) =>
+    while count < !(length range):
         !(printLine !(add count @ range !(toNum !input)))
         count => count + 1
     endwl

@@ -11,28 +11,28 @@ falsey_check => 0
 falsey_check_str => 0
 truthy_check => 0
 
-if true_val =>
+if true_val:
     true_check => 1
 endif
 
-if not false_val =>
+if not false_val:
     false_check => 1
 endif
 
-if not falsey_val =>
+if not falsey_val:
     falsey_check => 1
 endif
 
-if not falsey_val_str =>
+if not falsey_val_str:
     falsey_check_str => 1
 endif
 
-if truthy_val =>
+if truthy_val:
     truthy_check => 1
 endif
 
 int_to_strbool: func(int) =>
-    if int == 1 =>
+    if int == 1:
         <- "All good :)"
     endif
     <- "Something went wrong :("

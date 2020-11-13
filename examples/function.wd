@@ -14,12 +14,12 @@ main: func() =>
     add_8 => !(generate_add 8)
     
     count => 0
-    while count < 20 =>
-        if count % 2 == 0 =>
+    while count < 20:
+        if count % 2 == 0:
             !(print !(toStr count ) . " is even. Adding 5:")
             !(print " ")
             !(printLine !(add_5 count))
-        else =>
+        else:
             !(print !(toStr count) . " is odd.  Adding 8:")
             !(print " ")
             !(printLine !(add_8 count))

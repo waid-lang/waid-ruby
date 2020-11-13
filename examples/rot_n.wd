@@ -3,7 +3,7 @@ join: func(arr) =>
     count => 0
 
     new_str => ""
-    while count < l =>
+    while count < l:
         new_str => new_str . (count@arr)
         count => count + 1
     endwl
@@ -13,8 +13,8 @@ endfn
 in: func(elem, str) =>
     l => !(length str)
     count => 0
-    while count < l =>
-        if elem == count@str =>
+    while count < l:
+        if elem == count@str:
             <- count
         endif
         count => count + 1
@@ -30,11 +30,11 @@ lower: func(str) =>
     count => 0
 
     new_str => ""
-    while count < l =>
+    while count < l:
         pos => !(in count@str upper_case) 
-        if pos =>
+        if pos:
             new_str => new_str . (pos@lower_case)
-        else =>
+        else:
             new_str => new_str . (count@str)
         endif
         count => count + 1
@@ -49,14 +49,14 @@ make_rot_alph: func(num) =>
     ind => num
     curr_index => 0
 
-    while ind < 26 =>
+    while ind < 26:
         (curr_index@new_str) =>  ind@lower_case
         curr_index => curr_index + 1
         ind => ind + 1
     endwl
 
     ind => 0
-    while ind < num =>
+    while ind < num:
         (curr_index@new_str) => ind@lower_case
         ind => ind + 1
         curr_index => curr_index + 1
@@ -74,11 +74,11 @@ make_rot: func(num) =>
         count => 0
 
         new_str => ""
-        while count < len =>
+        while count < len:
             char => count@str
-            if not !(in char alphabet) =>
+            if not !(in char alphabet):
                 new_str => new_str . char
-            else =>
+            else:
                 letter_index => !(in count@str alphabet)
                 new_str => new_str . (letter_index@rot_alph)
             endif

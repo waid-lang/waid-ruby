@@ -1,32 +1,32 @@
 ret: func() =>
-    if true =>
+    if true:
         !(printLine 0)
-        <- 77777
-        !(printLine -1)
+        <- "Return 1 ok :)"
+        !(printLine "Never here 1")
     endif
-    !(printLine 1)
-    <- -2
+    !(printLine "Never here 2")
+    <- "Return 1 not ok :("
 endfn
 
 ret2: func() =>
-    if true =>
+    if true:
         !(printLine 0)
-        if true =>
+        if true:
             !(printLine 1)
-            if true =>
+            if true:
                 !(printLine 2)
-                <- 8888
-                !(printLine -1)
+                <- "Return 2 ok :)"
+                !(printLine "Never here 1")
             endif
-            !(printLine 3)
+            !(printLine "Never here 2")
         endif
-        !(printLine 4)
+        !(printLine "Never here 3")
     endif
-    !(printLine 5)
-    <- -2
+    !(printLine "Never here 4")
+    <- "Return 2 not ok :("
 endfn
 
-!(printLine "Return 1")
+!(printLine "Return 1 Test")
 !(printLine !ret)
-!(printLine "Return 2:")
+!(printLine "Return 2 Test")
 !(printLine !ret2)

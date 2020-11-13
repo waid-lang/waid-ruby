@@ -1,12 +1,12 @@
 fizzbuzz: func(num) =>
     str => ""
-    if num % 3 == 0 =>
+    if num % 3 == 0:
         str => str . "Fizz"
     endif
-    if num % 5 == 0 =>
+    if num % 5 == 0:
         str => str . "Buzz"
     endif
-    if not str =>
+    if not str:
         str => !(toStr num)
     endif
     <- str
@@ -16,7 +16,7 @@ get_input: func(str) =>
     !(print str)
     in => !(toNum !input)
     !(printLine in)
-    if not in =>
+    if not in:
         !(printLine "Por favor ingresa un valor válido")
         <- !(get_input str)
     endif
@@ -26,7 +26,7 @@ endfn
 main: func() =>
     max => !(toNum !(get_input "Ingresa un número máximo: "))
     count => 0
-    while count <= max =>
+    while count <= max:
         !(printLine !(fizzbuzz count))
         count => count + 1
     endwl

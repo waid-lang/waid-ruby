@@ -1,5 +1,5 @@
 fib_rec: func(n) =>
-    if n < 2 =>
+    if n < 2:
         <- n
     endif
     <- !(fib_rec n - 1) + !(fib_rec n - 2)
@@ -9,7 +9,7 @@ fib_while: func(n) =>
     a => 0
     b => 1
     count => 0
-    while count < n =>
+    while count < n:
         prev_a => a
         a => b
         b => prev_a + b
@@ -21,7 +21,7 @@ endfn
 fib_dp: func(n) =>
     fibs => [0, 1]
     count => 2
-    while count <= n =>
+    while count <= n:
         fibs => fibs . ((count - 1)@fibs + (count - 2)@fibs)
         count => count + 1
     endwl
@@ -32,7 +32,7 @@ main: func() =>
     num => !(toNum !input)
     count => 0
     !(printLine "Iterative Fibonacci:")
-    while count < num =>
+    while count < num:
         !(print !(fib_while count))
         !(print " ")
         count => count + 1
@@ -42,7 +42,7 @@ main: func() =>
 
     count => 0
     !(printLine "DP Fibonacci:")
-    while count < num =>
+    while count < num:
         !(print !(fib_dp count))
         !(print " ")
         count => count + 1
@@ -52,7 +52,7 @@ main: func() =>
 
     count => 0
     !(printLine "Recursive Fibonacci:")
-    while count < num =>
+    while count < num:
         !(print !(fib_rec count))
         !(print " ")
         count => count + 1

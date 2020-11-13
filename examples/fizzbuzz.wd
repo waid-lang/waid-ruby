@@ -1,15 +1,15 @@
 fizzbuzz: func(max) =>
     count => 0
     msg => ""
-    while count <= max =>
+    while count <= max:
         msg => count
-        if count % 3 == 0 =>
+        if count % 3 == 0:
             msg => "Fizz"
         endif
-        if count % 5 == 0 =>
+        if count % 5 == 0:
             msg => "Buzz"
         endif
-        if count % 3 == 0 and count % 5 == 0 =>
+        if count % 3 == 0 and count % 5 == 0:
             msg => "FizzBuzz"
         endif
         !(printLine msg)

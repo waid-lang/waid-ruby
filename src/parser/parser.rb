@@ -214,13 +214,15 @@ class Parser
     # Definimos elsebody al tiro por si no sale nada
     stmt.ElseBody = StatementList.new
 
-    consumePeek(TokenKind::OP_ASSIGN)
+    #consumePeek(TokenKind::OP_ASSIGN)
+    consumePeek(TokenKind::OP_COLON)
 
     stmt.Body = parseStatementList
 
     if peekTokenEquals(TokenKind::KEY_ELSE)
       pushToken
-      consumePeek(TokenKind::OP_ASSIGN)
+      #consumePeek(TokenKind::OP_ASSIGN)
+      consumePeek(TokenKind::OP_COLON)
       stmt.ElseBody = parseStatementList
     end
 
@@ -232,7 +234,8 @@ class Parser
     stmt = WhileStatement.new
     stmt.Condition = parseExpression
 
-    consumePeek(TokenKind::OP_ASSIGN)
+    #consumePeek(TokenKind::OP_ASSIGN)
+    consumePeek(TokenKind::OP_COLON)
 
     stmt.Body = parseStatementList
 

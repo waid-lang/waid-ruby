@@ -26,17 +26,18 @@ punto_add: func(punto, punto2) =>
     <- !{Punto (punto'x + punto2'x) punto'y + punto2'y}
 endfn
 
-!(printLine !(!(punto_add p1 p2)'to_str))
+!(printLine !!(punto_add p1 p2)'to_str)
 
 !(p2'times 2)
-!(printLine !(p2'to_str))
+!(printLine !p2'to_str)
 
 ### Ejemplo 2 ###
 Vector: record =>
     nombre => ""
     pos => !{Punto 0 0}
     mag => 0
-endfn
+endrc
 
 v1 => !{Vector "Fuerza" !{Punto -34 2.9} 61}
 v2 => !{Vector "Aceleración" !{Punto 2, 8} 19.7778}
+v_def => !Vector

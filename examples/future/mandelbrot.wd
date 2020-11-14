@@ -1,0 +1,39 @@
+##################################################################
+### Implementación básica de números complejos y sus funciones ###
+##################################################################
+
+Complex: record =>
+    real => 0
+    im => 0
+
+    add: func(z) =>
+        <- !{Complex real + z'real im + z'im}
+    endfn
+
+    mul: func(z) =>
+        <- !{Complex real * z'real - im * z'im (real * z'im + z'real * im}
+    endfn
+
+    abs: func() =>
+        <- real^2 + i^2
+    endfn
+endrc
+
+main: func() =>
+    while y => -1, y < 1, y => y + 0.05:
+        while x => -2.05, x < 0.55, x => x + 0.03:
+            z => !{Complex 0 0}
+            while _ => 0, _ <= 100, _ => _ + 1:
+                z => !(!(z'mul z)'add !{Complex x y})
+            endwl
+            if !z'abs < 2:
+                !(print "#")
+            else:
+                !(print ":")
+            endif
+        endwl
+        !printLine
+    endwl
+endfn
+
+!main

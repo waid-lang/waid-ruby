@@ -1,0 +1,57 @@
+##################################################################
+### Implementación básica de números complejos y sus funciones ###
+##################################################################
+
+# Número Complejo
+Complex: func(r, i) =>
+    <- [r, i]
+endfn
+
+# Suma de complejos
+cadd: func(c1, c2) =>
+    <- [0@c1 + 0@c2, 1@c1 + 1@c2]
+endfn
+
+# Multiplicación de complejos
+cmul: func(c1, c2) =>
+    r1 => 0@c1
+    i1 => 1@c1
+
+    r2 => 0@c2
+    i2 => 1@c2
+    <- [r1 * r2 - i1 * i1, r1 * i2 + r2 * i1]
+endfn
+
+# Módulo de un complejo
+cabs: func(c1) =>
+    r => 0@c1
+    i => 1@c1
+    <- r * r + i * i
+endfn
+
+main: func() =>
+    y => -1
+    while y < 1:
+        x => -2.05
+        while x < 0.55:
+            z => !(Complex 0 0)
+
+            i => 0
+            while i <= 100:
+                z => !(cadd !(cmul z z) !(Complex x y))
+                i => i + 1
+            endwl
+
+            if !(cabs z) < 2:
+                !(print "#")
+            else:
+                !(print ":")
+            endif
+            x => x + 0.03
+        endwl
+        !printLine
+        y => y + 0.05
+    endwl
+endfn
+
+!main

@@ -1,5 +1,5 @@
 require_relative '../parser/ast'
-require_relative 'object'
+require_relative 'waid_object'
 require_relative '../tokenizer/tokenizer'
 require_relative 'builtin'
 

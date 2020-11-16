@@ -31,6 +31,7 @@ def main
   file = ARGV.pop
 
   begin
+    # Creamos un nuevo objeto Builder
     builder = Builder.new
 
     if @options[:show_tokens]

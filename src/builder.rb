@@ -6,6 +6,14 @@ require_relative 'parser/parser'
 require_relative 'exec/enviroment'
 require_relative 'exec/eval'
 
+# El Builder es el responsable de juntar todas las piezas del compilador e
+# interpretador. El builder se encarga pasarle los tokens del tokenizador al
+# parser, y el AST del parser al interpretador.
+#
+# Este también maneja todas las opciones del cli usadas para el debug como la
+# impresión de los tokens generados o la impresión del árbol sintáctico del
+# programa.
+
 class Builder
   attr_writer :source_path
   def initialize()
@@ -14,6 +22,8 @@ class Builder
     @show_env = false
     @source_path = String.new
   end
+
+  # Pseudo setters
 
   def set_show_tokens
     @show_tokens = true
@@ -27,18 +37,27 @@ class Builder
     @show_env = true
   end
 
+  # Función principal llamada en main
   def run
+
+    # Creamos un objeto archivo
     source_file = WaidFile.new(@source_path)
 
+    # error_colector es la única instancia que se crea de ErrorCollector. Esta
+    # se va a pasar a cada fase del compilador para que... recolecte errores.
     error_collector = ErrorCollector.new(source_file)
 
+    # tokenizer es la única instancia de tokenizer.
     tokenizer = Tokenizer.new(source_file, error_collector)
     tokenizer.tokenize!
 
+    # Si se generaron errores en la fase de análisis léxico, mostrarlos.
     if error_collector.hasErrors
       error_collector.showErrors
     end
 
+    # Si se seleccionó la opción en la cli, mostramos los tokens junto al
+    # número de linea en donde aparecen.
     if @show_tokens
       tokenizer.tokens.each do |tok|
         puts "#{tok.get_line_number}| #{tok.to_s} #{tok.value}"
@@ -46,23 +65,32 @@ class Builder
       puts
     end
 
+    # parser es la única instancia de Parser
     parser = Parser.new(tokenizer.tokens, error_collector)
     parser.parse!
-
+  
+    # Mostramos es AST generado si es que el usuario seleccionó la opción.
     if @show_ast
       #parser.ast.to_string
       parser.ast.print_tree("", true)
       puts
     end
-
+    
+    # Y mostramos los errores generados durante el análisis sintáctico.
     if error_collector.hasErrors
       error_collector.showErrors
     end
 
     env = Enviroment.new
+
+    # Interpretamos el AST con el nuevo ambiente
     res = eval_node(parser.ast, env)
+
+    # Mostramos el estado final del Env
     if @show_env
       puts " \nEnviroment:"
+
+      # Mostramos las variables
       if not env.Objects.empty?
         puts "Global variables"
         puts "----------------"
@@ -70,7 +98,9 @@ class Builder
           puts "#{k} => #{v.inspect}"
         end
       end
-    if not env.Functions.empty?
+      
+      # Y mostramos las funciones declaradas
+      if not env.Functions.empty?
         puts "Functions"
         puts "---------"
         env.Functions.each do |k, v|

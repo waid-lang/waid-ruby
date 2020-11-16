@@ -1,4 +1,4 @@
-require_relative 'object'
+require_relative 'waid_object'
 
 builtin_printLine = Proc.new do |ob|
   if not ob

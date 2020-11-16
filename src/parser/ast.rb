@@ -1,9 +1,19 @@
+# PORFAVORNOMEFUNENPORUSARVARIABLESGLOBALES
+#
+# Todas estas son para el pretty print del árbol sintáctico.
+# No voy a comentar mucho las funciones "print_tree" de cada nodo porque:
+# 1) Son muy enredadas
+# 2) Están 100% listas y no creo que necesiten mejoras
+#
+# Si tú, lector, quieres darte la lata de entender el print_tree y mejorarlo,
+# bienvenido seas, pero no creo que valga la pena.
 $AST_INDENTATION = 4
 $AST_LAST = "└" + "─" * ($AST_INDENTATION - 1)
 $AST_MIDDLE = "├" + "─" * ($AST_INDENTATION - 1)
 $AST_LINE = "│" + " " * ($AST_INDENTATION - 1)
 $AST_SPACE = " " * $AST_INDENTATION
 
+# Esto también es parte del pretty print
 def indentation(last)
   if last
     print $AST_LAST
@@ -14,6 +24,8 @@ def indentation(last)
   end
 end
 
+# El nodo programa es la raiz del árbol sintáctico. Consiste de un arreglo de
+# Nodos de estamentos.
 class Program
   attr_accessor :Statements
   def initialize
@@ -28,6 +40,9 @@ class Program
   end
 end
 
+# Correponde a un nodo de un arreglo de Nodos de estamentos. Lo podría poner en
+# Programa, pero por alguna razón no lo he hecho. Si quieres hacerlo y hacer un
+# pull request, genial, te compro un juguito.
 class StatementList
   attr_accessor :Statements
   def initialize
@@ -43,6 +58,12 @@ class StatementList
   end
 end
 
+# Nodo correspondiente al estamento return de una función.
+# En el código se vería algo así:
+# <- *Alguna expresión*
+#
+# Corresponde a un ReturnValue que es un nodo representando una expresión de
+# algún tipo.
 class ReturnStatement
   attr_accessor :ReturnValue
   def initialize

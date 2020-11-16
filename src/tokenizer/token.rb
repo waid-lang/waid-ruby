@@ -1,3 +1,8 @@
+
+# Estos son todos los tipos de Tokens que Waid posee. Hay lexers que usan
+# strings nomás, pero ellos no saben ná B).
+# Mejor hacer un enum y que cada token esté representado por un número debajo
+# de la mesa.
 module TokenKind
   # Misc
   EOF                  = 0x00
@@ -58,6 +63,8 @@ module TokenKind
   OP_CLOSE_BRACKETS    = 0x31
 end
 
+# token_string: TokenKind -> String
+# Me devuelve una representación en string del tok
 def token_string(tok)
   s = case tok
       when TokenKind::EOF
@@ -171,22 +178,33 @@ def token_string(tok)
         #when TokenKind::END
         #  "END"
       end
-  s
+  s # "s" xd
 end
 
 # TODO: Implementar como Struct mejor (?)
+# Token representa un token en Waid. Garsias, esa explicación no sirvió de
+# nada.
 class Token
   attr_accessor :value
   attr_reader :kind
   attr_reader :source_position
-  # Sería bueno implementar una clase que represente la posición en el código
-  # fuente.
+
   def initialize(token_kind, source_pos, value=nil)
+
+    # El TokenKind
     @kind = token_kind
+
+    # El valor del token si es que existe. Por ejemplo:
+    # kind = LiteralInt, value = 10
+    # Se entiende...
     @value = value
+
+    # Posición en el código fuente del token
+    # T = SourcePosition
     @source_position = source_pos
   end
 
+  # Getters
   def get_line_number
     @source_position.line
   end

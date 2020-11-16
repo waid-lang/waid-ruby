@@ -82,9 +82,75 @@ endfn
 sum => !(call add 382 284)
 !(print sum)
 ```
-### Conditionals
-### Builtin Functions
+### Control Flow
+#### If Statement
+If statements in Waid work just like in any other language. The elseif/elif syntax isn't implemented yet, but it will be in the future.
+```ruby
+falsey => null
+truthy => 5
 
-## TODO
-- Arrays
-- Hashes
+if true and truthy:
+    !(printLine ":D")
+else:
+    !(printLine ":(")
+endif
+
+if false or not falsey:
+	!(printLine ":D x2")
+endif
+```
+
+#### While Loop
+While loops work normally aswell. For loops haven't been implemented yet.
+```ruby
+x => 0
+while x < 10:
+    !(printLine x)
+    x => x + 1
+endwl
+```
+### Builtin Functions
+Waid has 6 builtin functions at the moment:
+#### printLine
+Prints its arguments string representation to Stdout and appends a line break to it.
+```ruby
+!(printLine "str") # str
+!(printLine 6) # 6
+!(printLine printLine) # Builtin function
+```
+#### print
+Prints its argument without appending a new line.
+```ruby
+!(print "Hello ")
+!(print "world")
+# Hello world
+```
+#### length
+Returns the length of a string or array. If the arguments is neither of those, it returns null.
+```ruby
+!(length "hola :)") # 7
+!(length [1, "dos", 7 - 4, ["cua", "tro"]]) # 4
+!(length 7) # null
+```
+#### input
+Input doesn't take any arguments and returns a string read from Stdin.
+```ruby
+a => !input
+!(printLine a)
+```
+#### toNum
+toNum converts its argument into its numeric representation, if it doesn't exist, it returns null. Because of this it can also be used to check if a string is in fact a number or not.
+```ruby
+num => !(toNum !input)
+if num: # Is not null
+    num => num + 1
+else:
+    !(printLine "No ingresaste un número :(")
+endif
+```
+#### toStr
+toStr converts its argument into its string representation.
+```ruby
+n => 7
+frase => "Este es el número " . !(toStr n) . "!!" # String concatenation
+```

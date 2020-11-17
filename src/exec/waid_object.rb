@@ -137,6 +137,57 @@ class WaidArray < WaidObject
   end
 end
 
+class WaidRecord < WaidObject
+  attr_accessor :TypeName, :Env
+  def initialize(env=Enviroment.new)
+    @TypeName = nil
+    @Env = env
+  end
+
+  def type
+    "Record"
+  end
+
+  def inspect
+    str = "<Record("
+    @Env.Objects.each do |id, val|
+      str += "#{id}"
+      str += ", "
+    end
+    str = str[0...-2]
+    str += ")>"
+    str
+  end
+end
+
+class WaidRecordInstance < WaidObject
+  attr_accessor :Identifier, :Env
+  def initialize(env=Enviroment.new)
+    @Identifier = nil
+    @Env = env
+  end
+
+  def type
+    "Record"
+  end
+
+  def inspect
+    str = "<#{@Identifier.Value}("
+    @Env.Objects.each do |id, val|
+      if val.is_a? WaidString
+        str += "#{id} => \"#{val.inspect}\""
+      else
+        str += "#{id} => #{val.inspect}"
+      end
+      str += ", "
+    end
+    str = str[0...-2]
+    str += ")>"
+    str
+  end
+end
+
+
 class WaidNull < WaidObject
   attr_accessor :Value
   def initialize

@@ -1,0 +1,36 @@
+Node: record =>
+    value => null
+    right => null
+    left => null
+endrc
+
+expr => !{Node
+    "+"
+    !{Node 4 null null}
+    !{Node
+        "*"
+        !{Node 8 null null}
+        !{Node 10 null null}
+    }
+}
+
+node_identity: func(node) =>
+    <- node
+endfn
+
+eval: func(node) =>
+    if not node:
+        <- node
+    endif
+    if !(toNum node'value):
+        <- node'value
+    endif
+    if !(node_identity node)'value == "+":
+        <- !(eval node'right) + !(eval node'left)
+    endif
+    if node'value == "*":
+        <- !(eval node'right) * !(eval node'left)
+    endif
+endfn
+
+!(printLine !(eval expr))

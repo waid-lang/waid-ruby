@@ -11,9 +11,8 @@ LITERAL_FLOAT    = DECIMALES, ".", DECIMALES;
 DECIMALES        = DIGITO_DECIMAL, {DIGITO_DECIMAL};
 LITERAL          = LITERAL_ENTERO
                  | LITERAL_FLOAT;
-                
+   
 OPERANDO         = LITERAL
-                 | IDENTIFICADOR
                  | "(", EXPR, ")";
                 
 LISTA_STMTS      = {ESTAMENTO};
@@ -43,11 +42,39 @@ OP_MULT          = "*"
                  | "%";
 NEG              = "-", NEG
                  | EXPR_PRIMARIA
-EXPR_PRIMARIA    = OPERANDO
-                 | FUNC_CALL;
+
+
+# EXPR_PRIMARIA    = EXPR_PRIMARIA, ["'", IDENTIFICADOR]
+#                  | OPERANDO
+#                  | FUNC_CALL
+#                  | RECORD_INIT;
+#
+# Aquí tendríamos recursión por la izquierda y nuestro parser no puede procesar
+# estas gramáticas. Para eso utilizaremos lo siguiente:
+#
+# A -> AB | C1 | C2 | C3 | C4...
+# => A  -> C1A' | C2A' | C3A' | C4A'...
+#    A' -> BA' | ε
+#
+# De esta forma conservamos la gramática y eliminamos la recursión por la
+# izquierda :)
+# Lo malo es que nos va a quedar una gramática media fea. Pero lo vale,
+# supongo.
+# Quedaría así:
+EXPR_PRIMARIA    = OPERANDO, EXPR_PRIMARIA_P
+                 | FUNC_CALL, EXPR_PRIMARIA_P
+                 | RECORD_INIT, EXPR_PRIMARIA_P
+EXPR_PRIMARIA_P  = "'", IDENTIFICADOR, EXPR_PRIMARIA_P
+                 | ε
+             
+RECORD_INIT      = "!", "{", IDENTIFICADOR, [LISTA_EXPR], "}";
+                 | "!", IDENTIFICADOR;
 
 FUNC_CALL        = "!", "(", IDENTIFICADOR, [LISTA_EXPR], ")";
                  | "!", IDENTIFICADOR;
+
+DECL_RECORD      = DECL_TIPO, "record", "=>", CUERPO_RECORD;
+CUERPO_RECORD    = [DECL_VARIABLE], "endrc"
 
 TIPO_FUNC        = "func", PARAMETROS;
 PARAMETROS       = "(", [LISTA_PARAMS], ")";
@@ -69,6 +96,7 @@ WHILE_STMT       = "while", EXPR, WHILE_BODY, ":", LISTA_STMTS, "endwl";
 RETURN_STMTS     = "<-", EXPR;
 ESTAMENTO        = DECL_VARIABLE
                  | DECL_FUNC
+                 | DECL_RECORD
                  | RETURN_STMT
                  | IF_STMT
                  | WHILE_STMT

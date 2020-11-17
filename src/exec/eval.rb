@@ -42,6 +42,22 @@ def eval_node(node, env)
     arguments = evalExpressions(node.Arguments, env)
     return callFunction(env, func, arguments)
 
+  when RecordDeclarationStatement
+    # Hago esto para que el record pueda definir atributos de su propio tipo
+    env.set_ob(node.Identifier.Value, nil)
+    record_env = Enviroment.new
+    node.VariableDeclarations.each do |vd|
+      eval_node(vd, record_env)
+    end
+    rec_literal = WaidRecord.new(record_env)
+    env.set_ob(node.Identifier.Value, rec_literal)
+    return rec_literal
+
+  when RecordInitialize
+    id = node.Identifier
+    arguments = evalExpressions(node.Arguments, env)
+    return initRecord(id, arguments, env)
+
   when ReturnStatement
     return eval_node(node.ReturnValue, env)
 
@@ -78,6 +94,10 @@ def eval_node(node, env)
     expr_r = eval_node(node.Right, env)
     return evalBinaryOperatorExpression(node.Operator, expr_l, expr_r, env)
 
+  when AttributeAccessExpression
+    object = eval_node(node.Object, env)
+    attr = eval_node(node.Attribute, object.Env)
+    return attr
   when Identifier
     return evalIdentifier(node, env)
   end
@@ -134,10 +154,11 @@ def evalUnaryOperatorExpression(operator, expr)
   when TokenKind::OP_MINUS
     return evalMinusOperatorExpression(expr)
   when TokenKind::KEY_NOT
-    if expr.is_a?(WaidString) or expr.is_a?(WaidNull)
+    if expr.is_a?(WaidString) or expr.is_a?(WaidNull) or expr.is_a?(WaidRecordInstance)
       val = isFalse(expr)
       return boolToWaidBoolean(val)
     end
+    puts expr
     return boolToWaidBoolean(!expr.Value)
   end
 end
@@ -286,6 +307,27 @@ def newFunctionEnv(funcs, func, args)
   env
 end
 
+def initRecord(identifier, arguments, env)
+  rc_inst = WaidRecordInstance.new
+  rc_inst.Identifier = identifier
+
+  record = eval_node(identifier, env)
+
+  keys = record.Env.Objects.keys
+  if arguments.none?
+    # Si no hay argumentos, usamos los valores default
+    rc_inst.Env = record.Env
+  elsif arguments.length != keys.length
+    puts "Wrong number of arguments to Record init"
+    exit()
+  else
+    arguments.each_with_index do |val, index|
+      rc_inst.Env.set_ob(keys[index], val)
+    end
+  end
+  rc_inst
+end
+
 def callFunction(funcs, func, arguments)
   # ENV = func.Env
   case func
@@ -329,7 +371,7 @@ def evalIdentifier(node, env)
   # Debería tener un sistema de error
   puts "NameError: Undefined variable '#{node.Value}'"
   exit() # Salida floja por ahora. TODO: Crear sistema de manjeo de excepciones en runtime
-  return nil
+  nil
 end
 
 def evalStatementList(node, env)

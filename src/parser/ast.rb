@@ -60,10 +60,13 @@ end
 
 # Nodo correspondiente al estamento return de una función.
 # En el código se vería algo así:
-# <- *Alguna expresión*
 #
 # Corresponde a un ReturnValue que es un nodo representando una expresión de
 # algún tipo.
+# Por ejemplo:
+#   <- x + y
+#      ~~+~~
+#        +-----> @ReturnValue
 class ReturnStatement
   attr_accessor :ReturnValue
   def initialize
@@ -79,6 +82,17 @@ class ReturnStatement
   end
 end
 
+# Representa una declaración de variable en el código fuente.
+# Guarda el nombre del identificador y el arbol de una expresión como valor
+# asignado.
+#
+# Por ejemplo
+# var_name => 5
+#
+# var_name24 => var_name * 2 - 3
+# ~~~~~+~~~~    ~~~~~~~~+~~~~~~~
+#      |                +----------> @Value
+#      +---------------------------> @Identifier
 class VarDeclarationStatement
   attr_accessor :Identifier
   attr_accessor :Value
@@ -100,6 +114,19 @@ class VarDeclarationStatement
   end
 end
 
+
+# Este nodo representa la asignación de un valor a un elemento de un arreglo.
+# En el código fuente esto es:
+# (expr @ arreglo) => expr
+#
+# Por ejemplo:
+# (2 @ array) => 2 * 3 - 3
+#
+# ((i - 1) @ array) => i * 2
+#  ~~~+~~~   ~~+~~     ~~+~~
+#     |        |         +--------> @Value
+#     |        +------------------> @ArrayIdentifier
+#     +---------------------------> @IndexExpression 
 class ArrayIndexDeclarationStatement
   attr_accessor :IndexExpression
   attr_accessor :Value
@@ -126,6 +153,21 @@ class ArrayIndexDeclarationStatement
   end
 end
 
+
+# Este nodo representa la declaración de una función.
+#
+# Ejemplo:
+#
+#  +----------------------> @Identifier
+#  |          +-----------> @Parameters
+# ~+~       ~~+~~
+# max: func(x, y) =>
+#     if x > y:      |
+#         <- x       |
+#     endif          +----> @Body
+#     <- y           |
+# endfn
+#
 class FuncDeclarationStatement
   attr_accessor :Identifier
   attr_accessor :Parameters
@@ -156,6 +198,21 @@ class FuncDeclarationStatement
   end
 end
 
+# Representa el llamado de una función.
+#
+# Ejemplos:
+#
+# Sin argumentos.
+#
+# !printLine
+#  ~~~~+~~~~
+#      +---------> @Function
+#
+# Con argumentos.
+# !(max 3 350)
+#   ~+~ ~~+~~
+#    |    +------> @Arguments
+#    +-----------> @Function
 class FunctionCall
   attr_accessor :Function, :Arguments
   def initialize(f=nil, a=Array.new)
@@ -178,6 +235,8 @@ class FunctionCall
   end
 end
 
+# Representa una hoja vacía. Puede ser un Body de una función vació o un return
+# sin nada, por ejemplo.
 class Empty
   def print_tree(indent, last)
     print indent
@@ -187,6 +246,16 @@ class Empty
   end
 end
 
+
+# Representa un estamento if-else
+# Ejemplo:
+#           +----------------------> @Condition
+#    ~~~~~~~+~~~~~~~~
+# if var - 2 > ruedas:
+#     !(printLine "mal ahí") +-----> @Body
+# else:
+#     <- x * 2 +-------------------> @ElseBody
+# endif
 class IfStatement
   attr_accessor :Condition, :Body, :ElseBody
   def initialize
@@ -218,6 +287,16 @@ class IfStatement
   end
 end
 
+# Representa un bucle While.
+# Ejemplo:
+# 
+#          +--------------> @Condition
+#       ~~~+~~~
+# while x < 150:
+#     !(printLine x) |
+#     a => x         +----> @Body
+#     x => x + 1     |
+# endwl
 class WhileStatement
   attr_accessor :Condition, :Body
   def initialize
@@ -240,6 +319,7 @@ class WhileStatement
   end
 end
 
+# Este nodo representa un identificador. Es una hoja en el AST.
 class Identifier
   attr_accessor :Value
   def initialize(value)
@@ -255,6 +335,24 @@ class Identifier
   end
 end
 
+# Representa una operación binaria.
+#
+# Ejemplo compuesto:
+#
+#          +-----------> @Right
+#          | +---------> @Operator
+#          | | +-------> @Right
+# valor => 2 * a - 3
+#          ~~+~~ | +---> @Right
+#            |   +-----> @Operator
+#            +---------> @Left
+#
+# Esto puesto como un árbol:
+#               -
+#             /   \
+#           *      3
+#         /   \
+#        2     a
 class BinaryOperatorExpression
   attr_accessor :Left, :Operator, :Right
   def initialize(l, o, r)
@@ -279,6 +377,13 @@ class BinaryOperatorExpression
   end
 end 
 
+
+# Representa un operador unario. No tiene mucha más explicación, pero acá hay
+# unos ejemplos:
+#          +-----------> @Operator
+# valor => -(i * k)
+#           ~~~+~~~
+#              +-------> @Expression
 class UnaryOperatorExpression
   attr_accessor :Operator, :Expression
   def initialize(op=nil, exp=nil)
@@ -299,6 +404,12 @@ class UnaryOperatorExpression
   end
 end
 
+
+# De aquí para abajo son puras hojas del árbol. Son todos literales y creo que
+# se explican solos
+##############################################################################
+
+# Una hoja del árbol. Representa un literal entero (2, 6, 32329, 0,-4)
 class IntLiteral
   attr_accessor :Value
   def initialize(val=nil)
@@ -314,6 +425,8 @@ class IntLiteral
   end
 end
 
+# Representa un literal de un arreglo. Guarda internamente en un arreglo todos
+# los elementos del literal.
 class ArrayLiteral
   attr_accessor :Values
   def initialize

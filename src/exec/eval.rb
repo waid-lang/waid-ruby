@@ -3,6 +3,7 @@ require_relative 'waid_object'
 require_relative '../tokenizer/tokenizer'
 require_relative 'builtin'
 
+# No quiero comentar este archivo porque lo voy a reescribir desde cero :(
 NullValue = WaidNull.new
 TrueValue = WaidBoolean.new(true)
 FalseValue = WaidBoolean.new(false)

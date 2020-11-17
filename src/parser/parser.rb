@@ -2,6 +2,20 @@ require_relative 'ast'
 require_relative '../tokenizer/token'
 require_relative '../common/error_collector'
 
+# Parser es el generador del árbol sintáctico de un programa en Waid. Es, según
+# yo, la parte más importante de todo el proceso, pues tiene codificada
+# directamente la gramática del lenguaje. El parser es el que verifica
+# finalmente si un programa está bien escrito o no, esto es, si sigue las
+# reglas gramaticales establecidas para el lenguaje.
+#
+# No hay mucho que añadir puesto que, siendo un parser recursivo descendiente,
+# este es una traducción casi literal de la gramática del lenguaje (Esta está
+# completa en "grammar.ebnf"). Por lo mismo, solo están comentadas las partes
+# que no tienen una correlación directa con lo establecido en el archivo
+# mencionado.
+#
+# En general, siempre que haga un cambio en "grammar.ebnf" también haré uno
+# acá.
 class Parser
   attr_accessor :ast
   def initialize(tokens, err_coll)

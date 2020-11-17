@@ -61,10 +61,10 @@ DECL_TIPO        = IDENTIFICADOR, ":";
 
 DECL_VARIABLE    = IDENTIFICADOR, "=>", EXPR;
 
-IF_STMT          = "if", EXPR, "=>", LISTA_STMTS, [ELIF_BLOCK], "endif";
-ELIF_BLOCK       = "else", "=>", LISTA_STMTS;
+IF_STMT          = "if", EXPR, ":", LISTA_STMTS, [ELIF_BLOCK], "endif";
+ELIF_BLOCK       = "else", ":", LISTA_STMTS;
 
-WHILE_STMT       = "while", EXPR, WHILE_BODY, "=>", LISTA_STMTS, "endwl";
+WHILE_STMT       = "while", EXPR, WHILE_BODY, ":", LISTA_STMTS, "endwl";
 
 RETURN_STMTS     = "<-", EXPR;
 ESTAMENTO        = DECL_VARIABLE

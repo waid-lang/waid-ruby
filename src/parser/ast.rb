@@ -447,6 +447,15 @@ class BinaryOperatorExpression
   end
 end 
 
+# Representa el acceso al atributo de un record.
+# Ejemplo compuesto:
+#
+#              +----------------------> @Object
+#              |        +-------------> @Attribute
+#           ~~~+~~~ ~~~~+~~~
+# pos_x => (Vector1'posicion)'x
+#          ~~~~~~~~~+~~~~~~~  +-------> @Attribute
+#                   +-----------------> @Object
 class AttributeAccessExpression
   attr_accessor :Object, :Attribute
   def initialize(o, a)

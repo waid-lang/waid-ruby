@@ -6,7 +6,7 @@ endrc
 
 expr => !{Node
     "+"
-    !{Node "4" null null}
+    !{Node 4 null null}
     !{Node
         "*"
         !{Node 8 null null}

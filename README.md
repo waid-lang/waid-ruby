@@ -96,7 +96,7 @@ else:
 endif
 
 if false or not falsey:
-	!(printLine ":D x2")
+    (printLine ":D x2")
 endif
 ```
 
@@ -108,6 +108,28 @@ while x < 10:
     !(printLine x)
     x => x + 1
 endwl
+```
+### Records
+Records are what structures are called in Waid. Their declaration has a similar syntax to the one used when calling functions. Attributes are accessed using a single quote ***'***
+```ruby
+# Complex number
+Complex: record =>
+    real => 0
+    imaginary => 0
+endrc
+
+complex_str: func(z) =>
+    str => !(toStr z'real)
+	if z'imaginary < 0:
+        str => str . " - " . !(toStr -z'imaginary)
+    else:
+        str => str . " + " . !(toStr z'imaginary)
+    endif
+    <- str . "i"
+endfn
+
+comp_number => !{Complex 1 4}
+!(printLine !(complex_str comp_number)) # 1 + 4i
 ```
 ### Builtin Functions
 Waid has 6 builtin functions at the moment:

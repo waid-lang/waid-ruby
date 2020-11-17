@@ -140,7 +140,7 @@ end
 class WaidRecord < WaidObject
   attr_accessor :TypeName, :Env
   def initialize(env=Enviroment.new)
-    @TypeName
+    @TypeName = nil
     @Env = env
   end
 

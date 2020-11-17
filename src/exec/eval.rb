@@ -94,6 +94,10 @@ def eval_node(node, env)
     expr_r = eval_node(node.Right, env)
     return evalBinaryOperatorExpression(node.Operator, expr_l, expr_r, env)
 
+  when AttributeAccessExpression
+    object = eval_node(node.Object, env)
+    attr = eval_node(node.Attribute, object.Env)
+    return attr
   when Identifier
     return evalIdentifier(node, env)
   end
@@ -150,10 +154,11 @@ def evalUnaryOperatorExpression(operator, expr)
   when TokenKind::OP_MINUS
     return evalMinusOperatorExpression(expr)
   when TokenKind::KEY_NOT
-    if expr.is_a?(WaidString) or expr.is_a?(WaidNull)
+    if expr.is_a?(WaidString) or expr.is_a?(WaidNull) or expr.is_a?(WaidRecordInstance)
       val = isFalse(expr)
       return boolToWaidBoolean(val)
     end
+    puts expr
     return boolToWaidBoolean(!expr.Value)
   end
 end
@@ -309,8 +314,16 @@ def initRecord(identifier, arguments, env)
   record = eval_node(identifier, env)
 
   keys = record.Env.Objects.keys
-  arguments.each_with_index do |val, index|
-    rc_inst.Env.set_ob(keys[index], val)
+  if arguments.none?
+    # Si no hay argumentos, usamos los valores default
+    rc_inst.Env = record.Env
+  elsif arguments.length != keys.length
+    puts "Wrong number of arguments to Record init"
+    exit()
+  else
+    arguments.each_with_index do |val, index|
+      rc_inst.Env.set_ob(keys[index], val)
+    end
   end
   rc_inst
 end

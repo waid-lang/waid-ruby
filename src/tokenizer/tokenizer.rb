@@ -13,6 +13,8 @@ $keywords = {
   "else" => TokenKind::KEY_ELSE,
   "elif" => TokenKind::KEY_ELIF,
   "endif" => TokenKind::KEY_ENDIF,
+  "record" => TokenKind::KEY_RECORD,
+  "endrc" => TokenKind::KEY_ENDRC,
   "and" => TokenKind::KEY_AND,
   "or" => TokenKind::KEY_OR,
   "not" => TokenKind::KEY_NOT,
@@ -288,6 +290,8 @@ class Tokenizer
           TokenKind::OP_COMMA
         when '.'
           TokenKind::OP_DOT
+        when '\''
+          TokenKind::OP_SINGLE_QUOTE
         when ':'
           TokenKind::OP_COLON
         when '('
@@ -298,6 +302,10 @@ class Tokenizer
           TokenKind::OP_OPEN_BRACKETS
         when ']'
           TokenKind::OP_CLOSE_BRACKETS
+        when '{'
+          TokenKind::OP_OPEN_CURLYBRACES
+        when '}'
+          TokenKind::OP_CLOSE_CURLYBRACES
         else
           return false
         end

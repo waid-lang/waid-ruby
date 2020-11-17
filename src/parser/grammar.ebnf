@@ -11,9 +11,11 @@ LITERAL_FLOAT    = DECIMALES, ".", DECIMALES;
 DECIMALES        = DIGITO_DECIMAL, {DIGITO_DECIMAL};
 LITERAL          = LITERAL_ENTERO
                  | LITERAL_FLOAT;
+
+ACCESO_ATRIBUTO  = EXPR_PRIMARIA, ["'", IDENTIFICADOR];
                 
 OPERANDO         = LITERAL
-                 | IDENTIFICADOR
+                 | ACCESO_ATRIBUTO
                  | "(", EXPR, ")";
                 
 LISTA_STMTS      = {ESTAMENTO};
@@ -44,10 +46,17 @@ OP_MULT          = "*"
 NEG              = "-", NEG
                  | EXPR_PRIMARIA
 EXPR_PRIMARIA    = OPERANDO
-                 | FUNC_CALL;
+                 | FUNC_CALL
+                 | RECORD_INIT;
+
+RECORD_INIT      = "!", "{", IDENTIFICADOR, [LISTA_EXPR], "}";
+                 | "!", IDENTIFICADOR;
 
 FUNC_CALL        = "!", "(", IDENTIFICADOR, [LISTA_EXPR], ")";
                  | "!", IDENTIFICADOR;
+
+DECL_RECORD      = DECL_TIPO, "record", "=>", CUERPO_RECORD;
+CUERPO_RECORD    = [DECL_VARIABLE], "endrc"
 
 TIPO_FUNC        = "func", PARAMETROS;
 PARAMETROS       = "(", [LISTA_PARAMS], ")";
@@ -69,6 +78,7 @@ WHILE_STMT       = "while", EXPR, WHILE_BODY, ":", LISTA_STMTS, "endwl";
 RETURN_STMTS     = "<-", EXPR;
 ESTAMENTO        = DECL_VARIABLE
                  | DECL_FUNC
+                 | DECL_RECORD
                  | RETURN_STMT
                  | IF_STMT
                  | WHILE_STMT

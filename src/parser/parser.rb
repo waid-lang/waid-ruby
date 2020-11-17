@@ -76,6 +76,7 @@ class Parser
   def parseStatement
     # ESTAMENTO = DECL_VARIABLE
     #           | DECL_FUNC
+    #           | DECL_RECORD
     #           | RETURN_STMT
     #           | IF_STMT
     #           | WHILE_STMT
@@ -84,8 +85,14 @@ class Parser
     when TokenKind::OP_OPEN_PARENTHESIS
       return parseArrayElementDeclarationStatement
     when TokenKind::IDENTIFIER # Puede ser declaración de función o de variable
+      id = @current_token
       if peekTokenEquals(TokenKind::OP_COLON)
-        return parseFunctionDeclStatement
+        pushToken
+        if peekTokenEquals(TokenKind::KEY_FUNC)
+          return parseFunctionDeclStatement(id)
+        elsif peekTokenEquals(TokenKind::KEY_RECORD)
+          return parseRecordDeclStatement(id)
+        end
       elsif peekTokenEquals(TokenKind::OP_ASSIGN)
         return parseVarDeclStatement
       end
@@ -144,14 +151,14 @@ class Parser
     statement
   end
 
-  def parseFunctionDeclStatement
+  def parseFunctionDeclStatement(id)
     # DECL_FUNC   = DECL_TIPO, TIPO_FUNC, CUERPO_FUNC;
     # CUERPO_FUNC = "=>", LISTA_STMTS, "endfn";
     # DECL_TIP    = IDENTIFICADOR, ":";
     # TIPO_FUNC        = "func", PARAMETROS
     statement = FuncDeclarationStatement.new
 
-    statement.Identifier = Identifier.new(@current_token.value)
+    statement.Identifier = Identifier.new(id.value)
 
     consumePeek(TokenKind::OP_COLON)
 
@@ -212,6 +219,27 @@ class Parser
       end
     end
     list
+  end
+
+  def parseRecordDeclStatement(id)
+    consumePeek(TokenKind::KEY_RECORD)
+    consumePeek(TokenKind::OP_ASSIGN)
+    rec_decl = RecordDeclarationStatement.new
+    rec_decl.Identifier = Identifier.new(id.value)
+
+    while peekTokenEquals(TokenKind::IDENTIFIER)
+      var_decl = VarDeclarationStatement.new
+      var_decl.Identifier = Identifier.new(@peek_token.value)
+      pushToken
+
+      consumePeek(TokenKind::OP_ASSIGN)
+
+      var_decl.Value = parseExpression
+      rec_decl.VariableDeclarations.push(var_decl)
+    end
+
+    consumePeek(TokenKind::KEY_ENDRC)
+    rec_decl
   end
 
   def parseReturnStatement
@@ -371,7 +399,11 @@ class Parser
     #               | FUNC_CALL;
     if peekTokenEquals(TokenKind::OP_EXCLAMATION)
       consumePeek(TokenKind::OP_EXCLAMATION)
-      return parseFunctionCall
+      if peekTokenEquals(TokenKind::OP_OPEN_PARENTHESIS)
+        return parseFunctionCall
+      elsif peekTokenEquals(TokenKind::OP_OPEN_CURLYBRACES)
+        return parseRecordInit
+      end
     end
     return parseOperand
   end
@@ -412,6 +444,38 @@ class Parser
     expr.Arguments.push(Empty.new)
     expr
   end
+
+  def parseRecordInit
+    expr = RecordInitialize.new
+    #consumePeek(TokenKind::OP_EXCLAMATION)
+    if peekTokenEquals(TokenKind::OP_OPEN_CURLYBRACES)
+      # Tiene argumentos
+      pushToken
+      consumePeek(TokenKind::IDENTIFIER)
+
+      expr.Identifier = Identifier.new(@current_token.value)
+      expr.Arguments.push(parseExpression)
+
+      if not peekTokenEquals(TokenKind::OP_CLOSE_CURLYBRACES)
+        expr.Arguments.push(parseExpression)
+      end
+      
+      expr_ = parseExpression
+      while expr_
+        expr.Arguments.push(expr_)
+        expr_ = parseExpression
+      end
+
+      consumePeek(TokenKind::OP_CLOSE_CURLYBRACES)
+      return expr
+    end
+      # Sin argumentos
+    consumePeek(TokenKind::IDENTIFIER)
+    expr.Identifier = Identifier.new(@current_token.value)
+    expr.Arguments.push(Empty.new)
+    expr
+  end
+
 
   def parseArrayLiteral
     elements = Array.new

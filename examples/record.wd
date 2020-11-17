@@ -1,0 +1,19 @@
+BinOp: record =>
+    right => nil
+    operator => nil
+    left => nil
+endrc
+
+Number: record =>
+    value => nil
+endrc
+
+expr => !{BinOp
+    !{Number 6}
+    "+"
+    !{BinOp
+        !{Number 8}
+        "*"
+        !{Number 10}
+    }
+}

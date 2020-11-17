@@ -198,6 +198,38 @@ class FuncDeclarationStatement
   end
 end
 
+# Nodo que representa la delcaración de un nuevo record.
+# Ejemplo:
+#
+#    +----------------------> @Identifier
+# ~~~+~~~
+# Persona: record =>
+#     nombre => ""     |
+#     edad = 0         +----> @VariableDeclarations
+#     cant_brazos => 2 |
+# endrc
+class RecordDeclarationStatement
+  attr_accessor :Identifier, :VariableDeclarations
+  def initialize
+    @Identifier = nil
+    @VariableDeclarations = Array.new
+  end
+
+  def print_tree(indent, last)
+    print indent
+    indent += indentation(last)
+
+    puts "RecordDeclaration"
+    puts indent + $AST_MIDDLE + "Identifier"
+    @Identifier.print_tree(indent + $AST_LINE, true)
+
+    puts indent + $AST_LAST + "VariableDeclarations"
+    @VariableDeclarations.each_with_index do |decl, index|
+      decl.print_tree(indent + $AST_SPACE, index == @VariableDeclarations.length - 1)
+    end
+  end
+end
+
 # Representa el llamado de una función.
 #
 # Ejemplos:
@@ -234,6 +266,44 @@ class FunctionCall
     end
   end
 end
+
+# Este nodo representa la inicialización de un record.
+# Ejemplos:
+#
+# Sin argumentos (Se inicializa con valores default).
+#
+# v => !Vector
+#       ~~+~~~
+#         +--------> @Identifier
+#
+# Con argumentos.
+#
+# v2 => !{Vector "Fuerza" 2 67}
+#         ~~+~~~ ~~~~~~+~~~~~~
+#           |          +---------> @Identifier
+#           +--------------------> @Arguments
+class RecordInitialize
+  attr_accessor :Identifier, :Arguments
+  def initialize
+    @Identifier = nil
+    @Arguments = Array.new
+  end
+
+  def print_tree(indent, last)
+    print indent
+    indent += indentation(last)
+
+    puts "RecordInitialize"
+    puts indent + $AST_MIDDLE + "Identifier"
+    @Identifier.print_tree(indent + $AST_LINE, true)
+
+    puts indent + $AST_LAST + "Arguments"
+    @Arguments.each_with_index do |stmt, index|
+      stmt.print_tree(indent + $AST_SPACE, index == @Arguments.length - 1)
+    end
+  end
+end
+
 
 # Representa una hoja vacía. Puede ser un Body de una función vació o un return
 # sin nada, por ejemplo.

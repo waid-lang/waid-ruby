@@ -160,8 +160,6 @@ class Parser
 
     statement.Identifier = Identifier.new(id.value)
 
-    consumePeek(TokenKind::OP_COLON)
-
     consumePeek(TokenKind::KEY_FUNC)
 
     statement.Parameters = parseFunctionParameters

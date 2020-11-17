@@ -1,11 +1,16 @@
 BinOp: record =>
-    right => nil
-    operator => nil
-    left => nil
+    right => null
+    operator => null
+    left => null
 endrc
 
+a: func(x, y) =>
+    s => 0
+    <- x
+endfn
+
 Number: record =>
-    value => nil
+    value => null
 endrc
 
 expr => !{BinOp
@@ -17,3 +22,5 @@ expr => !{BinOp
         !{Number 10}
     }
 }
+
+!(printLine expr)

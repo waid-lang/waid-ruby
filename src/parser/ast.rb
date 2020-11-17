@@ -447,6 +447,27 @@ class BinaryOperatorExpression
   end
 end 
 
+class AttributeAccessExpression
+  attr_accessor :Object, :Attribute
+  def initialize(o, a)
+    @Object = o
+    @Attribute = a
+  end
+
+  def print_tree(indent, last)
+    print indent
+    indent += indentation(last)
+
+    puts "AttributeAccess"
+    puts indent + $AST_MIDDLE + "Object"
+    @Object.print_tree(indent + $AST_LINE, true)
+
+    puts indent + $AST_LAST + "Attribute"
+    @Attribute.print_tree(indent + $AST_SPACE, true)
+  end
+end 
+
+
 
 # Representa un operador unario. No tiene mucha más explicación, pero acá hay
 # unos ejemplos:

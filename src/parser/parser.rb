@@ -395,15 +395,37 @@ class Parser
   def parsePrimaryExpression
     # EXPR_PRIMARIA = OPERANDO
     #               | FUNC_CALL;
+    operand = WaidObject.new
     if peekTokenEquals(TokenKind::OP_EXCLAMATION)
       consumePeek(TokenKind::OP_EXCLAMATION)
       if peekTokenEquals(TokenKind::OP_OPEN_PARENTHESIS)
-        return parseFunctionCall
+        operand = parseFunctionCall
       elsif peekTokenEquals(TokenKind::OP_OPEN_CURLYBRACES)
-        return parseRecordInit
+        operand = parseRecordInit
       end
+    else
+      operand = parseOperand
     end
-    return parseOperand
+
+    # Por ahora solo tengo implementado el acceso a un atributo a la vez, es
+    # decir, no puedo hacer algo tipo:
+    #
+    # pos_x => vector_1'posicion'x
+    #
+    # Tendría que hacerlo de 2 formas:
+    #
+    # 1) pos => vector_1'posicion
+    #    pos_x => pos'x
+    #
+    # 2) pos_x => (vector_1'posicion)'x
+    if peekTokenEquals(TokenKind::OP_SINGLE_QUOTE)
+
+      pushToken
+      consumePeek(TokenKind::IDENTIFIER)
+      attr_acc = AttributeAccessExpression.new(operand, Identifier.new(@current_token.value))
+      return attr_acc
+    end
+    operand
   end
 
   def parseFunctionCall

@@ -11,11 +11,8 @@ LITERAL_FLOAT    = DECIMALES, ".", DECIMALES;
 DECIMALES        = DIGITO_DECIMAL, {DIGITO_DECIMAL};
 LITERAL          = LITERAL_ENTERO
                  | LITERAL_FLOAT;
-
-ACCESO_ATRIBUTO  = EXPR_PRIMARIA, ["'", IDENTIFICADOR];
-                
+   
 OPERANDO         = LITERAL
-                 | ACCESO_ATRIBUTO
                  | "(", EXPR, ")";
                 
 LISTA_STMTS      = {ESTAMENTO};
@@ -45,10 +42,31 @@ OP_MULT          = "*"
                  | "%";
 NEG              = "-", NEG
                  | EXPR_PRIMARIA
-EXPR_PRIMARIA    = OPERANDO
-                 | FUNC_CALL
-                 | RECORD_INIT;
 
+
+# EXPR_PRIMARIA    = EXPR_PRIMARIA, ["'", IDENTIFICADOR]
+#                  | OPERANDO
+#                  | FUNC_CALL
+#                  | RECORD_INIT;
+#
+# Aquí tendríamos recursión por la izquierda y nuestro parser no puede procesar
+# estas gramáticas. Para eso utilizaremos lo siguiente:
+#
+# A -> AB | C1 | C2 | C3 | C4...
+# => A  -> C1A' | C2A' | C3A' | C4A'...
+#    A' -> BA' | ε
+#
+# De esta forma conservamos la gramática y eliminamos la recursión por la
+# izquierda :)
+# Lo malo es que nos va a quedar una gramática media fea. Pero lo vale,
+# supongo.
+# Quedaría así:
+EXPR_PRIMARIA    = OPERANDO, EXPR_PRIMARIA_P
+                 | FUNC_CALL, EXPR_PRIMARIA_P
+                 | RECORD_INIT, EXPR_PRIMARIA_P
+EXPR_PRIMARIA_P  = "'", IDENTIFICADOR, EXPR_PRIMARIA_P
+                 | ε
+             
 RECORD_INIT      = "!", "{", IDENTIFICADOR, [LISTA_EXPR], "}";
                  | "!", IDENTIFICADOR;
 

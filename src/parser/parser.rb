@@ -146,6 +146,7 @@ class Parser
     # TODO: Implementar todo esto como un método y que lo añada como error
     consumePeek(TokenKind::OP_ASSIGN)
     #pushToken
+    statement.Token = @current_token
 
     statement.Value = parseExpression
     statement
@@ -161,6 +162,7 @@ class Parser
     statement.Identifier = Identifier.new(id.value)
 
     consumePeek(TokenKind::KEY_FUNC)
+    statement.Token = @current_token
 
     statement.Parameters = parseFunctionParameters
 
@@ -243,12 +245,14 @@ class Parser
   def parseReturnStatement
     # RETURN_STMTS = "<-", EXPR;
     statement = ReturnStatement.new
+    statement.Token = @current_token
     statement.ReturnValue = parseExpression
     return statement
   end
 
   def parseIfStatement
     stmt = IfStatement.new
+    stmt.Token = @current_token
     stmt.Condition = parseExpression
 
     # Definimos elsebody al tiro por si no sale nada
@@ -272,6 +276,7 @@ class Parser
 
   def parseWhileStatement
     stmt = WhileStatement.new
+    stmt.Token = @current_token
     stmt.Condition = parseExpression
 
     #consumePeek(TokenKind::OP_ASSIGN)
@@ -398,7 +403,7 @@ class Parser
     operand = WaidObject.new
     if peekTokenEquals(TokenKind::OP_EXCLAMATION)
       consumePeek(TokenKind::OP_EXCLAMATION)
-      if peekTokenEquals(TokenKind::OP_OPEN_PARENTHESIS)
+      if peekTokenEquals(TokenKind::OP_OPEN_PARENTHESIS) or peekTokenEquals(TokenKind::IDENTIFIER)
         operand = parseFunctionCall
       elsif peekTokenEquals(TokenKind::OP_OPEN_CURLYBRACES)
         operand = parseRecordInit
@@ -430,6 +435,7 @@ class Parser
 
   def parseFunctionCall
     expr = FunctionCall.new
+    expr.Token = @current_token
     #consumePeek(TokenKind::OP_EXCLAMATION)
     if peekTokenEquals(TokenKind::OP_OPEN_PARENTHESIS)
       # Tiene argumentos
@@ -457,9 +463,8 @@ class Parser
       return expr
     end
       # Sin argumentos
-    if not consumePeek(TokenKind::IDENTIFIER)
-      return nil
-    end
+    consumePeek(TokenKind::IDENTIFIER)
+
     expr.Function = Identifier.new(@current_token.value)
     expr.Arguments.push(Empty.new)
     expr
@@ -467,6 +472,7 @@ class Parser
 
   def parseRecordInit
     expr = RecordInitialize.new
+    expr.Token = @current_token
     #consumePeek(TokenKind::OP_EXCLAMATION)
     if peekTokenEquals(TokenKind::OP_OPEN_CURLYBRACES)
       # Tiene argumentos

@@ -14,6 +14,20 @@ expr => !{Node
     }
 }
 
+expr_err => !{Node
+    "/"
+    !{Node
+        "-"
+        !{Node 4 null null}
+        !{Node 4 null null}
+    }
+    !{Node
+        "*"
+        !{Node 78 null null}
+        !{Node -6 null null}
+    }
+}
+
 node_identity: func(node) =>
     <- node
 endfn
@@ -26,11 +40,23 @@ eval: func(node) =>
         <- node'value
     endif
     if !(node_identity node)'value == "+":
-        <- !(eval node'right) + !(eval node'left)
+        <- !(eval node'left) + !(eval node'right)
+    endif
+    if node'value == "-":
+        <- !(eval node'left) - !(eval node'right)
     endif
     if node'value == "*":
-        <- !(eval node'right) * !(eval node'left)
+        <- !(eval node'left) * !(eval node'right)
+    endif
+    if node'value == "/":
+        right => !(eval node'right)
+        if right == 0:
+            !(printLine "¡División por 0!")
+            <- null
+        endif
+        <- !(eval node'left) * right
     endif
 endfn
 
 !(printLine !(eval expr))
+!(printLine !(eval expr_err))

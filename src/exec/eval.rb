@@ -158,7 +158,6 @@ def evalUnaryOperatorExpression(operator, expr)
       val = isFalse(expr)
       return boolToWaidBoolean(val)
     end
-    puts expr
     return boolToWaidBoolean(!expr.Value)
   end
 end

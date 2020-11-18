@@ -65,11 +65,13 @@ end
 # algún tipo.
 # Por ejemplo:
 #   <- x + y
-#      ~~+~~
-#        +-----> @ReturnValue
+#   +  ~~+~~
+#   |    +-----> @ReturnValue
+#   +----------> @Token
 class ReturnStatement
-  attr_accessor :ReturnValue
+  attr_accessor :Token, :ReturnValue
   def initialize
+    @Token = nil
     @ReturnValue = nil
   end
 
@@ -89,6 +91,8 @@ end
 # Por ejemplo
 # var_name => 5
 #
+#            +---------------------> @Token
+#            +
 # var_name24 => var_name * 2 - 3
 # ~~~~~+~~~~    ~~~~~~~~+~~~~~~~
 #      |                +----------> @Value
@@ -96,7 +100,9 @@ end
 class VarDeclarationStatement
   attr_accessor :Identifier
   attr_accessor :Value
+  attr_accessor :Token
   def initialize(id=nil, val=nil)
+    @Token = nil
     @Identifier = id
     @Value = val
   end
@@ -120,18 +126,20 @@ end
 # (expr @ arreglo) => expr
 #
 # Por ejemplo:
+#
 # (2 @ array) => 2 * 3 - 3
 #
+#                   +-------------> @Token
+#                   +
 # ((i - 1) @ array) => i * 2
 #  ~~~+~~~   ~~+~~     ~~+~~
 #     |        |         +--------> @Value
 #     |        +------------------> @ArrayIdentifier
 #     +---------------------------> @IndexExpression 
 class ArrayIndexDeclarationStatement
-  attr_accessor :IndexExpression
-  attr_accessor :Value
-  attr_accessor :ArrayIdentifier
+  attr_accessor :Token, :IndexExpression, :Value, :ArrayIdentifier
   def initialize(ind=nil, name=nil, val=nil)
+    @Token = nil
     @IndexExpression = ind
     @ArrayIdentifier = name
     @Value = val
@@ -159,8 +167,9 @@ end
 # Ejemplo:
 #
 #  +----------------------> @Identifier
-#  |          +-----------> @Parameters
-# ~+~       ~~+~~
+#  |    +-----------------> @Token
+#  |    |     +-----------> @Parameters
+# ~+~  ~+~~ ~~+~~
 # max: func(x, y) =>
 #     if x > y:      |
 #         <- x       |
@@ -169,10 +178,9 @@ end
 # endfn
 #
 class FuncDeclarationStatement
-  attr_accessor :Identifier
-  attr_accessor :Parameters
-  attr_accessor :Body
+  attr_accessor :Token, :Identifier, :Parameters, :Body
   def initialize
+    @Token = nil
     @Identifier = nil
     @Parameters = Array.new
     @Body = nil
@@ -202,15 +210,17 @@ end
 # Ejemplo:
 #
 #    +----------------------> @Identifier
-# ~~~+~~~
+#    |        +-------------> @Token
+# ~~~+~~~  ~~~+~~
 # Persona: record =>
 #     nombre => ""     |
 #     edad = 0         +----> @VariableDeclarations
 #     cant_brazos => 2 |
 # endrc
 class RecordDeclarationStatement
-  attr_accessor :Identifier, :VariableDeclarations
+  attr_accessor :Token, :Identifier, :VariableDeclarations
   def initialize
+    @Token = nil
     @Identifier = nil
     @VariableDeclarations = Array.new
   end
@@ -241,13 +251,16 @@ end
 #      +---------> @Function
 #
 # Con argumentos.
+# +--------------> @Token
+# +
 # !(max 3 350)
 #   ~+~ ~~+~~
 #    |    +------> @Arguments
 #    +-----------> @Function
 class FunctionCall
-  attr_accessor :Function, :Arguments
+  attr_accessor :Token, :Function, :Arguments
   def initialize(f=nil, a=Array.new)
+    @Token = nil
     @Function = f
     @Arguments = a
   end
@@ -277,14 +290,16 @@ end
 #         +--------> @Identifier
 #
 # Con argumentos.
-#
+#       +------------------------> @Token
+#       +
 # v2 => !{Vector "Fuerza" 2 67}
 #         ~~+~~~ ~~~~~~+~~~~~~
 #           |          +---------> @Identifier
 #           +--------------------> @Arguments
 class RecordInitialize
-  attr_accessor :Identifier, :Arguments
+  attr_accessor :Token, :Identifier, :Arguments
   def initialize
+    @Token = nil
     @Identifier = nil
     @Arguments = Array.new
   end
@@ -319,16 +334,19 @@ end
 
 # Representa un estamento if-else
 # Ejemplo:
-#           +----------------------> @Condition
-#    ~~~~~~~+~~~~~~~~
+#
+# +--------------------------------> @Token
+# |         +----------------------> @Condition
+# +  ~~~~~~~+~~~~~~~~
 # if var - 2 > ruedas:
 #     !(printLine "mal ahí") +-----> @Body
 # else:
 #     <- x * 2 +-------------------> @ElseBody
 # endif
 class IfStatement
-  attr_accessor :Condition, :Body, :ElseBody
+  attr_accessor :Token, :Condition, :Body, :ElseBody
   def initialize
+    @Token = nil
     @Condition = nil
     @Body = nil
     @ElseBody = nil
@@ -360,16 +378,18 @@ end
 # Representa un bucle While.
 # Ejemplo:
 # 
-#          +--------------> @Condition
-#       ~~~+~~~
+#   +---------------------> @Token
+#   |      +--------------> @Condition
+# ~~+~~ ~~~+~~~
 # while x < 150:
 #     !(printLine x) |
 #     a => x         +----> @Body
 #     x => x + 1     |
 # endwl
 class WhileStatement
-  attr_accessor :Condition, :Body
+  attr_accessor :Token, :Condition, :Body
   def initialize
+    @Token = nil
     @Condition = nil
     @Body = nil
   end
@@ -393,6 +413,10 @@ end
 class Identifier
   attr_accessor :Value
   def initialize(value)
+    
+    # El token IDENTIFIER
+    @Token = nil
+
     @Value = value
   end
 
@@ -410,11 +434,11 @@ end
 # Ejemplo compuesto:
 #
 #          +-----------> @Right
-#          | +---------> @Operator
+#          | +---------> @Operator/@Token
 #          | | +-------> @Right
 # valor => 2 * a - 3
 #          ~~+~~ | +---> @Right
-#            |   +-----> @Operator
+#            |   +-----> @Operator/@Token
 #            +---------> @Left
 #
 # Esto puesto como un árbol:
@@ -424,8 +448,9 @@ end
 #         /   \
 #        2     a
 class BinaryOperatorExpression
-  attr_accessor :Left, :Operator, :Right
+  attr_accessor :Token, :Left, :Operator, :Right
   def initialize(l, o, r)
+    @Token = nil # El token del operador: TokenKind::OP_*
     @Left = l
     @Operator = o
     @Right = r
@@ -451,14 +476,17 @@ end
 # Ejemplo compuesto:
 #
 #              +----------------------> @Object
-#              |        +-------------> @Attribute
-#           ~~~+~~~ ~~~~+~~~
+#              |   +------------------> @Token
+#              |   |    +-------------> @Attribute
+#           ~~~+~~~+~~~~+~~~
 # pos_x => (Vector1'posicion)'x
-#          ~~~~~~~~~+~~~~~~~  +-------> @Attribute
+#          ~~~~~~~~~+~~~~~~~ ++-------> @Attribute
+#                   |        +--------> @Token
 #                   +-----------------> @Object
 class AttributeAccessExpression
-  attr_accessor :Object, :Attribute
+  attr_accessor :Token, :Object, :Attribute
   def initialize(o, a)
+    @Token = nil
     @Object = o
     @Attribute = a
   end
@@ -480,13 +508,15 @@ end
 
 # Representa un operador unario. No tiene mucha más explicación, pero acá hay
 # unos ejemplos:
-#          +-----------> @Operator
+#          +-----------> @Operator/@Token
+#          +
 # valor => -(i * k)
 #           ~~~+~~~
 #              +-------> @Expression
 class UnaryOperatorExpression
   attr_accessor :Operator, :Expression
   def initialize(op=nil, exp=nil)
+    @Token = nil
     @Operator = op
     @Expression = exp
   end

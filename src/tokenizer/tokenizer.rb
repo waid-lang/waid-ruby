@@ -121,8 +121,7 @@ class Tokenizer
       SourcePosition.new(
         @line_number,
         @column_number,
-        @source.line_indexes.last,
-        @source
+        @source.line_indexes.last
       ),
       value
     )
@@ -133,12 +132,10 @@ class Tokenizer
     @error_collector.addError(
       CompilationError.new(
         desc,
-        getFullLine,
         SourcePosition.new(
           @line_number,
           @column_number,
-          @source.line_indexes.last,
-          @source
+          @source.line_indexes.last
         )
       )
     )

@@ -11,7 +11,7 @@ resta: func(x, y) =>
 endfn
 
 max: func(nombres_arbitrariamente_largos_punto_com, i) =>
-    if nombres_arbitrariamente_largos_punto_com > i =>
+    if nombres_arbitrariamente_largos_punto_com > i:
         <- nombres_arbitrariamente_largos_punto_com
     endif
     <- i

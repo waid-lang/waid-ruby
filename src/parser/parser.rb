@@ -48,17 +48,18 @@ class Parser
     @peek_token.kind == tok
   end
 
+  def addParseError(desc, sp)
+    c_err = CompilationError.new(desc, sp)
+    @error_collector.addError(c_err)
+    @error_collector.showErrors
+  end
+
   def consumePeek(token_kind)
     if peekTokenEquals(token_kind)
       pushToken
       return true
     end
-    @error_collector.addError(CompilationError.new(
-      "Expected '#{token_string(token_kind)}', but got '#{@peek_token}' instead.",
-      @error_collector.getLine(@peek_token.source_position),
-      @peek_token.source_position
-    ))
-    @error_collector.showErrors
+    addParseError("Expected '#{token_string(token_kind)}', but got '#{@peek_token}' instead.", @peek_token.source_position)
     return nil
   end
 
@@ -113,19 +114,9 @@ class Parser
     stmt = ArrayIndexDeclarationStatement.new
     index_expr = parseExpression
     if index_expr.Operator.kind != TokenKind::OP_AT
-       @error_collector.addError(CompilationError.new(
-        "Expected '@', but got '#{@peek_token}' instead.",
-        @error_collector.getLine(@peek_token.source_position),
-        @peek_token.source_position
-      ))
-      @error_collector.showErrors
+      addParseError("Expected '@', but got #{@peek_token} instead.", @peek_token.source_position)
     elsif not index_expr.Right.is_a?(Identifier)
-      @error_collector.addError(CompilationError.new(
-        "Expected 'Identifier', but got '#{@current_token}' instead.",
-        @error_collector.getLine(@current_token.source_position),
-        @current_token.source_position
-      ))
-      @error_collector.showErrors
+      addParseError("Expected 'IDENTIFIER', but got '#{@current_token}' instead.", @current_token.source_position)
     end
 
     consumePeek(TokenKind::OP_CLOSE_PARENTHESIS)
@@ -255,6 +246,10 @@ class Parser
     stmt.Token = @current_token
     stmt.Condition = parseExpression
 
+    if not stmt.Condition
+      addParseError("Expected expression for if statement.", @current_token.source_position)
+    end
+
     # Definimos elsebody al tiro por si no sale nada
     stmt.ElseBody = StatementList.new
 
@@ -286,10 +281,6 @@ class Parser
 
     consumePeek(TokenKind::KEY_ENDWL)
     stmt
-  end
-
-  def parseExpressionStatement
-    nil
   end
 
   def parseExpression
@@ -440,9 +431,7 @@ class Parser
     if peekTokenEquals(TokenKind::OP_OPEN_PARENTHESIS)
       # Tiene argumentos
       pushToken
-      if not consumePeek(TokenKind::IDENTIFIER)
-        return nil
-      end
+      consumePeek(TokenKind::IDENTIFIER)
 
       expr.Function = Identifier.new(@current_token.value)
       expr.Arguments.push(parseExpression)
@@ -457,9 +446,7 @@ class Parser
         expr_ = parseExpression
       end
 
-      if not consumePeek(TokenKind::OP_CLOSE_PARENTHESIS)
-        return nil
-      end
+      consumePeek(TokenKind::OP_CLOSE_PARENTHESIS)
       return expr
     end
       # Sin argumentos

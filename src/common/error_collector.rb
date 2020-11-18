@@ -6,7 +6,7 @@ def number_of_digits(num)
   Math.log10(num + 1).ceil
 end
 
-CompilationError = Struct.new(:error_description, :full_line, :source_position) do
+CompilationError = Struct.new(:error_description, :source_position) do
   def to_s
     # Ya que implementaré estos mensajes de error en el futuro, me quedo satisfecho con unos más simples.
     # Modelos de errores
@@ -51,6 +51,12 @@ class ErrorCollector
     not @errors.empty?
   end
 
+  def formatError(c_err)
+    full_line = getLine(c_err.source_position)
+    error_string = "Error: #{c_err.error_description}\n\t#{c_err.source_position.line}| #{full_line}\n\t"
+    error_string += " " * (c_err.source_position.column + number_of_digits(c_err.source_position.line) + 1) + "^"
+  end
+
   # showErrors muestra los errores uno por uno. Eso xd
   def showErrors
     # Primero mostramos el nombre del archivo
@@ -58,7 +64,7 @@ class ErrorCollector
 
     # Y luego los errores
     @errors.each do |err|
-      puts "\t#{err.to_s}"
+      puts "\t#{formatError(err)}"
     end
 
     # Luego lanzamos un error para que el "rescue" en waid.rb lo atrape y se

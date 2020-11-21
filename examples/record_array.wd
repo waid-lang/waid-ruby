@@ -1,0 +1,45 @@
+Circle: record =>
+    radius => 0
+    colour => ""
+endrc
+
+floor: func(x) =>
+    <- x - x % 1
+endfn
+
+pow: func(base, exp) =>
+    if exp == 0:
+        <- 1
+    endif
+    <- base * !(pow base exp - 1)
+endfn
+
+circle_area: func(circ) =>
+    pi => 3.14
+    <- !(round pi * circ'radius * circ'radius 5)
+endfn
+
+round: func(num, decimal_places) =>
+    pow_10 => !(pow 10 decimal_places)
+    <- !(floor 0.5 + pow_10 * num) / pow_10
+endfn
+
+circle_info: func(circ) =>
+    <- "Color: " . circ'colour . "; Area: " . !(toStr !(circle_area circ))
+endfn
+
+main: func() =>
+    circles => [
+        !{Circle 12 "Green"},
+        !{Circle 37 "Red"},
+        !{Circle 46 "Blue"}
+    ]
+
+    x => 0
+    while x < !(length circles):
+        !(printLine !(circle_info x@circles))
+        x => x + 1
+    endwl
+endfn
+
+!main

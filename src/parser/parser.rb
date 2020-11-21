@@ -48,6 +48,8 @@ class Parser
     @peek_token.kind == tok
   end
 
+  # TODO: Reescribir esta función para que reciba un Token
+  # y no un SourcePosition.
   def addParseError(desc, sp)
     c_err = CompilationError.new(desc, sp)
     @error_collector.addError(c_err)
@@ -111,28 +113,46 @@ class Parser
   end
 
   def parseArrayElementDeclarationStatement
-    stmt = ArrayIndexDeclarationStatement.new
+    stmt = VarDeclarationStatement.new
+    index_access_expr = IndexAccessExpression.new
+
     index_expr = parseExpression
     if index_expr.Operator.kind != TokenKind::OP_AT
       addParseError("Expected '@', but got #{@peek_token} instead.", @peek_token.source_position)
-    elsif not index_expr.Right.is_a?(Identifier)
-      addParseError("Expected 'IDENTIFIER', but got '#{@current_token}' instead.", @current_token.source_position)
+    
+    # No creo que este elsif sea necesario porque el nombre del arreglo podría surgir de una
+    # expresión, por ejemplo:
+    #
+    # range: func(num) =>
+    #     arr => []
+    #     x => 0
+    #     while x < num:
+    #         arr => arr . x
+    #     endwl
+    # endfn
+    #
+    # length => 10
+    # ((length / 2) @ !(range length)) => 0
+    #elsif not index_expr.Right.is_a?(Identifier)
+    #  addParseError("Expected 'IDENTIFIER', but got '#{@current_token}' instead.", @current_token.source_position)
     end
 
     consumePeek(TokenKind::OP_CLOSE_PARENTHESIS)
     consumePeek(TokenKind::OP_ASSIGN)
 
-    stmt.IndexExpression = index_expr.Left
-    stmt.ArrayIdentifier = index_expr.Right
+    index_access_expr.IndexExpression = index_expr.Left
+    index_access_expr.ArrayIdentifier = index_expr.Right
+
+    stmt.Left = index_access_expr
     stmt.Value = parseExpression
     stmt
   end
 
   def parseVarDeclStatement
-    # DECcurrentRIABLE = IDENTIFICADOR, "=>", EXPR;
+    # DECL_VARIABLE = IDENTIFICADOR, "=>", EXPR;
     statement = VarDeclarationStatement.new
     #end
-    statement.Identifier = Identifier.new(@current_token.value)
+    statement.Left = Identifier.new(@current_token.value)
 
     # TODO: Implementar todo esto como un método y que lo añada como error
     consumePeek(TokenKind::OP_ASSIGN)
@@ -391,7 +411,7 @@ class Parser
   def parsePrimaryExpression
     # EXPR_PRIMARIA = OPERANDO
     #               | FUNC_CALL;
-    operand = WaidObject.new
+    operand = nil
     if peekTokenEquals(TokenKind::OP_EXCLAMATION)
       consumePeek(TokenKind::OP_EXCLAMATION)
       if peekTokenEquals(TokenKind::OP_OPEN_PARENTHESIS) or peekTokenEquals(TokenKind::IDENTIFIER)

@@ -96,14 +96,22 @@ end
 # var_name24 => var_name * 2 - 3
 # ~~~~~+~~~~    ~~~~~~~~+~~~~~~~
 #      |                +----------> @Value
-#      +---------------------------> @Identifier
+#      +---------------------------> @Left
+#
+#
+#                   +-------------> @Token
+#                   +
+# ((i - 1) @ array) => i * 2
+#  ~~~~~~~~+~~~~~~~     ~~+~~
+#          |              +--------> @Value
+#          +-----------------------> @Left = IndexAccessExpression
 class VarDeclarationStatement
-  attr_accessor :Identifier
+  attr_accessor :Left
   attr_accessor :Value
   attr_accessor :Token
-  def initialize(id=nil, val=nil)
+  def initialize(l=nil, val=nil)
     @Token = nil
-    @Identifier = id
+    @Left = l
     @Value = val
   end
 
@@ -112,8 +120,8 @@ class VarDeclarationStatement
     indent += indentation(last)
 
     puts "VariableDeclaration"
-    puts indent + $AST_MIDDLE + "Identifier"
-    @Identifier.print_tree(indent + $AST_LINE, true)
+    puts indent + $AST_MIDDLE + "Left"
+    @Left.print_tree(indent + $AST_LINE, true)
 
     puts indent + $AST_LAST + "Value"
     @Value.print_tree(indent + $AST_SPACE, true)
@@ -129,35 +137,28 @@ end
 #
 # (2 @ array) => 2 * 3 - 3
 #
-#                   +-------------> @Token
-#                   +
-# ((i - 1) @ array) => i * 2
-#  ~~~+~~~   ~~+~~     ~~+~~
-#     |        |         +--------> @Value
+# ((i - 1) @ array)
+#     |        |
 #     |        +------------------> @ArrayIdentifier
 #     +---------------------------> @IndexExpression 
-class ArrayIndexDeclarationStatement
-  attr_accessor :Token, :IndexExpression, :Value, :ArrayIdentifier
+class IndexAccessExpression
+  attr_accessor :Token, :IndexExpression, :ArrayIdentifier
   def initialize(ind=nil, name=nil, val=nil)
     @Token = nil
     @IndexExpression = ind
     @ArrayIdentifier = name
-    @Value = val
   end
 
   def print_tree(indent, last)
     print indent
     indent += indentation(last)
 
-    puts "ArrayIndexDeclaration"
+    puts "IndexAccessExpression"
     puts indent + $AST_MIDDLE + "IndexExpression"
     @IndexExpression.print_tree(indent + $AST_LINE, true)
 
-    puts indent + $AST_MIDDLE + "ArrayIdentifier"
-    @ArrayIdentifier.print_tree(indent + $AST_LINE, true)
-
-    puts indent + $AST_LAST + "Value"
-    @Value.print_tree(indent + $AST_SPACE, true)
+    puts indent + $AST_LAST + "ArrayIdentifier"
+    @ArrayIdentifier.print_tree(indent + $AST_SPACE, true)
   end
 end
 

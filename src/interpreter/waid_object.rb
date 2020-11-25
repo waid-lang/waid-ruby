@@ -36,9 +36,10 @@ class WaidFunction < WaidObject
 end
 
 class WaidBuiltin < WaidObject
-  attr_accessor :Function
-  def initialize(fn=nil)
+  attr_accessor :Function, :Arity
+  def initialize(fn=nil, ar=0)
     @Function = fn
+    @Arity = ar
   end
   
   def type
@@ -151,7 +152,7 @@ class WaidRecord < WaidObject
 
   def inspect
     str = "<Record("
-    @Env.Objects.each do |id, val|
+    @Env.table.each do |id, val|
       str += "#{id}"
       str += ", "
     end

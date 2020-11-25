@@ -117,6 +117,7 @@ class Parser
     index_access_expr = IndexAccessExpression.new
 
     index_expr = parseExpression
+    index_access_expr.Token =  index_expr.Token
     if index_expr.Operator.kind != TokenKind::OP_AT
       addParseError("Expected '@', but got #{@peek_token} instead.", @peek_token.source_position)
     
@@ -152,7 +153,7 @@ class Parser
     # DECL_VARIABLE = IDENTIFICADOR, "=>", EXPR;
     statement = VarDeclarationStatement.new
     #end
-    statement.Left = Identifier.new(@current_token.value)
+    statement.Left = Identifier.new(@current_token.value, @current_token)
 
     # TODO: Implementar todo esto como un método y que lo añada como error
     consumePeek(TokenKind::OP_ASSIGN)
@@ -170,7 +171,7 @@ class Parser
     # TIPO_FUNC        = "func", PARAMETROS
     statement = FuncDeclarationStatement.new
 
-    statement.Identifier = Identifier.new(id.value)
+    statement.Identifier = Identifier.new(id.value, id)
 
     consumePeek(TokenKind::KEY_FUNC)
     statement.Token = @current_token
@@ -201,14 +202,14 @@ class Parser
 
     consumePeek(TokenKind::IDENTIFIER)
 
-    identifiers.push(Identifier.new(@current_token.value))
+    identifiers.push(Identifier.new(@current_token.value, @current_token))
 
     # TODO
     while peekTokenEquals(TokenKind::OP_COMMA)
       pushToken
       pushToken
 
-      identifiers.push(Identifier.new(@current_token.value))
+      identifiers.push(Identifier.new(@current_token.value, @current_token))
     end
 
     consumePeek(TokenKind::OP_CLOSE_PARENTHESIS)
@@ -236,11 +237,11 @@ class Parser
     consumePeek(TokenKind::KEY_RECORD)
     consumePeek(TokenKind::OP_ASSIGN)
     rec_decl = RecordDeclarationStatement.new
-    rec_decl.Identifier = Identifier.new(id.value)
+    rec_decl.Identifier = Identifier.new(id.value, id)
 
     while peekTokenEquals(TokenKind::IDENTIFIER)
       var_decl = VarDeclarationStatement.new
-      var_decl.Identifier = Identifier.new(@peek_token.value)
+      var_decl.Left = Identifier.new(@peek_token.value, @peek_token)
       pushToken
 
       consumePeek(TokenKind::OP_ASSIGN)
@@ -438,7 +439,7 @@ class Parser
 
       pushToken
       consumePeek(TokenKind::IDENTIFIER)
-      attr_acc = AttributeAccessExpression.new(operand, Identifier.new(@current_token.value))
+      attr_acc = AttributeAccessExpression.new(operand, Identifier.new(@current_token.value, @current_token))
       return attr_acc
     end
     operand
@@ -453,7 +454,7 @@ class Parser
       pushToken
       consumePeek(TokenKind::IDENTIFIER)
 
-      expr.Function = Identifier.new(@current_token.value)
+      expr.Function = Identifier.new(@current_token.value, @current_token)
       expr.Arguments.push(parseExpression)
 
       if not peekTokenEquals(TokenKind::OP_CLOSE_PARENTHESIS)
@@ -472,7 +473,7 @@ class Parser
       # Sin argumentos
     consumePeek(TokenKind::IDENTIFIER)
 
-    expr.Function = Identifier.new(@current_token.value)
+    expr.Function = Identifier.new(@current_token.value, @current_token)
     expr.Arguments.push(Empty.new)
     expr
   end
@@ -486,7 +487,7 @@ class Parser
       pushToken
       consumePeek(TokenKind::IDENTIFIER)
 
-      expr.Identifier = Identifier.new(@current_token.value)
+      expr.Identifier = Identifier.new(@current_token.value, @current_token)
       expr.Arguments.push(parseExpression)
 
       if not peekTokenEquals(TokenKind::OP_CLOSE_CURLYBRACES)
@@ -504,7 +505,7 @@ class Parser
     end
       # Sin argumentos
     consumePeek(TokenKind::IDENTIFIER)
-    expr.Identifier = Identifier.new(@current_token.value)
+    expr.Identifier = Identifier.new(@current_token.value, @current_token)
     expr.Arguments.push(Empty.new)
     expr
   end
@@ -535,7 +536,7 @@ class Parser
     case @peek_token.kind
     when TokenKind::IDENTIFIER
       consumePeek(TokenKind::IDENTIFIER)
-      operand = Identifier.new(@current_token.value)
+      operand = Identifier.new(@current_token.value, @current_token)
     when TokenKind::OP_OPEN_PARENTHESIS
       consumePeek(TokenKind::OP_OPEN_PARENTHESIS)
       operand = parseExpression

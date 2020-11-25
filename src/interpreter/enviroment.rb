@@ -1,7 +1,7 @@
 class Enviroment
-  def initialize
+  def initialize(outer=nil)
     @table = Hash.new
-    @outer = nil
+    @outer = outer
   end
 
   def table
@@ -10,9 +10,21 @@ class Enviroment
 
   # Devuelve el WaidObject asociado a key
   def get(key)
-    object = @table[key]
+    object = getLocal(key)
     if not object and @outer
-      object = @outer.get(key)
+      object = @outer.getLocal(key)
+    end
+    object
+  end
+
+  def getLocal(key)
+    @table[key]
+  end
+
+  def getGlobal(key)
+    object = getLocal(key)
+    if not object and @outer
+      object = @outer.getGlobal(key)
     end
     object
   end
@@ -21,6 +33,11 @@ class Enviroment
   def set(key, object)
     @table[key] = object
     object
+  end
+
+  def setArrayObject(id, index, value)
+    # Este es el medio hack siono
+    @table[id].Values[index] = value
   end
 
   # Devuelve el outer env

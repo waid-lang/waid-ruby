@@ -86,7 +86,6 @@ class Builder
     interpreter.run
 
    # Prefiero implementar esto después
-=begin
     # Mostramos el estado final del Env
     if @show_env
       puts " \nEnviroment:"
@@ -100,6 +99,5 @@ class Builder
         end
       end
     end
-=end
   end
 end

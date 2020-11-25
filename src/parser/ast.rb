@@ -412,11 +412,11 @@ end
 
 # Este nodo representa un identificador. Es una hoja en el AST.
 class Identifier
-  attr_accessor :Value
-  def initialize(value)
+  attr_accessor :Value, :Token
+  def initialize(value, tok)
     
     # El token IDENTIFIER
-    @Token = nil
+    @Token = tok
 
     @Value = value
   end
@@ -451,7 +451,7 @@ end
 class BinaryOperatorExpression
   attr_accessor :Token, :Left, :Operator, :Right
   def initialize(l, o, r)
-    @Token = nil # El token del operador: TokenKind::OP_*
+    @Token = o # El token del operador: TokenKind::OP_*
     @Left = l
     @Operator = o
     @Right = r

@@ -282,11 +282,39 @@ class Interpreter
     evalFunctionStatementList(func, func_env)
   end
 
+  def initRecord(node, env)
+    id = node.Identifier
+    arguments = evalExpressions(node.Arguments, env)
+
+    record_instance = WaidRecordInstance.new
+    record_instance.Identifier = id
+
+    record = resolveIdentifier(id, env, true)
+
+    keys = record.Env.table.keys
+    length = arguments.length
+    if arguments.none?
+      length = 0
+      record_instance.Env = record.Env
+    else
+      arguments.each_with_index do |val, index|
+        record_instance.Env.set(keys[index], val)
+      end
+    end
+
+    if arguments.length > keys.length
+      addRuntimeError("'#{id}' expects a maximum of #{keys.length} arguments, but #{arguments.length} were given.", node.Token)
+    end
+    record_instance
+  end
+
   def evalExpressions(expressions, env)
     res = Array.new
     expressions.each do |expr|
       ind_res = evalNode(expr, env)
-      res.push(ind_res)
+      if ind_res
+        res.push(ind_res)
+      end
     end
     res
   end
@@ -338,10 +366,15 @@ class Interpreter
       env.set(node.Identifier.Value, rec_literal)
       return rec_literal
 
+    when RecordInitialize
+      return initRecord(node, env)
+
     when IfStatement
       return evalIfStatement(node, env)
+
     when WhileStatement
       return evalWhileStatement(node, env)
+
     when FuncDeclarationStatement
       func_literal = WaidFunction.new(
         node.Parameters,
@@ -389,6 +422,11 @@ class Interpreter
     when UnaryOperatorExpression
       expr = evalNode(node.Expression, env)
       return evalUnaryOperatorExpression(node, expr)
+
+    when AttributeAccessExpression
+      object = evalNode(node.Object, env)
+      attr = evalNode(node.Attribute, object.Env)
+      return attr
 
     when Identifier
       return resolveIdentifier(node, env)

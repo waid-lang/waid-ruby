@@ -60,6 +60,7 @@ class ErrorCollector
   # showErrors muestra los errores uno por uno. Eso xd
   def showErrors
     # Primero mostramos el nombre del archivo
+    puts
     puts @source_file.get_filename
 
     # Y luego los errores

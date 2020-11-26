@@ -49,7 +49,7 @@ main: func() =>
             endif
             x => x + 0.03
         endwl
-        !printLine
+        !(printLine "")
         y => y + 0.05
     endwl
 endfn

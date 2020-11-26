@@ -43,10 +43,10 @@ builtin_toNum = Proc.new do |str|
 end
 
 $builtins = {
-  "printLine" => WaidBuiltin.new(builtin_printLine),
-  "print" => WaidBuiltin.new(builtin_print),
-  "length" => WaidBuiltin.new(builtin_length),
-  "input" => WaidBuiltin.new(builtin_input),
-  "toNum" => WaidBuiltin.new(builtin_toNum),
-  "toStr" => WaidBuiltin.new(builtin_toStr)
+  "printLine" => WaidBuiltin.new(builtin_printLine, 1),
+  "print" => WaidBuiltin.new(builtin_print, 1),
+  "length" => WaidBuiltin.new(builtin_length, 1),
+  "input" => WaidBuiltin.new(builtin_input, 0),
+  "toNum" => WaidBuiltin.new(builtin_toNum, 1),
+  "toStr" => WaidBuiltin.new(builtin_toStr, 1)
 }

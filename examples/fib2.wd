@@ -38,7 +38,7 @@ main: func() =>
         count => count + 1
     endwl
 
-    !printLine
+    !(printLine "")
 
     count => 0
     !(printLine "DP Fibonacci:")
@@ -48,7 +48,7 @@ main: func() =>
         count => count + 1
     endwl
 
-    !printLine
+    !(printLine "")
 
     count => 0
     !(printLine "Recursive Fibonacci:")
@@ -57,7 +57,7 @@ main: func() =>
         !(print " ")
         count => count + 1
     endwl
-    !printLine
+    !(printLine "")
 endfn
 
 !main

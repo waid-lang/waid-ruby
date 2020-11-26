@@ -3,8 +3,8 @@ require_relative 'common/waid_exception'
 require_relative 'common/file_util'
 require_relative 'tokenizer/tokenizer'
 require_relative 'parser/parser'
-require_relative 'exec/enviroment'
-require_relative 'exec/eval'
+require_relative 'interpreter/enviroment'
+require_relative 'interpreter/interpreter'
 
 # El Builder es el responsable de juntar todas las piezas del compilador e
 # interpretador. El builder se encarga pasarle los tokens del tokenizador al
@@ -81,29 +81,20 @@ class Builder
       error_collector.showErrors
     end
 
-    env = Enviroment.new
+    # Creamos un nuevo intérprete e interpretamos el AST
+    interpreter = Interpreter.new(parser.ast, error_collector)
+    interpreter.run
 
-    # Interpretamos el AST con el nuevo ambiente
-    res = eval_node(parser.ast, env)
-
+   # Prefiero implementar esto después
     # Mostramos el estado final del Env
     if @show_env
       puts " \nEnviroment:"
 
       # Mostramos las variables
-      if not env.Objects.empty?
+      if not interpreter.env.table.empty?
         puts "Global variables"
         puts "----------------"
-        env.Objects.each do |k, v|
-          puts "#{k} => #{v.inspect}"
-        end
-      end
-      
-      # Y mostramos las funciones declaradas
-      if not env.Functions.empty?
-        puts "Functions"
-        puts "---------"
-        env.Functions.each do |k, v|
+        interpreter.env.table.each do |k, v|
           puts "#{k} => #{v.inspect}"
         end
       end

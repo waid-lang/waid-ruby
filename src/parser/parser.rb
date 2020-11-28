@@ -117,6 +117,11 @@ class Parser
     index_access_expr = IndexAccessExpression.new
 
     index_expr = parseExpression
+    
+    if not index_expr.is_a? BinaryOperatorExpression
+      pushToken
+      addParseError("Expected '@', but got #{@current_token} instead.", index_expr.Token.source_position)
+    end
     index_access_expr.Token =  index_expr.Token
     if index_expr.Operator.kind != TokenKind::OP_AT
       addParseError("Expected '@', but got #{@peek_token} instead.", @peek_token.source_position)

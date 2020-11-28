@@ -219,11 +219,12 @@ end
 #     cant_brazos => 2 |
 # endrc
 class RecordDeclarationStatement
-  attr_accessor :Token, :Identifier, :VariableDeclarations
+  attr_accessor :Token, :Identifier, :VariableDeclarations, :InstanceFunctionDeclarations
   def initialize
     @Token = nil
     @Identifier = nil
     @VariableDeclarations = Array.new
+    @InstanceFunctionDeclarations = Array.new
   end
 
   def print_tree(indent, last)
@@ -234,9 +235,13 @@ class RecordDeclarationStatement
     puts indent + $AST_MIDDLE + "Identifier"
     @Identifier.print_tree(indent + $AST_LINE, true)
 
-    puts indent + $AST_LAST + "VariableDeclarations"
+    puts indent + $AST_MIDDLE + "VariableDeclarations"
     @VariableDeclarations.each_with_index do |decl, index|
-      decl.print_tree(indent + $AST_SPACE, index == @VariableDeclarations.length - 1)
+      decl.print_tree(indent + $AST_LINE, index == @VariableDeclarations.length - 1)
+    end
+    puts indent + $AST_LAST + "InstanceFunctionDeclarations"
+    @InstanceFunctionDeclarations.each_with_index do |decl, index|
+      decl.print_tree(indent + $AST_SPACE, index == @InstanceFunctionDeclarations.length - 1)
     end
   end
 end

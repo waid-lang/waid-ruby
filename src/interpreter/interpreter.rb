@@ -237,34 +237,44 @@ class Interpreter
   end
 
   def evalFunctionCall(node)
-    func = @runtime_stack.resolveName(node.Function.Value)
-
+    arguments = evalExpressions(node.Arguments)
+    func = evalNode(node.Function)
     if not func.is_a? WaidFunction and not func.is_a? WaidBuiltin
       addRuntimeError("#{func.type} is not callable.", node.Token)
     end
 
-    ar = StackFrame.new(node.Function.Value, @runtime_stack.getTopMost)
-    arguments = evalExpressions(node.Arguments)
-    @runtime_stack.push(ar)
+    if node.Function.is_a? AttributeAccessExpression
+      id = node.Function.Attribute
+      rec_inst = evalNode(node.Function.Object)
+      @runtime_stack.push(rec_inst.Env)
+    else
+      id = node.Function
+      ar = StackFrame.new(id.Value, @runtime_stack.getTopMost)
+      @runtime_stack.push(ar)
+    end
 
     length = arguments.length
     if arguments.none?
       length = 0
     end
     if func.Arity != length
-      addRuntimeError("'#{node.Function.Value}' takes #{func.Arity} positional arguments, but #{length} were given.", node.Token)
+      addRuntimeError("'#{id.Value}' takes #{func.Arity} positional arguments, but #{length} were given.", node.Token)
     end
 
     if func.is_a? WaidBuiltin
       a = func.Function.call(*arguments)
-      @runtime_stack.pop
       return a
     end
-    
+
+    #puts "CALLING #{id.Value}"
+    #puts "\nPARAMETERS"
     func.Parameters.each_with_index do |par, index|
+      #puts "\t#{par.Value} => #{arguments[index].inspect}"
       @runtime_stack.define(par.Value, arguments[index])
     end
+    #puts "END PARAMETERS"
     res = evalFunctionStatementList(func)
+
     @runtime_stack.pop
     res
   end
@@ -272,16 +282,16 @@ class Interpreter
   def initRecord(node)
     id = node.Identifier
     arguments = evalExpressions(node.Arguments)
-    record = @runtime_stack.resolveName(id.Value)
+    record = evalNode(id)
 
     record_instance = WaidRecordInstance.new
 
-    record_instance.Env = StackFrame.new
-    record_instance.Env.memory_map.each do |key, val|
+    record_instance.Identifier = id
+
+    record_instance.Env = StackFrame.new(id.Value)
+    record.Env.memory_map.each do |key, val|
       record_instance.Env.define(key, val)
     end
-
-    record_instance.Identifier = id
 
     keys = record.Env.getAllNames
     length = arguments.length
@@ -335,6 +345,7 @@ class Interpreter
   end
 
   def evalNode(node)
+    "CURRENT: #{@runtime_stack.getTopMost}"
     case node
     when Program
       ar = StackFrame.new("global", nil)
@@ -343,6 +354,7 @@ class Interpreter
       populateGlobals
 
       a = evalProgram(node)
+      @runtime_stack.pop
       return a
 
     when VarDeclarationStatement
@@ -373,7 +385,14 @@ class Interpreter
       node.VariableDeclarations.each do |vd|
         evalNode(vd)
       end
+
+      node.InstanceFunctionDeclarations.each do |vd|
+        evalNode(vd)
+      end
+
       rec_literal = WaidRecord.new(ar)
+
+      @runtime_stack.define(node.Identifier.Value, rec_literal)
       @runtime_stack.pop
 
       @runtime_stack.define(node.Identifier.Value, rec_literal)
@@ -409,7 +428,7 @@ class Interpreter
       # Expressions
     when IntLiteral
       return WaidInteger.new(node.Value)
-    
+
     when FloatLiteral
       return WaidFloat.new(node.Value)
 
@@ -447,13 +466,19 @@ class Interpreter
 
     when Identifier
       value = @runtime_stack.resolveName(node.Value)
+      #puts "\tRESOLVED #{node.Value} => #{value.class}"
+      #puts "\t  INSIDE UPPER: '#{@runtime_stack.getTopMost.identifier}'#{@runtime_stack.getTopMost.memory_map}"
+      if @runtime_stack.getTopMost.linkedTo
+        #puts "\t  INSIDE LOWER: '#{@runtime_stack.getTopMost.linkedTo.identifier}'#{@runtime_stack.getTopMost.linkedTo.memory_map}"
+      end
+      #puts
       if not value
         addRuntimeError("Undeclared variable '#{node.Value}'", node.Token)
       end
       value
     end
   end
-  
+
   def populateGlobals
     $builtins.each do |key, val|
       @runtime_stack.define(key, val)

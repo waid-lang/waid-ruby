@@ -116,20 +116,21 @@ Records are what structures are called in Waid. Their declaration has a similar 
 Complex: record =>
     real => 0
     imaginary => 0
+
+instance:
+    complex_str: func(z) =>
+        str => !(toStr z'real)
+	    if z'imaginary < 0:
+            str => str . " - " . !(toStr -z'imaginary)
+        else:
+            str => str . " + " . !(toStr z'imaginary)
+        endif
+        <- str . "i"
+    endfn
 endrc
 
-complex_str: func(z) =>
-    str => !(toStr z'real)
-	if z'imaginary < 0:
-        str => str . " - " . !(toStr -z'imaginary)
-    else:
-        str => str . " + " . !(toStr z'imaginary)
-    endif
-    <- str . "i"
-endfn
-
 comp_number => !{Complex 1 4}
-!(printLine !(complex_str comp_number)) # 1 + 4i
+!(printLine !comp_number'complex_str) # 1 + 4i
 ```
 ### Builtin Functions
 Waid has 6 builtin functions at the moment:

@@ -250,6 +250,18 @@ class Parser
       rec_decl.VariableDeclarations.push(var_decl)
     end
 
+    if peekTokenEquals(TokenKind::KEY_INSTANCE)
+      pushToken
+      consumePeek(TokenKind::OP_COLON)
+
+      while peekTokenEquals(TokenKind::IDENTIFIER)
+        id = @peek_token
+        pushToken
+        pushToken
+        rec_decl.InstanceFunctionDeclarations.push(parseFunctionDeclStatement(id))
+      end
+    end
+
     consumePeek(TokenKind::KEY_ENDRC)
     rec_decl
   end
@@ -453,9 +465,9 @@ class Parser
     if peekTokenEquals(TokenKind::OP_OPEN_PARENTHESIS)
       # Tiene argumentos
       pushToken
-      consumePeek(TokenKind::IDENTIFIER)
 
-      expr.Function = Identifier.new(@current_token.value, @current_token)
+      expr.Function = parsePrimaryExpression
+
       expr.Arguments.push(parseExpression)
 
       if not peekTokenEquals(TokenKind::OP_CLOSE_PARENTHESIS)
@@ -472,9 +484,7 @@ class Parser
       return expr
     end
       # Sin argumentos
-    consumePeek(TokenKind::IDENTIFIER)
-
-    expr.Function = Identifier.new(@current_token.value, @current_token)
+    expr.Function = parsePrimaryExpression
     expr.Arguments.push(Empty.new)
     expr
   end

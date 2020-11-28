@@ -62,6 +62,7 @@ class RuntimeStack
   end
 
   def define(name, val)
+    #puts "\tDEFINE #{name} ----> #{val.inspect}"
     getTopMost.define(name, val)
     val
   end
@@ -69,16 +70,19 @@ class RuntimeStack
   def resolveName(name)
     value = getTopMost.getName(name)
     if not value
+      # Globals
       value = @records[0].getName(name)
     end
     value
   end
 
   def push(activation_record)
+    #puts "PUSHING #{activation_record.identifier}"
     @records.push(activation_record)
   end
 
   def pop
+    #puts "POPPING #{@records[@records.length - 1].identifier}"
     @records.delete_at(@records.length - 1)
   end
 
@@ -89,7 +93,8 @@ end
 
 class StackFrame
   attr_reader :identifier, :memory_map
-  def initialize(id=nil, p=nil)
+  def initialize(id, p=nil)
+    #puts "NEW STACK FRAME #{id}"
     @identifier = id
     @previous = p
     @memory_map = Hash.new
@@ -104,7 +109,10 @@ class StackFrame
   end
 
   def getLocalName(name)
-    @memory_map[name]
+    a = @memory_map[name]
+    if a
+    end
+    a
   end
 
   def define(name, object)

@@ -14,6 +14,7 @@ $keywords = {
   "elif" => TokenKind::KEY_ELIF,
   "endif" => TokenKind::KEY_ENDIF,
   "record" => TokenKind::KEY_RECORD,
+  "instance" => TokenKind::KEY_INSTANCE,
   "endrc" => TokenKind::KEY_ENDRC,
   "and" => TokenKind::KEY_AND,
   "or" => TokenKind::KEY_OR,

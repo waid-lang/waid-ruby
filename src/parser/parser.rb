@@ -413,6 +413,7 @@ class Parser
     # EXPR_PRIMARIA = OPERANDO
     #               | FUNC_CALL;
     operand = nil
+
     if peekTokenEquals(TokenKind::OP_EXCLAMATION)
       consumePeek(TokenKind::OP_EXCLAMATION)
       if peekTokenEquals(TokenKind::OP_OPEN_PARENTHESIS) or peekTokenEquals(TokenKind::IDENTIFIER)
@@ -460,7 +461,7 @@ class Parser
       if not peekTokenEquals(TokenKind::OP_CLOSE_PARENTHESIS)
         expr.Arguments.push(parseExpression)
       end
-      
+
       expr_ = parseExpression
       while expr_
         expr.Arguments.push(expr_)
@@ -488,7 +489,6 @@ class Parser
       consumePeek(TokenKind::IDENTIFIER)
 
       expr.Identifier = Identifier.new(@current_token.value, @current_token)
-      expr.Arguments.push(parseExpression)
 
       if not peekTokenEquals(TokenKind::OP_CLOSE_CURLYBRACES)
         expr.Arguments.push(parseExpression)

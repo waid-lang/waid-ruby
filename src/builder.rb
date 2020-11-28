@@ -91,10 +91,10 @@ class Builder
       puts " \nEnviroment:"
 
       # Mostramos las variables
-      if not interpreter.env.table.empty?
+      if not interpreter.env.empty?
         puts "Global variables"
         puts "----------------"
-        interpreter.env.table.each do |k, v|
+        interpreter.env[0].memory_map.each do |k, v|
           puts "#{k} => #{v.inspect}"
         end
       end

@@ -12,14 +12,11 @@ class Interpreter
     @ast = ast
     @error_collector = err_coll
 
-    # TODO: Escribir un constructor MainEnv que inicialice el ambiente con
-    # todas las variables globales
-    @global_enviroment = Enviroment.new
+    @runtime_stack = RuntimeStack.new
   end
 
-  # DEBUG
   def env
-    @global_enviroment
+    @runtime_stack.records
   end
 
   def addRuntimeError(message, token)
@@ -132,7 +129,7 @@ class Interpreter
     end
   end
 
-  def evalBinaryOperatorExpression(node, left, right, env)
+  def evalBinaryOperatorExpression(node, left, right)
     operator = node
     if left.is_a? WaidInteger and right.is_a? WaidInteger
       return evalIntegerBinaryOperatorexpression(node, left, right)
@@ -163,7 +160,7 @@ class Interpreter
               val = false
               break
             else
-              val = evalBinaryOperatorExpression(operator, l, r, env)
+              val = evalBinaryOperatorExpression(operator, l, r)
             end
           end
         end
@@ -192,10 +189,10 @@ class Interpreter
     end
   end
 
-  def evalWhileStatement(node, env)
+  def evalWhileStatement(node)
     res = WaidObject.new
-    while isTruthy(evalNode(node.Condition, env))
-      res = evalNode(node.Body, env)
+    while isTruthy(evalNode(node.Condition))
+      res = evalNode(node.Body)
       if res.is_a?(ReturnStatement)
         return res
       end
@@ -203,36 +200,20 @@ class Interpreter
     res
   end
 
-  def evalIfStatement(node, env)
-    condition = evalNode(node.Condition, env)
+  def evalIfStatement(node)
+    condition = evalNode(node.Condition)
     if isTruthy(condition)
-      return evalNode(node.Body, env)
+      return evalNode(node.Body)
     elsif not node.ElseBody.Statements.empty?
-      return evalNode(node.ElseBody, env)
+      return evalNode(node.ElseBody)
     end
     return NullValue
   end
 
-  def resolveIdentifier(node, env, unscoped=false)
-    if unscoped
-      value = env.getGlobal(node.Value)
-    else
-      value = env.getLocal(node.Value)
-    end
-    if value
-      return value
-    end
-    if $builtins.key?(node.Value)
-      return $builtins[node.Value]
-    end
-
-    addRuntimeError("Undeclared variable '#{node.Value}'", node.Token)
-  end
-
-  def evalStatementList(node, env)
+  def evalStatementList(node)
     result = WaidObject.new
     node.Statements.each do |stmt|
-      result = evalNode(stmt, env)
+      result = evalNode(stmt)
       if result.is_a?(ReturnStatement)
         break
       end
@@ -243,24 +224,28 @@ class Interpreter
     result
   end
 
-  def evalFunctionStatementList(node, env)
+  def evalFunctionStatementList(node)
     result = WaidObject.new
     node.Body.Statements.each do |stmt|
-      result = evalNode(stmt, env)
+      result = evalNode(stmt)
       if result.is_a? ReturnStatement
-        result = evalNode(result, env)
+        result = evalNode(result)
         break
       end
     end
     result
   end
 
-  def evalFunctionCall(node, env)
-    func = resolveIdentifier(node.Function, env, true)
+  def evalFunctionCall(node)
+    func = @runtime_stack.resolveName(node.Function.Value)
+
     if not func.is_a? WaidFunction and not func.is_a? WaidBuiltin
       addRuntimeError("#{func.type} is not callable.", node.Token)
     end
-    arguments = evalExpressions(node.Arguments, env)
+
+    ar = StackFrame.new(node.Function.Value, @runtime_stack.getTopMost)
+    arguments = evalExpressions(node.Arguments)
+    @runtime_stack.push(ar)
 
     length = arguments.length
     if arguments.none?
@@ -271,34 +256,41 @@ class Interpreter
     end
 
     if func.is_a? WaidBuiltin
-      return func.Function.call(*arguments)
+      a = func.Function.call(*arguments)
+      @runtime_stack.pop
+      return a
     end
-
-    func_env = Enviroment.new(env)
     
     func.Parameters.each_with_index do |par, index|
-      func_env.set(par.Value, arguments[index])
+      @runtime_stack.define(par.Value, arguments[index])
     end
-    evalFunctionStatementList(func, func_env)
+    res = evalFunctionStatementList(func)
+    @runtime_stack.pop
+    res
   end
 
-  def initRecord(node, env)
+  def initRecord(node)
     id = node.Identifier
-    arguments = evalExpressions(node.Arguments, env)
+    arguments = evalExpressions(node.Arguments)
+    record = @runtime_stack.resolveName(id.Value)
 
     record_instance = WaidRecordInstance.new
+
+    record_instance.Env = StackFrame.new
+    record_instance.Env.memory_map.each do |key, val|
+      record_instance.Env.define(key, val)
+    end
+
     record_instance.Identifier = id
 
-    record = resolveIdentifier(id, env, true)
-
-    keys = record.Env.table.keys
+    keys = record.Env.getAllNames
     length = arguments.length
     if arguments.none?
       length = 0
       record_instance.Env = record.Env
     else
       arguments.each_with_index do |val, index|
-        record_instance.Env.set(keys[index], val)
+        record_instance.Env.define(keys[index], val)
       end
     end
 
@@ -308,10 +300,10 @@ class Interpreter
     record_instance
   end
 
-  def evalExpressions(expressions, env)
+  def evalExpressions(expressions)
     res = Array.new
     expressions.each do |expr|
-      ind_res = evalNode(expr, env)
+      ind_res = evalNode(expr)
       if ind_res
         res.push(ind_res)
       end
@@ -319,8 +311,8 @@ class Interpreter
     res
   end
 
-  def evalArrayIndexAssignment(node, env)
-    index = evalNode(node.Left.IndexExpression, env)
+  def evalArrayIndexAssignment(node)
+    index = evalNode(node.Left.IndexExpression)
     if not index.is_a? WaidInteger
       addRuntimeError("Array index must be an integer, not of type #{index.type}", node.Token)
     elsif index.Value < 0
@@ -328,71 +320,91 @@ class Interpreter
     end
 
     # Esto es para ver si el identificador existe en el scope actual
-    evalNode(node.Left.ArrayIdentifier, env)
+    evalNode(node.Left.ArrayIdentifier)
 
-    value = evalNode(node.Value, env)
-    env.setArrayObject(node.Left.ArrayIdentifier.Value, index.Value, value)
+    value = evalNode(node.Value)
+    @runtime_stack.resolveName(node.Left.ArrayIdentifier.Value).Values[index.Value] = value
   end
 
-  def evalProgram(program, env)
+  def evalProgram(program)
     result = WaidObject.new
     program.Statements.each do |stmt|
-      result = evalNode(stmt, env)
+      result = evalNode(stmt)
     end
     result
   end
 
-  def evalNode(node, env)
+  def evalNode(node)
     case node
     when Program
-      return evalProgram(node, env)
+      ar = StackFrame.new("global", nil)
+      @runtime_stack.push(ar)
+
+      populateGlobals
+
+      a = evalProgram(node)
+      return a
 
     when VarDeclarationStatement
-      value = evalNode(node.Value, env)
+      value = evalNode(node.Value)
 
       case node.Left
       when Identifier
-        return env.set(node.Left.Value, value)
+        return @runtime_stack.define(node.Left.Value, value)
       when IndexAccessExpression
-        return evalArrayIndexAssignment(node, env)
+        # TODO
+        return evalArrayIndexAssignment(node)
       end
 
     when RecordDeclarationStatement
-      rec_env = Enviroment.new
+      # Acá ningun valor, variable o función, dentro de la declaración del
+      # record debería ser capaz de acceder a las variables globales. Para
+      # hacer esto debo hacer que el atributo @previous de cada StackFrame
+      # apunte a su propio "global" o la raíz del árbol de búsqueda. También se
+      # puede pensar este atributo como el StackFrame arriba del
+      # correspondiente a aquel en que se declaró la variable.
+      # Luego implementamos en el CallStack que el órden de bpusqueda sea el
+      # StackFrame de más arriba, luego el que viene, y por último el apuntado
+      # por previous.
+      # Lo permitiré por ahora porque me da paja hacerlo antes de terminar
+      # todo. Saludos cordiales.
+      ar = StackFrame.new(node.Identifier.Value, @runtime_stack.getTopMost)
+      @runtime_stack.push(ar)
       node.VariableDeclarations.each do |vd|
-        evalNode(vd, rec_env)
+        evalNode(vd)
       end
-      rec_literal = WaidRecord.new(rec_env)
-      env.set(node.Identifier.Value, rec_literal)
+      rec_literal = WaidRecord.new(ar)
+      @runtime_stack.pop
+
+      @runtime_stack.define(node.Identifier.Value, rec_literal)
       return rec_literal
 
     when RecordInitialize
-      return initRecord(node, env)
+      return initRecord(node)
 
     when IfStatement
-      return evalIfStatement(node, env)
+      return evalIfStatement(node)
 
     when WhileStatement
-      return evalWhileStatement(node, env)
+      return evalWhileStatement(node)
 
     when FuncDeclarationStatement
       func_literal = WaidFunction.new(
         node.Parameters,
         node.Body,
-        env,
         node.Parameters.length
       )
-      env.set(node.Identifier.Value, func_literal)
+      @runtime_stack.define(node.Identifier.Value, func_literal)
       return node.Identifier
 
     when FunctionCall
-      return evalFunctionCall(node, env)
+      return evalFunctionCall(node)
 
     when ReturnStatement
-      return evalNode(node.ReturnValue, env)
+      return evalNode(node.ReturnValue)
 
     when StatementList
-      return evalStatementList(node, env)
+      return evalStatementList(node)
 
       # Expressions
     when IntLiteral
@@ -408,32 +420,47 @@ class Interpreter
       return WaidString.new(node.Value)
 
     when ArrayLiteral
-      exprs = evalExpressions(node.Values, env)
+      exprs = evalExpressions(node.Values)
       return WaidArray.new(exprs)
 
     when NullLiteral
       return WaidNull.new
 
     when BinaryOperatorExpression
-      l_val = evalNode(node.Left, env)
-      r_val = evalNode(node.Right, env)
-      return evalBinaryOperatorExpression(node, l_val, r_val, env)
+      l_val = evalNode(node.Left)
+      r_val = evalNode(node.Right)
+      return evalBinaryOperatorExpression(node, l_val, r_val)
 
     when UnaryOperatorExpression
-      expr = evalNode(node.Expression, env)
+      expr = evalNode(node.Expression)
       return evalUnaryOperatorExpression(node, expr)
 
     when AttributeAccessExpression
-      object = evalNode(node.Object, env)
-      attr = evalNode(node.Attribute, object.Env)
+      object = evalNode(node.Object)
+
+      @runtime_stack.push(object.Env)
+
+      attr = evalNode(node.Attribute)
+
+      @runtime_stack.pop
       return attr
 
     when Identifier
-      return resolveIdentifier(node, env)
+      value = @runtime_stack.resolveName(node.Value)
+      if not value
+        addRuntimeError("Undeclared variable '#{node.Value}'", node.Token)
+      end
+      value
+    end
+  end
+  
+  def populateGlobals
+    $builtins.each do |key, val|
+      @runtime_stack.define(key, val)
     end
   end
 
   def run
-    evalNode(@ast, @global_enviroment)
+    evalNode(@ast)
   end
 end

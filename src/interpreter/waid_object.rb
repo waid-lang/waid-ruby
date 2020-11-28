@@ -12,10 +12,9 @@ end
 
 class WaidFunction < WaidObject
   attr_accessor :Parameters, :Body, :Env, :Arity
-  def initialize(p=Array.new, b= StatementList.new, e=nil, a=nil)
+  def initialize(p=Array.new, b=StatementList.new, a=nil)
      @Parameters = p
      @Body = b
-     @Env = e
      @Arity = a
   end
 
@@ -141,7 +140,7 @@ end
 
 class WaidRecord < WaidObject
   attr_accessor :TypeName, :Env
-  def initialize(env=Enviroment.new)
+  def initialize(env)
     @TypeName = nil
     @Env = env
   end
@@ -152,7 +151,7 @@ class WaidRecord < WaidObject
 
   def inspect
     str = "<Record("
-    @Env.table.each do |id, val|
+    @Env.getAllNames.each do |id, val|
       str += "#{id}"
       str += ", "
     end
@@ -164,9 +163,9 @@ end
 
 class WaidRecordInstance < WaidObject
   attr_accessor :Identifier, :Env
-  def initialize(env=Enviroment.new)
+  def initialize
     @Identifier = nil
-    @Env = env
+    @Env = nil
   end
 
   def type
@@ -175,7 +174,7 @@ class WaidRecordInstance < WaidObject
 
   def inspect
     str = "<#{@Identifier.Value}("
-    @Env.Objects.each do |id, val|
+    @Env.memory_map.each do |id, val|
       if val.is_a? WaidString
         str += "#{id} => \"#{val.inspect}\""
       else

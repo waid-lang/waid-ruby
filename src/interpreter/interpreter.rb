@@ -278,7 +278,8 @@ class Interpreter
     end
     #puts "END PARAMETERS"
     res = evalStatementList(func.Body)
-    if not res
+
+    if not @runtime_stack.isReturnState
       res = NullValue
     end
 

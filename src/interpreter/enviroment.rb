@@ -1,53 +1,3 @@
-class Enviroment
-  def initialize(outer=nil)
-    @table = Hash.new
-    @outer = outer
-  end
-
-  def table
-    @table
-  end
-
-  # Devuelve el WaidObject asociado a key
-  def get(key)
-    object = getLocal(key)
-    if not object and @outer
-      object = @outer.getLocal(key)
-    end
-    object
-  end
-
-  def getLocal(key)
-    @table[key]
-  end
-
-  def getGlobal(key)
-    object = getLocal(key)
-    if not object and @outer
-      object = @outer.getGlobal(key)
-    end
-    object
-  end
-
-  # Asocia object a key en el ambiente
-  def set(key, object)
-    @table[key] = object
-    object
-  end
-
-  def setArrayObject(id, index, value)
-    # Este es el medio hack siono
-    @table[id].Values[index] = value
-  end
-
-  # Devuelve el outer env
-  def Outer
-    @outer
-  end
-end
-
-######## Nueva implementación ########
-
 class RuntimeStack
   def initialize
     @records = Array.new
@@ -62,7 +12,7 @@ class RuntimeStack
   end
 
   def define(name, val)
-    #puts "\tDEFINE #{name} ----> #{val.inspect}"
+    #puts "\tDEFINING  #{name} => #{val.inspect}"
     getTopMost.define(name, val)
     val
   end
@@ -86,6 +36,14 @@ class RuntimeStack
     @records.delete_at(@records.length - 1)
   end
 
+  def isReturnState
+    getTopMost.return_flag
+  end
+
+  def setReturnState
+    getTopMost.setReturnState
+  end
+
   def pp
     puts "CallStack"
   end
@@ -93,10 +51,11 @@ end
 
 class StackFrame
   attr_reader :identifier, :memory_map
+  attr_accessor :return_flag
   def initialize(id, p=nil)
-    #puts "NEW STACK FRAME #{id}"
     @identifier = id
     @previous = p
+    @return_flag = false
     @memory_map = Hash.new
   end
 
@@ -108,11 +67,12 @@ class StackFrame
     value
   end
 
+  def setReturnState
+    @return_flag = true
+  end
+
   def getLocalName(name)
-    a = @memory_map[name]
-    if a
-    end
-    a
+    @memory_map[name]
   end
 
   def define(name, object)

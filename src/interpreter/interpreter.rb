@@ -193,9 +193,6 @@ class Interpreter
     res = WaidObject.new
     while isTruthy(evalNode(node.Condition))
       res = evalNode(node.Body)
-      if res.is_a?(ReturnStatement)
-        return res
-      end
     end
     res
   end
@@ -214,23 +211,11 @@ class Interpreter
     result = WaidObject.new
     node.Statements.each do |stmt|
       result = evalNode(stmt)
-      if result.is_a?(ReturnStatement)
-        break
+      if stmt.is_a? ReturnStatement
+        @runtime_stack.setReturnState
       end
-      if stmt.is_a?(ReturnStatement)
-        return stmt
-      end
-    end
-    result
-  end
-
-  def evalFunctionStatementList(node)
-    result = WaidObject.new
-    node.Body.Statements.each do |stmt|
-      result = evalNode(stmt)
-      if result.is_a? ReturnStatement
-        result = evalNode(result)
-        break
+      if @runtime_stack.isReturnState
+        return result
       end
     end
     result
@@ -263,17 +248,18 @@ class Interpreter
 
     if func.is_a? WaidBuiltin
       a = func.Function.call(*arguments)
+      @runtime_stack.pop
       return a
     end
 
     #puts "CALLING #{id.Value}"
-    #puts "\nPARAMETERS"
+    #puts "PARAMETERS"
     func.Parameters.each_with_index do |par, index|
       #puts "\t#{par.Value} => #{arguments[index].inspect}"
       @runtime_stack.define(par.Value, arguments[index])
     end
     #puts "END PARAMETERS"
-    res = evalFunctionStatementList(func)
+    res = evalStatementList(func.Body)
 
     @runtime_stack.pop
     res
@@ -345,7 +331,6 @@ class Interpreter
   end
 
   def evalNode(node)
-    "CURRENT: #{@runtime_stack.getTopMost}"
     case node
     when Program
       ar = StackFrame.new("global", nil)
@@ -392,7 +377,6 @@ class Interpreter
 
       rec_literal = WaidRecord.new(ar)
 
-      @runtime_stack.define(node.Identifier.Value, rec_literal)
       @runtime_stack.pop
 
       @runtime_stack.define(node.Identifier.Value, rec_literal)
@@ -466,7 +450,12 @@ class Interpreter
 
     when Identifier
       value = @runtime_stack.resolveName(node.Value)
-      #puts "\tRESOLVED #{node.Value} => #{value.class}"
+      #puts value.class
+
+      #if value.is_a? WaidRecordInstance
+      #  puts value.Env.getAllNames
+      #end
+      #puts "\tRESOLVED #{node.Value} => #{value.inspect}"
       #puts "\t  INSIDE UPPER: '#{@runtime_stack.getTopMost.identifier}'#{@runtime_stack.getTopMost.memory_map}"
       if @runtime_stack.getTopMost.linkedTo
         #puts "\t  INSIDE LOWER: '#{@runtime_stack.getTopMost.linkedTo.identifier}'#{@runtime_stack.getTopMost.linkedTo.memory_map}"

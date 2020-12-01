@@ -5,19 +5,20 @@
 Complex: record =>
     real => 0
     im => 0
+
+instance:
+    add: func(z) =>
+        <- !{Complex z'real + real z'im + im}
+    endfn
+
+    mul: func(z) =>
+        <- !{Complex (z'real * real - z'im * im) (z'real * im + real * z'im)}
+    endfn
+
+    abs: func() =>
+        <- real * real + im * im
+    endfn
 endrc
-
-add: func(z, z2) =>
-    <- !{Complex z'real + z2'real z'im + z2'im}
-endfn
-
-mul: func(z, z2) =>
-    <- !{Complex z'real * z2'real - z'im * z2'im (z'real * z2'im + z2'real * z'im)}
-endfn
-
-abs: func(z) =>
-    <- z'real * z'real + z'im * z'im
-endfn
 
 main: func() =>
     y => -1
@@ -27,10 +28,10 @@ main: func() =>
             z => !{Complex}
             i => 0
             while i <= 100:
-                z => !(add !(mul z z) !{Complex x y})
+                z => !(!(z'mul z)'add !{Complex x y})
                 i => i + 1
             endwl
-            if !(abs z) < 2:
+            if !z'abs < 2:
                 !(print "#")
             else:
                 !(print ":")

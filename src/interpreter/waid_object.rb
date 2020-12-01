@@ -174,7 +174,7 @@ class WaidRecordInstance < WaidObject
 
   def inspect
     str = "<#{@Identifier.Value}("
-    @Env.memory_map.each do |id, val|
+    @Env.getAllNames.each do |id, val|
       if val.is_a? WaidString
         str += "#{id} => \"#{val.inspect}\""
       else

@@ -1,0 +1,106 @@
+escalonar: func(matriz) =>
+    filas => !(length matriz)
+    cols => !(length 0 @ matriz)
+
+    lead => 0
+
+    r => 0
+    while r < filas:
+        if cols <= lead:
+            <- matriz
+        endif
+
+        i => r
+        while lead @ (i @ matriz) == 0:
+            i => i + 1
+            if filas == i:
+                i => r
+                lead => lead + 1
+                if cols == lead:
+                    <- matriz
+                endif
+            endif
+        endwl
+
+        tmp => i @ matriz
+        (i @ matriz) => r @ matriz
+        (r @ matriz) => tmp
+
+        val => lead @ (r @ matriz)
+        j => 0
+        while j < cols:
+            (j @ (r @ matriz)) => (j @ (r @ matriz)) / val
+            j => j + 1
+        endwl
+
+        k => 0
+        while k < filas:
+            if k /= r:
+                val => lead @ (k @ matriz)
+                
+                j => 0
+                while j < cols:
+                    (j @ (k @ matriz)) => (j @ (k @ matriz)) - val * (j @ (r @ matriz))
+                    j => j + 1
+                endwl
+            endif
+            k => k + 1
+        endwl
+        r => r + 1
+    endwl
+    <- matriz
+endfn
+
+imprimir_matriz: func(matriz) =>
+    filas => !(length matriz)
+    cols => !(length 0 @ matriz)
+    if not cols:
+        cols => filas
+        filas => 1
+    endif
+
+    
+    i => 0
+    while i < filas:
+        j => 0
+        while j < cols:
+            if filas == 1:
+                !(print j @ matriz)
+            else:
+                !(print j @ (i @ matriz))
+            endif
+            if j /= cols - 1:
+                !(print ", ")
+            endif
+            j => j + 1
+        endwl
+        !(printLine "")
+        i => i + 1
+    endwl
+endfn
+
+matrices => [
+    [[0, 3, -6, 6, 4, -5],
+     [3, -7, 8, -5, 8, 9],
+     [3, -9, 12, -9, 6, 15]],
+
+    [[1, 2, 3, 4, 2, 1],
+     [2, 4, 6, 2, 6, 2],
+     [3, 6, 18, 9, 9, -6],
+     [4, 8, 12, 10, 12, 4],
+     [5, 10, 24, 11, 15, -4]]
+]
+
+i => 0
+while i < !(length matrices):
+    matriz => i @ matrices
+
+    !(printLine "----------------------------")
+    !(printLine "Matriz original:")
+    !(imprimir_matriz matriz)
+    !(printLine "")
+    !(printLine "Matriz escalonada: ")
+    !(imprimir_matriz !(escalonar matriz))
+    i => i + 1
+endwl
+

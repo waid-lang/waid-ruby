@@ -1,0 +1,6 @@
+array_2d => [[1, 2, 3], [4, 5, 165], [7, 8, 9]]
+!(printLine "Original Array: " . !(toStr array_2d))
+!(printLine "Bad number: " . !(toStr 2@(1@array_2d)))
+
+(2 @ (1 @ array_2d)) => 6
+!(printLine "New Array: " . !(toStr array_2d))

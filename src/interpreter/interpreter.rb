@@ -76,6 +76,9 @@ class Interpreter
     when TokenKind::OP_ASTERISK
       return WaidFloat.new(left.Value * right.Value)
     when TokenKind::OP_SLASH
+      if right.Value == 0
+        addRuntimeError("Division by 0", node.Token)
+      end
       return WaidFloat.new(left.Value / right.Value)
     when TokenKind::OP_MODULUS
       return WaidFloat.new(left.Value % right.Value)
@@ -97,6 +100,9 @@ class Interpreter
     when TokenKind::OP_ASTERISK
       return WaidInteger.new(left.Value * right.Value)
     when TokenKind::OP_SLASH
+      if right.Value == 0
+        addRuntimeError("Division by 0", node.Token)
+      end
       return WaidFloat.new(left.Value / right.Value)
     when TokenKind::OP_MODULUS
       return WaidInteger.new(left.Value % right.Value)
@@ -106,6 +112,8 @@ class Interpreter
       return boolToWaidBoolean(left.Value <= right.Value)
     when TokenKind::OP_EQUAL
       return boolToWaidBoolean(left.Value == right.Value)
+    when TokenKind::OP_NOT_EQUAL
+      return boolToWaidBoolean(left.Value != right.Value)
     when TokenKind::OP_GREATER
       return boolToWaidBoolean(left.Value > right.Value)
     end
@@ -114,7 +122,11 @@ class Interpreter
   def evalBooleanBinaryOperation(node, left, right)
     case node.Operator.kind
     when TokenKind::KEY_AND
-      return boolToWaidBoolean(isTruthy(left) && isTruthy(right))
+      l = isTruthy(left)
+      if not l
+        return FalseValue
+      end
+      return boolToWaidBoolean(l && isTruthy(right))
     when TokenKind::KEY_OR
       return boolToWaidBoolean(isTruthy(left) || isTruthy(right))
     end
@@ -168,6 +180,9 @@ class Interpreter
       end
 
     elsif left.is_a? WaidInteger and right.is_a? WaidArray and node.Operator.kind == TokenKind::OP_AT
+      if left.Value >= right.Values.length
+        return NullValue
+      end
       return right.Values[left.Value]
 
     elsif left.is_a? WaidInteger and right.is_a? WaidString and node.Operator.kind == TokenKind::OP_AT
@@ -190,9 +205,12 @@ class Interpreter
   end
 
   def evalWhileStatement(node)
-    res = WaidObject.new
+    res = NullValue
     while isTruthy(evalNode(node.Condition))
       res = evalNode(node.Body)
+      if @runtime_stack.isReturnState
+        return res
+      end
     end
     res
   end
@@ -208,7 +226,7 @@ class Interpreter
   end
 
   def evalStatementList(node)
-    result = WaidObject.new
+    result = NullValue
     node.Statements.each do |stmt|
       result = evalNode(stmt)
       if stmt.is_a? ReturnStatement
@@ -260,6 +278,9 @@ class Interpreter
     end
     #puts "END PARAMETERS"
     res = evalStatementList(func.Body)
+    if not res
+      res = NullValue
+    end
 
     @runtime_stack.pop
     res
@@ -315,11 +336,11 @@ class Interpreter
       addRuntimeError("Index #{index.Value} too small for array; minimun: 0", node.Token)
     end
 
-    # Esto es para ver si el identificador existe en el scope actual
-    evalNode(node.Left.ArrayIdentifier)
+    array = evalNode(node.Left.ArrayIdentifier)
 
     value = evalNode(node.Value)
-    @runtime_stack.resolveName(node.Left.ArrayIdentifier.Value).Values[index.Value] = value
+
+    array.Values[index.Value] = value
   end
 
   def evalProgram(program)
@@ -430,8 +451,9 @@ class Interpreter
       return WaidNull.new
 
     when BinaryOperatorExpression
-      l_val = evalNode(node.Left)
       r_val = evalNode(node.Right)
+      l_val = evalNode(node.Left)
+
       return evalBinaryOperatorExpression(node, l_val, r_val)
 
     when UnaryOperatorExpression
@@ -451,20 +473,21 @@ class Interpreter
     when Identifier
       value = @runtime_stack.resolveName(node.Value)
       #puts value.class
-
+      
       #if value.is_a? WaidRecordInstance
       #  puts value.Env.getAllNames
       #end
-      #puts "\tRESOLVED #{node.Value} => #{value.inspect}"
+      #puts "\tRESOLVED #{node.Value} => #{value}"
       #puts "\t  INSIDE UPPER: '#{@runtime_stack.getTopMost.identifier}'#{@runtime_stack.getTopMost.memory_map}"
-      if @runtime_stack.getTopMost.linkedTo
+      #if @runtime_stack.getTopMost.linkedTo
         #puts "\t  INSIDE LOWER: '#{@runtime_stack.getTopMost.linkedTo.identifier}'#{@runtime_stack.getTopMost.linkedTo.memory_map}"
-      end
+      #end
       #puts
       if not value
         addRuntimeError("Undeclared variable '#{node.Value}'", node.Token)
       end
-      value
+
+      return value
     end
   end
 

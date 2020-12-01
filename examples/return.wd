@@ -26,7 +26,32 @@ ret2: func() =>
     <- "Return 2 not ok :("
 endfn
 
+ret3: func() =>
+    ret4: func() =>
+        !(printLine "Return 4")
+        <- "Return 3/4 working"
+    endfn
+    !ret4
+    !(printLine "All good...")
+    <- "Return 3 working"
+endfn
+
+ret4: func() =>
+    i => 0
+    while i < 20:
+        !(printLine i)
+        if i == 10:
+            <- "Return 4 working!"
+        endif
+        i => i + 1
+    endwl
+endfn
+
 !(printLine "Return 1 Test")
 !(printLine !ret)
 !(printLine "Return 2 Test")
 !(printLine !ret2)
+!(printLine "Return 3 Test")
+!(printLine !ret3)
+!(printLine "Return 4 Test")
+!(printLine !ret4)

@@ -82,7 +82,7 @@ class Builder
     end
 
     # Creamos un nuevo intérprete e interpretamos el AST
-    interpreter = Interpreter.new(parser.ast, error_collector)
+    interpreter = Interpreter.new(parser.ast, error_collector, false)
     interpreter.run
 
    # Prefiero implementar esto después
@@ -91,7 +91,7 @@ class Builder
       puts " \nEnviroment:"
 
       # Mostramos las variables
-      if not interpreter.env.empty?
+      if not interpreter.env.records.empty?
         puts "Global variables"
         puts "----------------"
         interpreter.env[0].memory_map.each do |k, v|

@@ -21,7 +21,8 @@ $keywords = {
   "not" => TokenKind::KEY_NOT,
   "true" => TokenKind::KEY_TRUE,
   "false" => TokenKind::KEY_FALSE,
-  "null" => TokenKind::KEY_NULL
+  "null" => TokenKind::KEY_NULL,
+  "include" => TokenKind::KEY_INCLUDE
 }
 
 # No necesita explicación
@@ -291,7 +292,12 @@ class Tokenizer
         when '\''
           TokenKind::OP_SINGLE_QUOTE
         when ':'
-          TokenKind::OP_COLON
+          if @peek_char == ":"
+            pushChar
+            TokenKind::OP_DOUBLE_COLON
+          else
+            TokenKind::OP_COLON
+          end
         when '('
           TokenKind::OP_OPEN_PARENTHESIS
         when ')'

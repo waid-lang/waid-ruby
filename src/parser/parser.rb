@@ -107,6 +107,8 @@ class Parser
       return parseWhileStatement
     when TokenKind::OP_EXCLAMATION
       return parseFunctionCall
+    when TokenKind::KEY_INCLUDE
+      return parseIncludeStatement
     else
       consumePeek(TokenKind::EOF)
     end
@@ -277,6 +279,16 @@ class Parser
     statement.Token = @current_token
     statement.ReturnValue = parseExpression
     return statement
+  end
+
+  def parseIncludeStatement
+    statement = IncludeStatement.new
+    statement.Token = @current_token
+    if not peekTokenEquals(TokenKind::LITERAL_STRING)
+      addParseError("Expected string after \"include\".", @peek_token)
+    end
+    statement.Path = parseOperand
+    statement
   end
 
   def parseIfStatement
@@ -459,6 +471,11 @@ class Parser
       consumePeek(TokenKind::IDENTIFIER)
       attr_acc = AttributeAccessExpression.new(operand, Identifier.new(@current_token.value, @current_token))
       return attr_acc
+    elsif peekTokenEquals(TokenKind::OP_DOUBLE_COLON)
+      pushToken
+      consumePeek(TokenKind::IDENTIFIER)
+      mod_acc = ModuleAccessExpression.new(operand, Identifier.new(@current_token.value, @current_token))
+      return mod_acc
     end
     operand
   end

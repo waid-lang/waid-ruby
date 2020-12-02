@@ -1,0 +1,16 @@
+include "strings"
+
+# Fake count
+count: func(str, char) =>
+    <- 69
+endfn
+
+main: func() =>
+    !(printLine !(strings::count "asdasduua" "a"))
+    !(printLine !(count "asdasduua" "a"))
+
+    s => !{strings::Something}
+    !(printLine !(s'count "asdasduua" "a"))
+endfn
+
+!main

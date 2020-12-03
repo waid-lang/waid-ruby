@@ -1,0 +1,26 @@
+include "module1"
+
+count: func(str, char) =>
+    if !(length char) > 1 or not char:
+        <- -1
+    endif
+    
+    str_len => !(length str)
+    count => 0
+
+    index => 0
+    while index < str_len:
+        if index @ str == char:
+            count => !(module1::add1 count)
+        endif
+        index => !(module1::add1 index)
+    endwl
+    <- count
+endfn
+
+Something: record =>
+instance:
+    count: func(str, char) =>
+        <- !(module1::count str char)
+    endfn
+endrc

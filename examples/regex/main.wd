@@ -1,0 +1,19 @@
+include "regex"
+
+main: func() =>
+    engine => !{regex::RegexEngine}
+
+    regex_string => "a+b*(c|d)e"
+    compiled => !(engine'compile regex_string)
+
+    !(print "Ingresa algo: ")
+    in => !input
+    while in:
+        if !(compiled'match in):
+            !(printLine in . " matches " . regex_string)
+        endif
+        in => !input
+    endwl
+endfn
+
+!main

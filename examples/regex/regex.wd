@@ -1,0 +1,9 @@
+include "state_machine"
+
+RegexEngine: record =>
+
+instance:
+    compile: func(regex_string) =>
+
+    endfn
+endrc

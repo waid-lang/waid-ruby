@@ -1,0 +1,17 @@
+include "strings"
+
+# Fake count
+count: func(str, char) =>
+    <- "Soy inteligente y no confundo scopes B)"
+endfn
+
+main: func() =>
+    !(printLine !(strings::count "Tres tristes tigres tragaban trigo en un trigal" "i"))
+    
+    something => !{strings::Something}
+    !(printLine !(something'count "Pablito clavó un clavito, ¿cuántos clavitos clavó Pablito?" "c"))
+
+    !(printLine !(count "Como poco coco como, poco coco compro" "o"))
+endfn
+
+!main

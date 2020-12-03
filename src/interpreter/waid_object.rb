@@ -138,6 +138,22 @@ class WaidArray < WaidObject
   end
 end
 
+class WaidModule < WaidObject
+  attr_accessor :Identifier, :StackFrame
+  def initialize(id, sf)
+    @Identifier = id
+    @StackFrame = sf
+  end
+
+  def type
+    "Module"
+  end
+
+  def inspect
+    "Module"
+  end
+end
+
 class WaidRecord < WaidObject
   attr_accessor :TypeName, :Env
   def initialize(env)

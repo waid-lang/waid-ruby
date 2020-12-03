@@ -8,15 +8,16 @@ FalseValue = WaidBoolean.new(false)
 NullValue = WaidNull.new
 
 class Interpreter
-  def initialize(ast, err_coll)
+  def initialize(ast, err_coll, is_module)
     @ast = ast
     @error_collector = err_coll
+    @is_module = is_module
 
     @runtime_stack = RuntimeStack.new
   end
 
   def env
-    @runtime_stack.records
+    @runtime_stack
   end
 
   def addRuntimeError(message, token)
@@ -250,6 +251,11 @@ class Interpreter
       id = node.Function.Attribute
       rec_inst = evalNode(node.Function.Object)
       @runtime_stack.push(rec_inst.Env)
+
+    elsif node.Function.is_a? ModuleAccessExpression
+      id = node.Function.Module
+      stack_frame = evalNode(id).StackFrame
+      @runtime_stack.push(stack_frame)
     else
       id = node.Function
       ar = StackFrame.new(id.Value, @runtime_stack.getTopMost)
@@ -361,8 +367,48 @@ class Interpreter
       populateGlobals
 
       a = evalProgram(node)
-      @runtime_stack.pop
+
+      if not @is_module
+        @runtime_stack.pop
+      end
       return a
+
+    when IncludeStatement
+      path = evalNode(node.Path)
+      if not File.file?(path.Value + ".wd")
+        addRuntimeError("File '#{path.Value}.wd' not found", node.Token)
+      end
+      source_file = WaidFile.new(path.Value + ".wd")
+
+      error_collector = ErrorCollector.new(source_file)
+
+      tokenizer = Tokenizer.new(source_file, error_collector)
+      tokenizer.tokenize!
+
+      if error_collector.hasErrors
+        error_collector.showErrors
+      end
+
+      parser = Parser.new(tokenizer.tokens, error_collector)
+      parser.parse!
+
+      if error_collector.hasErrors
+        error_collector.showErrors
+      end
+
+      interpreter = Interpreter.new(parser.ast, error_collector, true)
+      interpreter.run
+
+      mod = StackFrame.new(path)
+      mod.makeLinkTo(@runtime_stack.getTopMost)
+
+
+      interpreter.env.getBottomMost.memory_map.each do |key, val|
+        mod.define(key, val)
+      end
+
+      @runtime_stack.define(node.Path.Value, WaidModule.new(path, mod))
+      return
 
     when VarDeclarationStatement
       value = evalNode(node.Value)
@@ -471,19 +517,19 @@ class Interpreter
       @runtime_stack.pop
       return attr
 
+    when ModuleAccessExpression
+      mod = evalNode(node.Module)
+      
+      @runtime_stack.push(mod.StackFrame)
+
+      obj = evalNode(node.Object)
+
+      @runtime_stack.pop
+      return obj
+
+
     when Identifier
       value = @runtime_stack.resolveName(node.Value)
-      #puts value.class
-      
-      #if value.is_a? WaidRecordInstance
-      #  puts value.Env.getAllNames
-      #end
-      #puts "\tRESOLVED #{node.Value} => #{value}"
-      #puts "\t  INSIDE UPPER: '#{@runtime_stack.getTopMost.identifier}'#{@runtime_stack.getTopMost.memory_map}"
-      #if @runtime_stack.getTopMost.linkedTo
-        #puts "\t  INSIDE LOWER: '#{@runtime_stack.getTopMost.linkedTo.identifier}'#{@runtime_stack.getTopMost.linkedTo.memory_map}"
-      #end
-      #puts
       if not value
         addRuntimeError("Undeclared variable '#{node.Value}'", node.Token)
       end

@@ -11,6 +11,10 @@ class RuntimeStack
     @records[@records.length - 1]
   end
 
+  def getBottomMost
+    @records[0]
+  end
+
   def define(name, val)
     #puts "\tDEFINING  #{name} => #{val.inspect}"
     getTopMost.define(name, val)

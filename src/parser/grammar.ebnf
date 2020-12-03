@@ -94,11 +94,15 @@ ELIF_BLOCK       = "else", ":", LISTA_STMTS;
 WHILE_STMT       = "while", EXPR, WHILE_BODY, ":", LISTA_STMTS, "endwl";
 
 RETURN_STMTS     = "<-", EXPR;
+
+INCLUDE_STMT     = "include", """, {}, """
+
 ESTAMENTO        = DECL_VARIABLE
                  | DECL_FUNC
                  | DECL_RECORD
                  | RETURN_STMT
                  | IF_STMT
                  | WHILE_STMT
+                 | INCLUDE_STMT
                  | EXPR;
 PROGRAMA         = {LISTA_STMTS};

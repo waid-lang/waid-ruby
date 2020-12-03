@@ -415,6 +415,31 @@ class WhileStatement
   end
 end
 
+# Representa un include en el programa.
+# Ejemplo:
+#
+# include "strings"
+# ~~~+~~~     +----------> @Path
+#    +-------------------> @Token
+
+class IncludeStatement
+  attr_accessor :Token, :Path
+  def initialize
+    @Token = nil
+    @Path = nil
+  end
+
+  def print_tree(indent, last)
+    print indent
+    indent += indentation(last)
+
+    puts "IncludeStatement"
+
+    puts indent + $AST_LAST + "Path"
+    @Path.print_tree(indent + $AST_SPACE, true)
+  end
+end
+
 # Este nodo representa un identificador. Es una hoja en el AST.
 class Identifier
   attr_accessor :Value, :Token
@@ -510,7 +535,33 @@ class AttributeAccessExpression
   end
 end 
 
+# Representa el acceso a un objecto en un módulo
+# Ejemplo:
+#
+# pow_2 => !(math::pow 2 10)
+#          ~+~ +  +------------> @Object
+#           |  +---------------> @Token
+#           +------------------> @Module
+class ModuleAccessExpression
+  attr_accessor :Token, :Module, :Object
+  def initialize(o, a)
+    @Token = nil
+    @Module = o
+    @Object = a
+  end
 
+  def print_tree(indent, last)
+    print indent
+    indent += indentation(last)
+
+    puts "ModuleAccess"
+    puts indent + $AST_MIDDLE + "Module"
+    @Module.print_tree(indent + $AST_LINE, true)
+
+    puts indent + $AST_LAST + "Object"
+    @Object.print_tree(indent + $AST_SPACE, true)
+  end
+end 
 
 # Representa un operador unario. No tiene mucha más explicación, pero acá hay
 # unos ejemplos:

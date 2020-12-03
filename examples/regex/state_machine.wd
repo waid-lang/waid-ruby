@@ -1,0 +1,33 @@
+include "collections"
+
+Automata: record =>
+    states => !{collections::Set}
+    start_state => null
+    final_states => []
+    transitions => !{collections::Hash}
+    language = [0, 1]
+
+instance:
+    setStartState: func(state) =>
+        start_state = state
+        !(states'add state)
+    endfn
+
+    addFinalState: func(state) =>
+        final_states => final_states . state
+    endfn
+
+#    addTransition: func(from, to, input) =>
+#        !(states'add from)
+#        !(states'add to)
+#
+#        if !(transtions'has from):
+#            if !(!(transitions'at from)'has to))
+#                !(!(transitions'at from)'at to)'set 
+#            endif
+#        else:
+#            temp_hash => !{collections::Hash [to] [input]}
+#            !(transitions'set from temp_hash)
+#        endif
+#    endfn
+endfn

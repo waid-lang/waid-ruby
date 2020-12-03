@@ -1,0 +1,7 @@
+add1: func(x) =>
+    <- x + 1
+endfn
+
+count: func(str, char) =>
+    <- "No sé contar"
+endfn

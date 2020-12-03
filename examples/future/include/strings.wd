@@ -1,0 +1,24 @@
+count: func(str, char) =>
+    if !(length char) > 1 or not char:
+        <- -1
+    endif
+    
+    str_len => !(length str)
+    count => 0
+
+    index => 0
+    while index < str_len:
+        if index @ str == char:
+            count => count + 1
+        endif
+        index => index + 1
+    endwl
+    <- count
+endfn
+
+Something: record =>
+instance:
+    count: func(str, char) =>
+        <- "this is fake"
+    endfn
+endrc

@@ -58,7 +58,6 @@ imprimir_matriz: func(matriz) =>
         cols => filas
         filas => 1
     endif
-
     
     i => 0
     while i < filas:
@@ -95,6 +94,7 @@ i => 0
 while i < !(length matrices):
     matriz => i @ matrices
 
+    # Imprimimos la matriz original y su versión escalonada
     !(printLine "----------------------------")
     !(printLine "Matriz original:")
     !(imprimir_matriz matriz)

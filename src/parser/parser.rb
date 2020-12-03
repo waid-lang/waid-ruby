@@ -451,7 +451,7 @@ class Parser
         operand = parseRecordInit
       end
     else
-      operand = parseOperand
+      operand = parseScopeAccess
     end
 
     # Por ahora solo tengo implementado el acceso a un atributo a la vez, es
@@ -466,15 +466,35 @@ class Parser
     #
     # 2) pos_x => (vector_1'posicion)'x
     if peekTokenEquals(TokenKind::OP_SINGLE_QUOTE)
-
       pushToken
       consumePeek(TokenKind::IDENTIFIER)
       attr_acc = AttributeAccessExpression.new(operand, Identifier.new(@current_token.value, @current_token))
+
+      while peekTokenEquals(TokenKind::OP_SINGLE_QUOTE)
+        pushToken
+        consumePeek(TokenKind::IDENTIFIER)
+        attr_acc = AttributeAccessExpression.new(attr_acc, Identifier.new(@current_token.value, @current_token))
+      end
       return attr_acc
-    elsif peekTokenEquals(TokenKind::OP_DOUBLE_COLON)
+    end
+    operand
+  end
+
+  def parseScopeAccess
+    operand = parseOperand
+    if peekTokenEquals(TokenKind::OP_DOUBLE_COLON)
       pushToken
       consumePeek(TokenKind::IDENTIFIER)
+
       mod_acc = ModuleAccessExpression.new(operand, Identifier.new(@current_token.value, @current_token))
+=begin
+      while peekTokenEquals(TokenKind::OP_DOUBLE_COLON)
+        pushToken
+        consumePeek(TokenKind::IDENTIFIER)
+        mod_acc = ModuleAccessExpression.new(mod_acc, Identifier.new(@current_token.value, @current_token))
+      end
+      return mod_acc
+=end
       return mod_acc
     end
     operand
@@ -492,16 +512,15 @@ class Parser
 
       expr.Arguments.push(parseExpression)
 
-      if not peekTokenEquals(TokenKind::OP_CLOSE_PARENTHESIS)
-        expr.Arguments.push(parseExpression)
-      end
-
       expr_ = parseExpression
       while expr_
         expr.Arguments.push(expr_)
         expr_ = parseExpression
       end
 
+      if expr.Arguments.none?
+        expr.Arguments = [Empty.new]
+      end
       consumePeek(TokenKind::OP_CLOSE_PARENTHESIS)
       return expr
     end
@@ -518,9 +537,7 @@ class Parser
     if peekTokenEquals(TokenKind::OP_OPEN_CURLYBRACES)
       # Tiene argumentos
       pushToken
-      consumePeek(TokenKind::IDENTIFIER)
-
-      expr.Identifier = Identifier.new(@current_token.value, @current_token)
+      expr.Identifier = parseScopeAccess
 
       if not peekTokenEquals(TokenKind::OP_CLOSE_CURLYBRACES)
         expr.Arguments.push(parseExpression)

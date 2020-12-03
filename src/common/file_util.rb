@@ -23,9 +23,17 @@ class WaidFile
     File.basename(@file_path)
   end
 
+  def getPath
+    File.dirname(File.expand_path(@file_path))
+  end
+
   # TODO: quitar esto! El archivo completo solo debería exisitir en
   # ErrorCollector :((
   def [](i)
     @source[i]
+  end
+
+  def source
+    @source
   end
 end

@@ -6,8 +6,7 @@ def number_of_digits(num)
   Math.log10(num + 1).ceil
 end
 
-CompilationError = Struct.new(:error_description, :source_position) do
-  def to_s
+CompilationError = Struct.new(:error_description, :source_position)
     # Ya que implementaré estos mensajes de error en el futuro, me quedo satisfecho con unos más simples.
     # Modelos de errores
     # Ni siquiera sé si son errores reales, pero sirven para mostrar la estructura:
@@ -23,10 +22,6 @@ CompilationError = Struct.new(:error_description, :source_position) do
     #     Error: 'reset_token()' takes exactly 1 argument (2 given)
     #     15|     token_arr@[i] => !->reset_token(token_arr@[i], x_coord - 2);
     #                                                            ^~~~~~~~~~~
-    error_string = "Error: #{error_description}\n\t#{source_position.line}| #{full_line}\n\t"
-    error_string += " " * (source_position.column + number_of_digits(source_position.line) + 1) + "^"
-  end
-end
 
 # ErrorCollector recolecta todos los errores en todas las fases del compilador.
 # También se encarga de imprimirlos bonitos en caso de.
@@ -38,7 +33,7 @@ class ErrorCollector
 
     # Este es el único lugar en el que se guardará el archivo completo.
     # Digo "será" porque todavía no lo es :(
-    @source_file = source
+    @source_files = [source]
   end
 
   # addError: CompilationError -> nil
@@ -60,11 +55,12 @@ class ErrorCollector
   # showErrors muestra los errores uno por uno. Eso xd
   def showErrors
     # Primero mostramos el nombre del archivo
-    puts
-    puts @source_file.get_filename
+    #puts
+    #puts @source_file.get_filename
 
     # Y luego los errores
     @errors.each do |err|
+      puts @source_files[err.source_position.file_index].get_filename
       puts "\t#{formatError(err)}"
     end
 
@@ -78,10 +74,23 @@ class ErrorCollector
   def getLine(sp)
     line_start = sp.source_line_column
     line = String.new
-    while @source_file[line_start] and not @source_file[line_start].eql? "\n"
-      line += @source_file[line_start]
+    file = @source_files[sp.file_index].source
+    while file[line_start] and not file[line_start].eql? "\n"
+      line += file[line_start]
       line_start += 1
     end
     line
+  end
+
+  def mainFile
+    @source_files[0]
+  end
+
+  def addFile(file)
+    @source_files.push(file)
+  end
+
+  def currentFileIndex
+    @source_files.length - 1
   end
 end

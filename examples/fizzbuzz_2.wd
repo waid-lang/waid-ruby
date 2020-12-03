@@ -26,9 +26,8 @@ endfn
 main: func() =>
     max => !(toNum !(get_input "Ingresa un número máximo: "))
     count => 0
-    while count <= max:
+    while count <= max, count => count + 1:
         !(printLine !(fizzbuzz count))
-        count => count + 1
     endwl
 endfn
 

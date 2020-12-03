@@ -1,7 +1,7 @@
 fizzbuzz: func(max) =>
     count => 0
     msg => ""
-    while count <= max:
+    while count <= max, count => count + 1:
         msg => count
         if count % 3 == 0:
             msg => "Fizz"
@@ -13,7 +13,6 @@ fizzbuzz: func(max) =>
             msg => "FizzBuzz"
         endif
         !(printLine msg)
-        count => count + 1
     endwl
 endfn
 

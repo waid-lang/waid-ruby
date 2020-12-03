@@ -392,11 +392,20 @@ end
 #     a => x         +----> @Body
 #     x => x + 1     |
 # endwl
+#
+#   +-------------------------> @Token
+#   |      +------------------> @Condition
+#   |      |         +--------> @PostExpression
+# ~~+~  ~~~+~~  ~~~~~+~~~~
+# while i < 10, i => i + 1:
+#     !(printLine i)       +--> @Body
+# endwl
 class WhileStatement
-  attr_accessor :Token, :Condition, :Body
+  attr_accessor :Token, :Condition, :PostExpression, :Body
   def initialize
     @Token = nil
     @Condition = nil
+    @PostExpression = nil
     @Body = nil
   end
 
@@ -407,6 +416,9 @@ class WhileStatement
     puts "WhileStatement"
     puts indent + $AST_MIDDLE + "Condition"
     @Condition.print_tree(indent + $AST_LINE, true)
+
+    puts indent + $AST_MIDDLE + "PostExpression"
+    @PostExpression.print_tree(indent + $AST_LINE, true)
 
     puts indent + $AST_LAST + "Body"
     @Body.Statements.each_with_index do |stmt, index|

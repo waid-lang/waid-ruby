@@ -216,6 +216,7 @@ class Interpreter
       if @runtime_stack.isReturnState
         return res
       end
+      evalNode(node.PostExpression)
     end
     res
   end

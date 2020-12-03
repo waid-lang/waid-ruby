@@ -1,11 +1,7 @@
 factorial_while: func(n) =>
     fact => 1
-    while n > 0:
-        # Todavía no sé cómo implementar estos operadores
-        #fact *> n
-        #n -> 1
+    while n > 0, n => n - 1:
         fact => fact * n
-        n => n - 1
     endwl
     <- fact
 endfn
@@ -21,9 +17,8 @@ factorial_dp: func(n) =>
     arr => [1]
     count => 1
 
-    while count <= n:
+    while count <= n, count => count + 1:
         (count @ arr) => count * (count - 1) @ arr
-        count => count + 1
     endwl
     <- n @ arr
 endfn

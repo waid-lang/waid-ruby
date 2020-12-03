@@ -324,6 +324,14 @@ class Parser
     stmt.Token = @current_token
     stmt.Condition = parseExpression
 
+    if peekTokenEquals(TokenKind::OP_COMMA)
+      pushToken
+      consumePeek(TokenKind::IDENTIFIER)
+      stmt.PostExpression = parseVarDeclStatement
+    else
+      stmt.PostExpression = Empty.new
+    end
+
     #consumePeek(TokenKind::OP_ASSIGN)
     consumePeek(TokenKind::OP_COLON)
 

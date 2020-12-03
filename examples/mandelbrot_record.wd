@@ -22,24 +22,21 @@ endrc
 
 main: func() =>
     y => -1
-    while y < 1:
+    while y < 1, y => y + 0.05:
         x => -2.05
-        while x < 0.55:
+        while x < 0.55, x => x + 0.03:
             z => !{Complex}
             i => 0
-            while i <= 100:
+            while i <= 100, i => i + 1:
                 z => !(!(z'mul z)'add !{Complex x y})
-                i => i + 1
             endwl
             if !z'abs < 2:
                 !(print "#")
             else:
                 !(print ":")
             endif
-            x => x + 0.03
         endwl
         !(printLine "")
-        y => y + 0.05
     endwl
 endfn
 

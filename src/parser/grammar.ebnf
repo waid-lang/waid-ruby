@@ -61,16 +61,21 @@ NEG              = "-", NEG
 # Lo malo es que nos va a quedar una gramática media fea. Pero lo vale,
 # supongo.
 # Quedaría así:
-EXPR_PRIMARIA    = OPERANDO, EXPR_PRIMARIA_P
+EXPR_PRIMARIA    = SCOPE_ACCESS, EXPR_PRIMARIA_P
                  | FUNC_CALL, EXPR_PRIMARIA_P
                  | RECORD_INIT, EXPR_PRIMARIA_P
+
 EXPR_PRIMARIA_P  = "'", IDENTIFICADOR, EXPR_PRIMARIA_P
                  | ε
-             
-RECORD_INIT      = "!", "{", IDENTIFICADOR, [LISTA_EXPR], "}";
+
+SCOPE_ACCESS     = OPERANDO, [SCOPE_ACCESS_P]
+SCOPE_ACCESS_P   = "::", SCOPE_ACCESS_P
+                 | IDENTIFICADOR
+
+RECORD_INIT      = "!", "{", SCOPE_ACCESS, [LISTA_EXPR], "}";
                  | "!", IDENTIFICADOR;
 
-FUNC_CALL        = "!", "(", IDENTIFICADOR, [LISTA_EXPR], ")";
+FUNC_CALL        = "!", "(", EXPR_PRIMARIA, [LISTA_EXPR], ")";
                  | "!", IDENTIFICADOR;
 
 DECL_RECORD      = DECL_TIPO, "record", "=>", CUERPO_RECORD;

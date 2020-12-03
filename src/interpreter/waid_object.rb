@@ -150,7 +150,7 @@ class WaidModule < WaidObject
   end
 
   def inspect
-    "Module"
+    "<Module: #{@Identifier}>"
   end
 end
 
@@ -185,22 +185,11 @@ class WaidRecordInstance < WaidObject
   end
 
   def type
-    "Record"
+    "<Instance of: #{@Identifier}>"
   end
 
   def inspect
-    str = "<#{@Identifier.Value}("
-    @Env.getAllNames.each do |id, val|
-      if val.is_a? WaidString
-        str += "#{id} => \"#{val.inspect}\""
-      else
-        str += "#{id} => #{val.inspect}"
-      end
-      str += ", "
-    end
-    str = str[0...-2]
-    str += ")>"
-    str
+    "<Instance of: #{@Identifier}>"
   end
 end
 

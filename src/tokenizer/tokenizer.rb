@@ -96,6 +96,8 @@ class Tokenizer
     @source = source
     @error_collector = err_coll
 
+    @current_file_index = @error_collector.currentFileIndex
+
     @tokens = Array.new
 
     # Número de línea actual
@@ -123,7 +125,8 @@ class Tokenizer
       SourcePosition.new(
         @line_number,
         @column_number,
-        @source.line_indexes.last
+        @source.line_indexes.last,
+        @current_file_index
       ),
       value
     )
@@ -137,7 +140,8 @@ class Tokenizer
         SourcePosition.new(
           @line_number,
           @column_number,
-          @source.line_indexes.last
+          @source.line_indexes.last,
+          @current_file_index
         )
       )
     )

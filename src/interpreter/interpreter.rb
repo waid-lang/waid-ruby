@@ -8,10 +8,10 @@ FalseValue = WaidBoolean.new(false)
 NullValue = WaidNull.new
 
 class Interpreter
-  def initialize(ast, err_coll, is_module)
+  def initialize(ast, err_coll)
     @ast = ast
     @error_collector = err_coll
-    @is_module = is_module
+    @is_module = 0
 
     @runtime_stack = RuntimeStack.new
   end
@@ -24,6 +24,10 @@ class Interpreter
     c_err = CompilationError.new(message, token.source_position)
     @error_collector.addError(c_err)
     @error_collector.showErrors
+  end
+
+  def inModuleContext
+    @is_module != 0
   end
 
   def boolToWaidBoolean(val)
@@ -253,8 +257,8 @@ class Interpreter
       @runtime_stack.push(rec_inst.Env)
 
     elsif node.Function.is_a? ModuleAccessExpression
-      id = node.Function.Module
-      stack_frame = evalNode(id).StackFrame
+      id = node.Function.Object
+      stack_frame = evalNode(node.Function.Module).StackFrame
       @runtime_stack.push(stack_frame)
     else
       id = node.Function
@@ -297,6 +301,10 @@ class Interpreter
     id = node.Identifier
     arguments = evalExpressions(node.Arguments)
     record = evalNode(id)
+
+    if id.is_a? ModuleAccessExpression
+      id = id.Module
+    end
 
     record_instance = WaidRecordInstance.new
 
@@ -361,53 +369,55 @@ class Interpreter
   def evalNode(node)
     case node
     when Program
-      ar = StackFrame.new("global", nil)
-      @runtime_stack.push(ar)
 
-      populateGlobals
+      if not inModuleContext
+        ar = StackFrame.new("global", nil)
+        @runtime_stack.push(ar)
+        populateGlobals
+      end
 
       a = evalProgram(node)
 
-      if not @is_module
-        @runtime_stack.pop
+      if inModuleContext
+        return @runtime_stack.pop
       end
       return a
 
     when IncludeStatement
       path = evalNode(node.Path)
-      if not File.file?(path.Value + ".wd")
+      full_path = @error_collector.mainFile.getPath + "/" + path.Value + ".wd"
+      if not File.file?(full_path)
         addRuntimeError("File '#{path.Value}.wd' not found", node.Token)
       end
-      source_file = WaidFile.new(path.Value + ".wd")
+      source_file = WaidFile.new(full_path)
 
-      error_collector = ErrorCollector.new(source_file)
+      @error_collector.addFile(source_file)
 
-      tokenizer = Tokenizer.new(source_file, error_collector)
+      tokenizer = Tokenizer.new(source_file, @error_collector)
       tokenizer.tokenize!
 
-      if error_collector.hasErrors
-        error_collector.showErrors
+      if @error_collector.hasErrors
+        @error_collector.showErrors
       end
 
-      parser = Parser.new(tokenizer.tokens, error_collector)
+      parser = Parser.new(tokenizer.tokens, @error_collector)
       parser.parse!
 
-      if error_collector.hasErrors
-        error_collector.showErrors
+      if @error_collector.hasErrors
+        @error_collector.showErrors
       end
-
-      interpreter = Interpreter.new(parser.ast, error_collector, true)
-      interpreter.run
 
       mod = StackFrame.new(path)
       mod.makeLinkTo(@runtime_stack.getTopMost)
 
+      @runtime_stack.push(mod)
 
-      interpreter.env.getBottomMost.memory_map.each do |key, val|
-        mod.define(key, val)
-      end
+      @is_module += 1
+      stack_frame = evalNode(parser.ast)
 
-      @runtime_stack.define(node.Path.Value, WaidModule.new(path, mod))
+      @runtime_stack.define(node.Path.Value, WaidModule.new(full_path, stack_frame))
+
+      @is_module -= 1
       return
 
     when VarDeclarationStatement
@@ -510,6 +520,10 @@ class Interpreter
     when AttributeAccessExpression
       object = evalNode(node.Object)
 
+      if not object.is_a? WaidRecordInstance
+        addRuntimeError("'#{node.Object.Value}' is not a record", node.Object.Token)
+      end
+
       @runtime_stack.push(object.Env)
 
       attr = evalNode(node.Attribute)
@@ -519,7 +533,11 @@ class Interpreter
 
     when ModuleAccessExpression
       mod = evalNode(node.Module)
-      
+ 
+      if not mod.is_a? WaidModule
+        addRuntimeError("'#{node.Module.Value}' is not a module", node.Module.Token)
+      end
+     
       @runtime_stack.push(mod.StackFrame)
 
       obj = evalNode(node.Object)

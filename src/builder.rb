@@ -82,7 +82,7 @@ class Builder
     end
 
     # Creamos un nuevo intérprete e interpretamos el AST
-    interpreter = Interpreter.new(parser.ast, error_collector, false)
+    interpreter = Interpreter.new(parser.ast, error_collector)
     interpreter.run
 
    # Prefiero implementar esto después

@@ -1,3 +1,5 @@
+include "io"
+
 fib_rec: func(n) =>
     if n < 2:
         <- n
@@ -21,9 +23,9 @@ endfn
 main: func() =>
     num => 10
     if !(fib_rec num) == !(fib_while num):
-        !(printLine true)
+        !(io::printLine true)
     else:
-        !(printLine false)
+        !(io::printLine false)
     endif
 endfn
 

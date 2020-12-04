@@ -1,45 +1,47 @@
+include "io"
+
 ret: func() =>
     if true:
-        !(printLine 0)
+        !(io::printLine 0)
         <- "Return 1 ok :)"
-        !(printLine "Never here 1")
+        !(io::printLine "Never here 1")
     endif
-    !(printLine "Never here 2")
+    !(io::printLine "Never here 2")
     <- "Return 1 not ok :("
 endfn
 
 ret2: func() =>
     if true:
-        !(printLine 0)
+        !(io::printLine 0)
         if true:
-            !(printLine 1)
+            !(io::printLine 1)
             if true:
-                !(printLine 2)
+                !(io::printLine 2)
                 <- "Return 2 ok :)"
-                !(printLine "Never here 1")
+                !(io::printLine "Never here 1")
             endif
-            !(printLine "Never here 2")
+            !(io::printLine "Never here 2")
         endif
-        !(printLine "Never here 3")
+        !(io::printLine "Never here 3")
     endif
-    !(printLine "Never here 4")
+    !(io::printLine "Never here 4")
     <- "Return 2 not ok :("
 endfn
 
 ret3: func() =>
     ret4: func() =>
-        !(printLine "Return 4")
+        !(io::printLine "Return 4")
         <- "Return 3/4 working"
     endfn
     !ret4
-    !(printLine "All good...")
+    !(io::printLine "All good...")
     <- "Return 3 working"
 endfn
 
 ret4: func() =>
     i => 0
     while i < 20:
-        !(printLine i)
+        !(io::printLine i)
         if i == 10:
             <- "Return 4 working!"
         endif
@@ -47,11 +49,11 @@ ret4: func() =>
     endwl
 endfn
 
-!(printLine "Return 1 Test")
-!(printLine !ret)
-!(printLine "Return 2 Test")
-!(printLine !ret2)
-!(printLine "Return 3 Test")
-!(printLine !ret3)
-!(printLine "Return 4 Test")
-!(printLine !ret4)
+!(io::printLine "Return 1 Test")
+!(io::printLine !ret)
+!(io::printLine "Return 2 Test")
+!(io::printLine !ret2)
+!(io::printLine "Return 3 Test")
+!(io::printLine !ret3)
+!(io::printLine "Return 4 Test")
+!(io::printLine !ret4)

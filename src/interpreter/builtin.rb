@@ -1,23 +1,8 @@
 require_relative 'waid_object'
-
-builtin_printLine = Proc.new do |ob|
-  if not ob
-    ob = WaidString.new("\n")
-  end
-  puts ob.inspect
-end
-
-builtin_print = Proc.new do |ob|
-  print ob.inspect
-end
-
-builtin_input = Proc.new do
-  input = gets
-  next WaidString.new(input.chomp)
-end
+require_relative 'ffi'
 
 builtin_length = Proc.new do |str|
-  if str.is_a?(WaidString)
+  if isStr(str)
     next WaidInteger.new(str.Value.length)
   elsif str.is_a?(WaidArray)
     next WaidInteger.new(str.Values.length)
@@ -42,11 +27,34 @@ builtin_toNum = Proc.new do |str|
   next WaidNull.new
 end
 
+load_primitive = Proc.new do |location|
+  if not isStr(location)
+    next WaidNull.new
+  end
+
+  object, library = location.Value.split("@")
+  
+  library = File.expand_path(File.dirname(__FILE__)) + "/lib/" + library
+  if not library or not object
+    next WaidNull.new
+  end
+  library += ".rb"
+
+  if not File.file?(library)
+    next WaidNull.new
+  end
+
+  require File.expand_path(library)
+
+  $MODULE.StackFrame.getName(object)
+end
+
+builtin_ffi_module = WaidForeignModule.new("ffi")
+builtin_ffi_module.define_primitive("load_primitive", load_primitive, 1)
+
 $builtins = {
-  "printLine" => WaidBuiltin.new(builtin_printLine, 1),
-  "print" => WaidBuiltin.new(builtin_print, 1),
   "length" => WaidBuiltin.new(builtin_length, 1),
-  "input" => WaidBuiltin.new(builtin_input, 0),
   "toNum" => WaidBuiltin.new(builtin_toNum, 1),
-  "toStr" => WaidBuiltin.new(builtin_toStr, 1)
+  "toStr" => WaidBuiltin.new(builtin_toStr, 1),
+  "ffi" => builtin_ffi_module
 }

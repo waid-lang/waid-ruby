@@ -24,8 +24,14 @@ class RuntimeStack
   def resolveName(name)
     value = getTopMost.getName(name)
     if not value
-      # Globals
-      value = @records[0].getName(name)
+      current_global = getTopMost.linkedTo
+      while current_global
+        if current_global.linkedTo
+          current_global = current_global.linkedTo
+        else
+          return current_global.getName(name)
+        end
+      end
     end
     value
   end
@@ -49,7 +55,12 @@ class RuntimeStack
   end
 
   def pp
-    puts "CallStack"
+    puts "########## CALL STACK ##########"
+    @records.reverse.each do |sf|
+      puts sf
+    end
+    puts "+-------------------------------+"
+    puts
   end
 end
 
@@ -94,5 +105,22 @@ class StackFrame
   def makeLinkTo(activation_record)
     @previous = activation_record
     self
+  end
+
+  def to_s
+    s = "+-------------------------------+\n"
+    if @previous
+      previous = @previous.identifier
+    else
+      previous = "None"
+    end
+
+    s += "|             #{@identifier} -> '#{previous}'     \n"
+
+    @memory_map.each do |key, val|
+      s += "|'#{key} => #{val.inspect}\n"
+    end
+    #s += "+-------------------------------+"
+    s
   end
 end

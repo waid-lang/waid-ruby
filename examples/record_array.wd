@@ -1,3 +1,5 @@
+include "io"
+
 Circle: record =>
     radius => 0
     colour => ""
@@ -37,7 +39,7 @@ main: func() =>
 
     x => 0
     while x < !(length circles):
-        !(printLine !((x@circles)'info))
+        !(io::printLine !((x@circles)'info))
         x => x + 1
     endwl
 endfn

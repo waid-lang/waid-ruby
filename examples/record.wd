@@ -58,5 +58,5 @@ eval: func(node) =>
     endif
 endfn
 
-!(printLine !(eval expr))
-!(printLine !(eval expr_err))
+!(io::printLine !(eval expr))
+!(io::printLine !(eval expr_err))

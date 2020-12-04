@@ -1,3 +1,5 @@
+include "io"
+
 ejecutador: func(f, x, y) =>
     <- !(f x y)
 endfn
@@ -17,13 +19,13 @@ max: func(nombres_arbitrariamente_largos_punto_com, i) =>
     <- i
 endfn
 
-!(printLine !(ejecutador suma 2 3) == 5)
-!(printLine !(ejecutador resta 10 7) == 3)
-!(printLine !(ejecutador max 22.8 30.78881) == 30.78881)
+!(io::printLine !(ejecutador suma 2 3) == 5)
+!(io::printLine !(ejecutador resta 10 7) == 3)
+!(io::printLine !(ejecutador max 22.8 30.78881) == 30.78881)
 
 
 # Porque puedo (ojalá):
-!(printLine !(ejecutador
+!(io::printLine !(ejecutador
     max
     !(ejecutador suma 2 3)
     !(ejecutador resta 4 5)

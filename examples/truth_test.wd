@@ -1,3 +1,5 @@
+include "io"
+
 true_val => true
 false_val => false
 falsey_val => null
@@ -38,8 +40,8 @@ int_to_strbool: func(int) =>
     <- "Something went wrong :("
 endfn
 
-!(printLine !(int_to_strbool true_check))
-!(printLine !(int_to_strbool false_check))
-!(printLine !(int_to_strbool falsey_check))
-!(printLine !(int_to_strbool falsey_check_str))
-!(printLine !(int_to_strbool truthy_check))
+!(io::printLine !(int_to_strbool true_check))
+!(io::printLine !(int_to_strbool false_check))
+!(io::printLine !(int_to_strbool falsey_check))
+!(io::printLine !(int_to_strbool falsey_check_str))
+!(io::printLine !(int_to_strbool truthy_check))

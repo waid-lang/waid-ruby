@@ -1,3 +1,5 @@
+include "io"
+
 fib_rec: func(n) =>
     if n < 2:
         <- n
@@ -27,32 +29,32 @@ fib_dp: func(n) =>
 endfn
 
 main: func() =>
-    num => !(toNum !input)
+    num => !(toNum !io::input)
     count => 0
-    !(printLine "Iterative Fibonacci:")
+    !(io::printLine "Iterative Fibonacci:")
     while count < num, count => count + 1:
-        !(print !(fib_while count))
-        !(print " ")
+        !(io::print !(fib_while count))
+        !(io::print " ")
     endwl
 
-    !(printLine "")
+    !(io::printLine "")
 
     count => 0
-    !(printLine "DP Fibonacci:")
+    !(io::printLine "DP Fibonacci:")
     while count < num, count => count + 1:
-        !(print !(fib_dp count))
-        !(print " ")
+        !(io::print !(fib_dp count))
+        !(io::print " ")
     endwl
 
-    !(printLine "")
+    !(io::printLine "")
 
     count => 0
-    !(printLine "Recursive Fibonacci:")
+    !(io::printLine "Recursive Fibonacci:")
     while count < num, count => count + 1:
-        !(print !(fib_rec count))
-        !(print " ")
+        !(io::print !(fib_rec count))
+        !(io::print " ")
     endwl
-    !(printLine "")
+    !(io::printLine "")
 endfn
 
 !main

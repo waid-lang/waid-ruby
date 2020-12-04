@@ -1,3 +1,5 @@
+include "io"
+
 index_element: func(num, elem) =>
     <- !(toStr num) . " -> " . elem
 endfn
@@ -5,12 +7,12 @@ endfn
 main: func() =>
     array => []
     while true:
-        array => array . !input
-        !(printLine "Elementos")
+        array => array . !io::input
+        !(io::printLine "Elementos")
         
         count => 0
         while count < !(length array):
-            !(printLine !(index_element count (count @ array))) # Paréntesis están demás, pero es para claridad
+            !(io::printLine !(index_element count (count @ array))) # Paréntesis están demás, pero es para claridad
             count => count + 1
         endwl
     endwl

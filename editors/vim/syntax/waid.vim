@@ -19,7 +19,7 @@ syntax keyword waidKeywords
 
 syntax keyword waidInclude include
 
-syn keyword waidBuiltin print printLine length toStr toNum
+syn keyword waidBuiltin length toStr toNum
 
 syntax match waidNumber "\v<\d+>"
 syntax match waidNumber "\v<\d+\.\d+>"
@@ -35,7 +35,7 @@ syntax match waidFunctionCallOperator  "!" contained
 syntax match waidFunction "!{\w*" contains=waidRecordId,waidFunctionCallOperator
 syntax match waidRecordId "\w*" contained
 
-syntax match waidFunctionDeclaration "\w*: func" contains=waidFunctionDeclarationId,waidKeywords
+syntax match waidFunctionDeclaration "\w*: [func\|record]" contains=waidFunctionDeclarationId,waidKeywords
 syntax match waidFunctionDeclarationId "\w*:" contained contains=waidFunctionId
 
 highlight default link waidNumber Number

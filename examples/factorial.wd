@@ -1,3 +1,5 @@
+include "io"
+
 factorial_while: func(n) =>
     fact => 1
     while n > 0, n => n - 1:
@@ -28,8 +30,8 @@ equal: func(x, y, z) =>
 endfn
 
 main: func() =>
-    num => !(toNum !input)
-    !(printLine !(equal !(factorial_dp num) !(factorial_while num) !(factorial_rec num)))
+    num => !(toNum !io::input)
+    !(io::printLine !(equal !(factorial_dp num) !(factorial_while num) !(factorial_rec num)))
 endfn
 
 !main

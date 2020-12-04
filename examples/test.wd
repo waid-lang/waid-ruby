@@ -1,3 +1,5 @@
+include "io"
+
 add: func(x, y) =>
     <- x + y
 endfn
@@ -15,10 +17,10 @@ endfn
 
 main: func() =>
     count => 0
-    range => !(range 0 !(add !(toNum !input) 1) 2)
-    !(printLine range)
+    range => !(range 0 !(add !(toNum !io::input) 1) 2)
+    !(io::printLine range)
     while count < !(length range):
-        !(printLine !(add count @ range !(toNum !input)))
+        !(io::printLine !(add count @ range !(toNum !io::input)))
         count => count + 1
     endwl
 endfn

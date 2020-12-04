@@ -1,3 +1,5 @@
+include "io"
+
 function_1: func() =>
     <- "Dentro de function_1"
 endfn
@@ -25,19 +27,19 @@ array => [
 array => array . [1, 2, 3]
 array => array . "Hola de nuevo"
 
-!(printLine 3 @ array)
-!(printLine 4 @ array)
-!(printLine 5 @ array)
+!(io::printLine 3 @ array)
+!(io::printLine 4 @ array)
+!(io::printLine 5 @ array)
 
 func_name => 6 @ array
-!(printLine !func_name)
+!(io::printLine !func_name)
 
-!(printLine "Length: " . !(toStr !(length array)))
+!(io::printLine "Length: " . !(toStr !(length array)))
 
 func_arr => 7 @ array
-!(printLine !(func_arr 2 3))
+!(io::printLine !(func_arr 2 3))
 
 (4 @ array) => 666
 (0 @ array) => ":)"
-!(printLine array == [":)", 46, "chao", "hola", 666, "Dentro de function_1", function_2, add, [1, 2, 3], "Hola de nuevo"])
-!(printLine "The array is: " . !(toStr array))
+!(io::printLine array == [":)", 46, "chao", "hola", 666, "Dentro de function_1", function_2, add, [1, 2, 3], "Hola de nuevo"])
+!(io::printLine "The array is: " . !(toStr array))

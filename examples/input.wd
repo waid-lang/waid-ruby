@@ -1,17 +1,19 @@
+include "io"
+
 # Test 1
-in => !input
-!(printLine "You wrote: " . in)
+in => !io::input
+!(io::printLine "You wrote: " . in)
 
 # Test 2
-!(print "Write a number: ")
-num1 => !(toNum !input)
+!(io::print "Write a number: ")
+num1 => !(toNum !io::input)
 
-!(print "Write another number: ")
-num2 => !(toNum !input)
+!(io::print "Write another number: ")
+num2 => !(toNum !io::input)
 
 sum => !(toStr num1 + num2)
-!(printLine "The sum of both numbers is: " . !(toStr sum))
+!(io::printLine "The sum of both numbers is: " . !(toStr sum))
 
 # Test 3
 num3 => !(toNum sum) * 5
-!(printLine "I just printed the number " . !(toStr num3) . "/5")
+!(io::printLine "I just printed the number " . !(toStr num3) . "/5")

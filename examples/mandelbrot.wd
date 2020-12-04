@@ -1,6 +1,4 @@
-##################################################################
-### Implementación básica de números complejos y sus funciones ###
-##################################################################
+include "io"
 
 # Número Complejo
 Complex: func(r, i) =>
@@ -43,13 +41,13 @@ main: func() =>
             endwl
 
             if !(cabs z) < 2:
-                !(print "#")
+                !(io::print "#")
             else:
-                !(print ":")
+                !(io::print ":")
             endif
             x => x + 0.03
         endwl
-        !(printLine "")
+        !(io::printLine "")
         y => y + 0.05
     endwl
 endfn

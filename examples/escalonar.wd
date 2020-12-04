@@ -1,3 +1,5 @@
+include "io"
+
 escalonar: func(matriz) =>
     filas => !(length matriz)
     cols => !(length 0 @ matriz)
@@ -60,16 +62,16 @@ imprimir_matriz: func(matriz) =>
         j => 0
         while j < cols:
             if filas == 1:
-                !(print j @ matriz)
+                !(io::print j @ matriz)
             else:
-                !(print j @ (i @ matriz))
+                !(io::print j @ (i @ matriz))
             endif
             if j /= cols - 1:
-                !(print ", ")
+                !(io::print ", ")
             endif
             j => j + 1
         endwl
-        !(printLine "")
+        !(io::printLine "")
     endwl
 endfn
 
@@ -90,11 +92,11 @@ while i < !(length matrices), i => i + 1:
     matriz => i @ matrices
 
     # Imprimimos la matriz original y su versión escalonada
-    !(printLine "----------------------------")
-    !(printLine "Matriz original:")
-    !(imprimir_matriz matriz)
-    !(printLine "")
-    !(printLine "Matriz escalonada: ")
+    !(io::printLine "----------------------------")
+    !(io::printLine "Matriz original:")
+    !(io::imprimir_matriz matriz)
+    !(io::printLine "")
+    !(io::printLine "Matriz escalonada: ")
     !(imprimir_matriz !(escalonar matriz))
 endwl
 

@@ -1,4 +1,5 @@
 include "strings"
+include "io"
 
 # Fake count
 count: func(str, char) =>
@@ -6,12 +7,12 @@ count: func(str, char) =>
 endfn
 
 main: func() =>
-    !(printLine !(strings::count "Tres tristes tigres tragaban trigo en un trigal" "i"))
+    !(io::printLine !(strings::count "Tres tristes tigres tragaban trigo en un trigal" "i"))
     
     something => !{strings::Something}
-    !(printLine !(something'count "Pablito clavó un clavito, ¿cuántos clavitos clavó Pablito?" "c"))
+    !(io::printLine !(something'count "Pablito clavó un clavito, ¿cuántos clavitos clavó Pablito?" "c"))
 
-    !(printLine !(count "Como poco coco como, poco coco compro" "o"))
+    !(io::printLine !(count "Como poco coco como, poco coco compro" "o"))
 endfn
 
 !main

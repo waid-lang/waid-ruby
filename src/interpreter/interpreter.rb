@@ -2,6 +2,7 @@ require_relative '../parser/ast'
 require_relative 'enviroment'
 require_relative 'waid_object'
 require_relative 'builtin'
+require_relative 'ffi'
 
 TrueValue = WaidBoolean.new(true)
 FalseValue = WaidBoolean.new(false)
@@ -30,6 +31,7 @@ class Interpreter
     @is_module != 0
   end
 
+  # Converts a ruby boolean into a waid boolean object
   def boolToWaidBoolean(val)
     if val
       return TrueValue
@@ -37,7 +39,13 @@ class Interpreter
     FalseValue
   end
 
-
+  # Convierte implicitamente un valor a un booleano
+  # Por ejemplo:
+  #
+  # null -> false
+  # "" -> false
+  # [] -> false
+  # Todo el resto -> true
   def isTruthy(obj)
     if obj.is_a? WaidString
       if obj.Value == ""
@@ -45,12 +53,18 @@ class Interpreter
       end
       return true
     end
+    if obj.is_a? WaidArray
+      if obj.Values.length == 0
+        return false
+      end
+      return true
     if obj.is_a? WaidBoolean
       return obj.Value
     end
     not obj.is_a? WaidNull
   end
 
+  # Evalúa un operador unario
   def evalUnaryOperatorExpression(node, expr)
     case node.Operator.kind
     when TokenKind::OP_MINUS
@@ -82,6 +96,7 @@ class Interpreter
       return WaidFloat.new(left.Value * right.Value)
     when TokenKind::OP_SLASH
       if right.Value == 0
+        # TODO: Implementar sistema de manejo de errores
         addRuntimeError("Division by 0", node.Token)
       end
       return WaidFloat.new(left.Value / right.Value)
@@ -127,6 +142,9 @@ class Interpreter
   def evalBooleanBinaryOperation(node, left, right)
     case node.Operator.kind
     when TokenKind::KEY_AND
+      # Esto es una optimización super penca en verdad. Con esto devolvemos el
+      # valor de verdad de un "and" sin tener que verificar todos los valores,
+      # esto es, apenas pillamos un false, devolvemos false
       l = isTruthy(left)
       if not l
         return FalseValue
@@ -151,7 +169,13 @@ class Interpreter
     if left.is_a? WaidInteger and right.is_a? WaidInteger
       return evalIntegerBinaryOperatorexpression(node, left, right)
 
-    elsif left.is_a? WaidFloat or right.is_a? WaidFloat
+    elsif left.is_a? WaidFloat and right.is_a? WaidInteger
+      return evalFloatBinaryOperatorexpression(node, left, right)
+
+    elsif left.is_a? WaidFloat and right.is_a? WaidFloat
+      return evalFloatBinaryOperatorexpression(node, left, right)
+
+    elsif left.is_a? WaidInteger and right.is_a? WaidFloat
       return evalFloatBinaryOperatorexpression(node, left, right)
 
     elsif left.is_a? WaidBoolean and right.is_a? WaidBoolean
@@ -167,20 +191,31 @@ class Interpreter
       when TokenKind::OP_DOT
         left.Values.push(right)
         return left
+
+      # Verificar igualdad de arreglos
       when TokenKind::OP_EQUAL
         val = true
+
+        # Si no tienen el mismo largo son distintos
         if left.Values.length != right.Values.length
           val = false
         else
           left.Values.zip(right.Values).each do |l, r|
+
+            # Si algún objeto es de distinto tipo que su par, los arreglos son
+            # distintos
             if l.class != r.class
               val = false
               break
             else
+
+              # En caso contrario, verificamos la igualdad de sus valores
               val = evalBinaryOperatorExpression(operator, l, r)
             end
           end
         end
+
+        # Y transformamos la respuesta a un booleano de Waid
         return boolToWaidBoolean(val)
       end
 
@@ -213,6 +248,8 @@ class Interpreter
     res = NullValue
     while isTruthy(evalNode(node.Condition))
       res = evalNode(node.Body)
+
+      # Si estamos devolviendo algo, no seguir con el while y devolver el valor
       if @runtime_stack.isReturnState
         return res
       end
@@ -235,6 +272,11 @@ class Interpreter
     result = NullValue
     node.Statements.each do |stmt|
       result = evalNode(stmt)
+
+      # Si un statement es un Return, entramos en lo que llampe un ReturnState.
+      # ReturnState es una bandera que tiene el interpretador para decirle a
+      # otras partes del programa (if/else, while) que no ejecuten el resto de
+      # su código porque se está devolviendo algo.
       if stmt.is_a? ReturnStatement
         @runtime_stack.setReturnState
       end
@@ -245,59 +287,127 @@ class Interpreter
     result
   end
 
+  # Probablemente la función más importante del interpretador. Evalúa el
+  # llamado de una función.
   def evalFunctionCall(node)
+
+    # Evaluamos los argumentos. Lo hacemos primero para que sean evaluados
+    # dentro del StackFrame de donde se llamó la función.
     arguments = evalExpressions(node.Arguments)
+
+    # Resolvemos el objeto WaidFunction
     func = evalNode(node.Function)
-    if not func.is_a? WaidFunction and not func.is_a? WaidBuiltin
+
+    # Si no es una función, tiramos error
+    if not func.is_a? WaidFunction and not func.is_a? WaidBuiltin and not func.is_a? WaidForeignFunction
       addRuntimeError("#{func.type} is not callable.", node.Token)
     end
 
+    # Si es un acceso a atributo, por ejemplo algo así:
+    #
+    # pos => !(Vector'pos 24)
+    #
+    # El StackFrame para la función va a ser el StackFrame de la instancia que
+    # contiene a la función.
     if node.Function.is_a? AttributeAccessExpression
       id = node.Function.Attribute
-      rec_inst = evalNode(node.Function.Object)
-      @runtime_stack.push(rec_inst.Env)
+      stack_frame = evalNode(node.Function.Object).Env
 
+    # Si es un acceso a un módulo, por ejemplo:
+    # 
+    # num => !(math::cos 45)
+    #
+    # Entonces:
     elsif node.Function.is_a? ModuleAccessExpression
+
+      # Aumentamos el stack de módulo. Esta es otra bandera para decirle al
+      # interpretador que está corriendo código de un archivo distinto al
+      # principal. Si el valor es distinto de 0, estamos dentro de un módulo.
+      @is_module += 1
+
+      # El identificador es el objeto que buscamos
       id = node.Function.Object
+
+      # Este es el stackframe del módulo. En el ejemplo de más arriba sería
+      # "math"
       stack_frame = evalNode(node.Function.Module).StackFrame
-      @runtime_stack.push(stack_frame)
+
+      # Esto lo vamos a usar para ver si estamos llamando a un módulo nativo o
+      # a uno Foreign, queriendo decir que fue creado con la ffi
+      mod = evalNode(node.Function.Module)
+
+      # Si es un módulo y una función nativa, empujar el stack del módulo al
+      # CallStack y crear un nuevo StackFrame con el nombre de la función
+      if not mod.is_a? WaidForeignModule and not func.is_a? WaidForeignFunction
+        @runtime_stack.push(stack_frame)
+        stack_frame = StackFrame.new(id.Value, @runtime_stack.getTopMost)
+      end
+
+    # Si es una función normal en el archivo principal, creamos un StackFrame
+    # con su nombre.
     else
       id = node.Function
-      ar = StackFrame.new(id.Value, @runtime_stack.getTopMost)
-      @runtime_stack.push(ar)
+      stack_frame = StackFrame.new(id.Value, @runtime_stack.getTopMost)
     end
 
+    # Empujamos el nuevo StackFrame de la función al CallStack
+    @runtime_stack.push(stack_frame)
+
     length = arguments.length
-    if arguments.none?
+    if arguments.none? # Si arguments queda como [nil]
       length = 0
     end
+
+    # Si la cantidad de argumentos no es la misma que la cantidad de
+    # parámetros, tiramos un error.
     if func.Arity != length
       addRuntimeError("'#{id.Value}' takes #{func.Arity} positional arguments, but #{length} were given.", node.Token)
     end
 
-    if func.is_a? WaidBuiltin
+    # Si es una función Builtin o una función creada con ffi, la llamamos y
+    # popeamos el CallStack
+    if func.is_a? WaidBuiltin or func.is_a? WaidForeignFunction
       a = func.Function.call(*arguments)
       @runtime_stack.pop
       return a
     end
 
-    #puts "CALLING #{id.Value}"
-    #puts "PARAMETERS"
+    # Definimos los argumentos dentro del StackFrame de la función
     func.Parameters.each_with_index do |par, index|
-      #puts "\t#{par.Value} => #{arguments[index].inspect}"
       @runtime_stack.define(par.Value, arguments[index])
     end
-    #puts "END PARAMETERS"
+
+    # Corremos la función
     res = evalStatementList(func.Body)
 
+    # Si la función no devolvió nada, esto es, la bandera de ReturnState nunca
+    # se activó, hacemos que la función devuelva null
     if not @runtime_stack.isReturnState
       res = NullValue
     end
 
+    if node.Function.is_a? ModuleAccessExpression
+      # Si la función era de un módulo le restamos uno al stack y popeamos un
+      # StackFrame
+      @is_module -= 1
+      @runtime_stack.pop
+    end
+
+    # Si no estábamos en un módulo, popeamos un StackFrame
+    if not inModuleContext
+      @runtime_stack.pop
+    end
+
+    # Popeamos el StackFrame de la función
     @runtime_stack.pop
     res
   end
 
+
+  # Inicializa un record.
+  # Ejemplo:
+  #
+  # v1 => !{Vector 2 4}
   def initRecord(node)
     id = node.Identifier
     arguments = evalExpressions(node.Arguments)
@@ -377,18 +487,24 @@ class Interpreter
         populateGlobals
       end
 
-      a = evalProgram(node)
+      res = evalProgram(node)
 
       if inModuleContext
         return @runtime_stack.pop
       end
-      return a
+      puts "FINAL: #{@runtime_stack.getTopMost.memory_map}"
+      return res
 
     when IncludeStatement
       path = evalNode(node.Path)
       full_path = @error_collector.mainFile.getPath + "/" + path.Value + ".wd"
       if not File.file?(full_path)
-        addRuntimeError("File '#{path.Value}.wd' not found", node.Token)
+
+        # Si no está relativo al archivo principal buscamos en stdlib
+        full_path = File.expand_path(File.dirname(__FILE__)) + "/lib/" + path.Value + ".wd"
+        if not File.file?(full_path)
+          addRuntimeError("File '#{path.Value}.wd' not found", node.Token)
+        end
       end
       source_file = WaidFile.new(full_path)
 
@@ -408,10 +524,11 @@ class Interpreter
         @error_collector.showErrors
       end
 
-      mod = StackFrame.new(path)
-      mod.makeLinkTo(@runtime_stack.getTopMost)
+      mod = StackFrame.new(path.Value)
 
       @runtime_stack.push(mod)
+
+      populateGlobals
 
       @is_module += 1
       stack_frame = evalNode(parser.ast)
@@ -509,9 +626,8 @@ class Interpreter
       return WaidNull.new
 
     when BinaryOperatorExpression
-      r_val = evalNode(node.Right)
       l_val = evalNode(node.Left)
-
+      r_val = evalNode(node.Right)
       return evalBinaryOperatorExpression(node, l_val, r_val)
 
     when UnaryOperatorExpression
@@ -535,7 +651,7 @@ class Interpreter
     when ModuleAccessExpression
       mod = evalNode(node.Module)
  
-      if not mod.is_a? WaidModule
+      if not mod.is_a? WaidModule and not mod.is_a? WaidForeignModule
         addRuntimeError("'#{node.Module.Value}' is not a module", node.Module.Token)
       end
      

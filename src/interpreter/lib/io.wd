@@ -1,0 +1,6 @@
+# io.wd
+# I/O library using ffi
+
+printLine => !(ffi::load_primitive "printLine@io")
+print => !(ffi::load_primitive "print@io")
+input => !(ffi::load_primitive "input@io")

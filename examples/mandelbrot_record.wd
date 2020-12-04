@@ -1,7 +1,6 @@
-##################################################################
-### Implementación básica de números complejos y sus funciones ###
-##################################################################
+include "io"
 
+### Implementación básica de números complejos y sus funciones
 Complex: record =>
     real => 0
     im => 0
@@ -31,12 +30,12 @@ main: func() =>
                 z => !(!(z'mul z)'add !{Complex x y})
             endwl
             if !z'abs < 2:
-                !(print "#")
+                !(io::print "#")
             else:
-                !(print ":")
+                !(io::print ":")
             endif
         endwl
-        !(printLine "")
+        !(io::printLine "")
     endwl
 endfn
 

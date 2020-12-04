@@ -1,11 +1,13 @@
+include "io"
+
 a => "Hello"
 b => "World"
 #c => "error
 
-!(printLine a . " " . b)
-!(printLine "")
-!(printLine "Adiós...")
+!(io::printLine a . " " . b)
+!(io::printLine "")
+!(io::printLine "Adiós...")
 
-!(printLine !(length a . "Everyone") + 4)
-!(printLine !(length 5))
-!(printLine !(length null))
+!(io::printLine !(length a . "Everyone") + 4)
+!(io::printLine !(length 5))
+!(io::printLine !(length null))

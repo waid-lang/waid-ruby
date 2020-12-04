@@ -1,3 +1,5 @@
+include "io"
+
 fizzbuzz: func(num) =>
     str => ""
     if num % 3 == 0:
@@ -13,11 +15,11 @@ fizzbuzz: func(num) =>
 endfn
 
 get_input: func(str) =>
-    !(print str)
-    in => !(toNum !input)
-    !(printLine in)
+    !(io::print str)
+    in => !(toNum !io::input)
+    !(io::printLine in)
     if not in:
-        !(printLine "Por favor ingresa un valor válido")
+        !(io::printLine "Por favor ingresa un valor válido")
         <- !(get_input str)
     endif
     <- in
@@ -27,7 +29,7 @@ main: func() =>
     max => !(toNum !(get_input "Ingresa un número máximo: "))
     count => 0
     while count <= max, count => count + 1:
-        !(printLine !(fizzbuzz count))
+        !(io::printLine !(fizzbuzz count))
     endwl
 endfn
 

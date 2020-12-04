@@ -58,6 +58,7 @@ class Interpreter
         return false
       end
       return true
+    end
     if obj.is_a? WaidBoolean
       return obj.Value
     end
@@ -492,7 +493,6 @@ class Interpreter
       if inModuleContext
         return @runtime_stack.pop
       end
-      puts "FINAL: #{@runtime_stack.getTopMost.memory_map}"
       return res
 
     when IncludeStatement

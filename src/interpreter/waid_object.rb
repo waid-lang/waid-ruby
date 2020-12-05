@@ -185,11 +185,11 @@ class WaidRecordInstance < WaidObject
   end
 
   def type
-    "<Instance of: #{@Identifier}>"
+    "<Instance of: #{@Identifier.Value}>"
   end
 
   def inspect
-    "<Instance of: #{@Identifier}>"
+    "<Instance of: #{@Identifier.Value}>"
   end
 end
 

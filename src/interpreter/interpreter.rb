@@ -300,7 +300,7 @@ class Interpreter
     func = evalNode(node.Function)
 
     # Si no es una función, tiramos error
-    if not func.is_a? WaidFunction and not func.is_a? WaidBuiltin and not func.is_a? WaidForeignFunction
+    if not func.is_a? WaidFunction and not func.is_a? WaidBuiltin and not func.is_a? WaidForeignFunction and not func.is_a? WaidForeignInstanceFunction
       addRuntimeError("#{func.type} is not callable.", node.Token)
     end
 
@@ -371,6 +371,10 @@ class Interpreter
       a = func.Function.call(*arguments)
       @runtime_stack.pop
       return a
+    elsif func.is_a? WaidForeignInstanceFunction
+      a = func.call(@runtime_stack.getTopMost, *arguments)
+      @runtime_stack.pop
+      return a
     end
 
     # Definimos los argumentos dentro del StackFrame de la función
@@ -415,7 +419,7 @@ class Interpreter
     record = evalNode(id)
 
     if id.is_a? ModuleAccessExpression
-      id = id.Module
+      id = id.Object
     end
 
     record_instance = WaidRecordInstance.new
@@ -642,7 +646,6 @@ class Interpreter
       end
 
       @runtime_stack.push(object.Env)
-
       attr = evalNode(node.Attribute)
 
       @runtime_stack.pop

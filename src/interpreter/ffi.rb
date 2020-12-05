@@ -17,6 +17,43 @@ class WaidForeignFunction < WaidObject
   end
 end
 
+class WaidForeignInstanceFunction < WaidObject
+  attr_accessor :Function, :Arity
+  def initialize(prim, args)
+     @Function = prim
+     @Arity = args
+  end
+
+  def call(sf, *args)
+    @Function.call(sf, *args)
+  end
+
+  def type
+    "Function"
+  end
+
+  def inspect
+    "<WaidFunction>"
+  end
+end
+
+
+class WaidForeignRecord < WaidObject
+  attr_accessor :TypeName, :Env
+  def initialize(tn=nil, sf=nil)
+     @TypeName = tn
+     @Env = sf
+  end
+
+  def type
+    "Record"
+  end
+
+  def inspect
+    "<Record>"
+  end
+end
+
 class WaidForeignModule < WaidObject
   attr_accessor :Identifier, :StackFrame
   def initialize(id)
@@ -25,9 +62,8 @@ class WaidForeignModule < WaidObject
     @StackFrame = StackFrame.new(id)
   end
 
-  def define_primitive(name, primitive, args)
-    func = WaidForeignFunction.new(primitive, args)
-    @StackFrame.define(name, func)
+  def define_primitive(name, primitive)
+    @StackFrame.define(name, primitive)
   end
 
   def type
@@ -53,4 +89,8 @@ end
 
 def isStr(obj)
   obj.is_a? WaidString
+end
+
+def isNull(obj)
+  obj.is_a? WaidNull
 end

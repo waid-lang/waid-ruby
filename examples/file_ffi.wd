@@ -1,0 +1,10 @@
+include "io"
+
+f => !{io::File}
+if not !(f'open "hola.txt" "w"):
+    !(io::printLine "Archivo 'hola.txt' no existe")
+else:
+    !(f'write "hola\nsajkdhs\n")
+    !f'close
+endif
+

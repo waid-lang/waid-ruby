@@ -50,7 +50,7 @@ load_primitive = Proc.new do |location|
 end
 
 builtin_ffi_module = WaidForeignModule.new("ffi")
-builtin_ffi_module.define_primitive("load_primitive", load_primitive, 1)
+builtin_ffi_module.define_primitive("load_primitive", WaidForeignFunction.new(load_primitive, 1))
 
 $builtins = {
   "length" => WaidBuiltin.new(builtin_length, 1),

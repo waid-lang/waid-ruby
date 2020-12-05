@@ -16,5 +16,5 @@ cos = Proc.new do |obj|
 end
 
 $MODULE = WaidForeignModule.new(__FILE__)
-$MODULE.define_primitive("sin", sin, 1)
-$MODULE.define_primitive("cos", cos, 1)
+$MODULE.define_primitive("sin", WaidForeignFunction.new(sin, 1))
+$MODULE.define_primitive("cos", WaidForeignFunction.new(cos, 1))

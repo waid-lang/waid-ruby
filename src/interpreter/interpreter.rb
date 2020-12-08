@@ -423,6 +423,7 @@ class Interpreter
     record_instance.Identifier = id
 
     record_instance.Env = StackFrame.new(id.Value)
+    record_instance.Env.makeLinkTo(@runtime_stack.getBottomMost)
     record.Env.memory_map.each do |key, val|
       record_instance.Env.define(key, val)
     end

@@ -34,6 +34,34 @@ class WaidFunction < WaidObject
   end
 end
 
+# Todas las funciones en Waid retornan una tupla (valor, error).
+# El primer elemento solo es accesible cuando el valor de la función es
+# asignado a una variable. Por ejemplo:
+# 
+# res => !(add 2 4)
+#
+# !(printLine !(add 2 9))
+#
+# Por otro lado, el segundo elemento de la tupla solo es accesible mediante el
+# operador "~>". Por ejemplo:
+#
+# res => !(divide num1 num2)~> div_error
+class WaidReturnTuple < WaidObject
+  attr_accessor :Value, :Error
+  def initialize(first=nil, second=nil)
+     @Value = first
+     @Error = second
+  end
+
+  def type
+    "ReturnTuple"
+  end
+
+  def inspect
+    "ReturnTuple"
+  end
+end
+
 class WaidBuiltin < WaidObject
   attr_accessor :Function, :Arity
   def initialize(fn=nil, ar=0)

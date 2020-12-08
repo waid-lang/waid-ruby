@@ -278,6 +278,13 @@ class Parser
     statement = ReturnStatement.new
     statement.Token = @current_token
     statement.ReturnValue = parseExpression
+
+    if peekTokenEquals(TokenKind::OP_COMMA)
+      pushToken
+      statement.ErrorValue = parseExpression
+    else
+      statement.ErrorValue = Empty.new
+    end
     return statement
   end
 
@@ -425,8 +432,6 @@ class Parser
     expr
   end
 
-
-
   def parseDotExpression
     expr = parseNegativeExpression
     while peekTokenEquals(TokenKind::OP_AT) or peekTokenEquals(TokenKind::OP_DOT)
@@ -530,11 +535,23 @@ class Parser
         expr.Arguments = [Empty.new]
       end
       consumePeek(TokenKind::OP_CLOSE_PARENTHESIS)
+
+      if peekTokenEquals(TokenKind::OP_ASSIGN_ERROR)
+        pushToken
+        consumePeek(TokenKind::IDENTIFIER)
+        expr.ErrorVariable = Identifier.new(@current_token.value, @current_token)
+      end
       return expr
     end
       # Sin argumentos
     expr.Function = parsePrimaryExpression
     expr.Arguments.push(Empty.new)
+
+    if peekTokenEquals(TokenKind::OP_ASSIGN_ERROR)
+      pushToken
+      consumePeek(TokenKind::IDENTIFIER)
+      expr.ErrorVariable = Identifier.new(@current_token.value, @current_token)
+    end
     expr
   end
 

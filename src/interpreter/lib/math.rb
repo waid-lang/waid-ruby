@@ -5,14 +5,14 @@ sin = Proc.new do |obj|
   if not isNum(obj)
     next WaidNull.new
   end
-  WaidFloat.new(Math.sin(obj.Value))
+  WaidReturnTuple.new(WaidFloat.new(Math.sin(obj.Value)), WaidNull.new)
 end
 
 cos = Proc.new do |obj|
   if not isNum(obj)
     next WaidNull.new
   end
-  WaidFloat.new(Math.cos(obj.Value))
+  WaidReturnTuple.new(WaidFloat.new(Math.cos(obj.Value)), WaidNull.new)
 end
 
 $MODULE = WaidForeignModule.new(__FILE__)

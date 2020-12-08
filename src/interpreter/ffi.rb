@@ -39,6 +39,10 @@ class WaidForeignModule < WaidObject
   end
 end
 
+def returnValue(value=WaidNull.new, error=WaidNull.new)
+  WaidReturnTuple.new(value, error)
+end
+
 def isInt(obj)
   obj.is_a? WaidInteger
 end

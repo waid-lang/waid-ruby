@@ -1,0 +1,26 @@
+include "io"
+
+MathError: record =>
+    msg => ""
+endrc
+
+divide: func(x, y) =>
+    if y == 0:
+        <- null, !{MathError "¡División por 0!"}
+    endif
+    <- x / y
+endfn
+
+main: func() =>
+    num1 => !(toNum !io::input)
+    num2 => !(toNum !io::input)
+
+    res => !(divide num1 num2)~> error
+    if error:
+        !(io::printLine error'msg)
+    else:
+        !(io::printLine res)
+    endif
+endfn
+
+!main

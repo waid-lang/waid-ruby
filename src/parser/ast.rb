@@ -69,10 +69,11 @@ end
 #   |    +-----> @ReturnValue
 #   +----------> @Token
 class ReturnStatement
-  attr_accessor :Token, :ReturnValue
+  attr_accessor :Token, :ReturnValue, :ErrorValue
   def initialize
     @Token = nil
     @ReturnValue = nil
+    @ErrorValue = nil
   end
 
   def print_tree(indent, last)
@@ -80,7 +81,11 @@ class ReturnStatement
     indent += indentation(last)
 
     puts "ReturnStatement"
-    @ReturnValue.print_tree(indent, true)
+    puts indent + $AST_MIDDLE + "ReturnValue"
+    @ReturnValue.print_tree(indent + $AST_LINE, true)
+
+    puts indent + $AST_LAST + "ErrorValue"
+    @ErrorValue.print_tree(indent + $AST_SPACE, true)
   end
 end
 
@@ -263,12 +268,16 @@ end
 #   ~+~ ~~+~~
 #    |    +------> @Arguments
 #    +-----------> @Function
+#
+# 
+# res => !(divide num1 num2)~> error
 class FunctionCall
-  attr_accessor :Token, :Function, :Arguments
+  attr_accessor :Token, :Function, :Arguments, :ErrorVariable
   def initialize(f=nil, a=Array.new)
     @Token = nil
     @Function = f
     @Arguments = a
+    @ErrorVariable = Empty.new
   end
 
   def print_tree(indent, last)
@@ -279,10 +288,13 @@ class FunctionCall
     puts indent + $AST_MIDDLE + "Identifier"
     @Function.print_tree(indent + $AST_LINE, true)
 
-    puts indent + $AST_LAST + "Arguments"
+    puts indent + $AST_MIDDLE + "Arguments"
     @Arguments.each_with_index do |stmt, index|
-      stmt.print_tree(indent + $AST_SPACE, index == @Arguments.length - 1)
+      stmt.print_tree(indent + $AST_LINE, index == @Arguments.length - 1)
     end
+
+    puts indent + $AST_LAST + "ErrorVariable"
+    @ErrorVariable.print_tree(indent + $AST_SPACE, true)
   end
 end
 

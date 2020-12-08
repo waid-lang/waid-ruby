@@ -75,8 +75,9 @@ SCOPE_ACCESS_P   = "::", SCOPE_ACCESS_P
 RECORD_INIT      = "!", "{", SCOPE_ACCESS, [LISTA_EXPR], "}";
                  | "!", IDENTIFICADOR;
 
-FUNC_CALL        = "!", "(", EXPR_PRIMARIA, [LISTA_EXPR], ")";
-                 | "!", IDENTIFICADOR;
+FUNC_CALL        = "!", "(", EXPR_PRIMARIA, [LISTA_EXPR], ")", [ERROR_ASSIGN]
+                 | "!", IDENTIFICADOR, [ERROR_ASSIGN];
+ERROR_ASSIGN     = "~>", [IDENTIFICADOR];
 
 DECL_RECORD      = DECL_TIPO, "record", "=>", CUERPO_RECORD;
 CUERPO_RECORD    = [DECL_VARIABLE], "endrc"
@@ -98,9 +99,9 @@ ELIF_BLOCK       = "else", ":", LISTA_STMTS;
 
 WHILE_STMT       = "while", EXPR, [",", DECL_VARIABLE], ":", LISTA_STMTS, "endwl";
 
-RETURN_STMTS     = "<-", EXPR;
+RETURN_STMTS     = "<-", EXPR, [",", EXPR];
 
-INCLUDE_STMT     = "include", """, {}, """
+INCLUDE_STMT     = "include", """, {}, """;
 
 ESTAMENTO        = DECL_VARIABLE
                  | DECL_FUNC

@@ -289,6 +289,13 @@ class Tokenizer
           TokenKind::OP_EXCLAMATION
         when '@'
           TokenKind::OP_AT
+        when "~"
+          if @peek_char == ">"
+            pushChar
+            TokenKind::OP_ASSIGN_ERROR
+          else
+            return
+          end
         when ','
           TokenKind::OP_COMMA
         when '.'

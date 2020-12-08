@@ -370,6 +370,11 @@ class Interpreter
     if func.is_a? WaidBuiltin or func.is_a? WaidForeignFunction
       a = func.Function.call(*arguments)
       @runtime_stack.pop
+
+      if not node.ErrorVariable.is_a? Empty
+        @runtime_stack.define(node.ErrorVariable.Value, a.Error)
+      end
+
       return a
     end
 
@@ -384,7 +389,7 @@ class Interpreter
     # Si la función no devolvió nada, esto es, la bandera de ReturnState nunca
     # se activó, hacemos que la función devuelva null
     if not @runtime_stack.isReturnState
-      res = NullValue
+      res = WaidReturnTuple.new(NullValue, NullValue)
     end
 
     if node.Function.is_a? ModuleAccessExpression
@@ -401,6 +406,10 @@ class Interpreter
 
     # Popeamos el StackFrame de la función
     @runtime_stack.pop
+
+    if not node.ErrorVariable.is_a? Empty
+      @runtime_stack.define(node.ErrorVariable.Value, res.Error)
+    end
     res
   end
 
@@ -544,6 +553,9 @@ class Interpreter
 
       case node.Left
       when Identifier
+        if value.is_a? WaidReturnTuple
+          value = value.Value
+        end
         return @runtime_stack.define(node.Left.Value, value)
       when IndexAccessExpression
         # TODO
@@ -601,7 +613,14 @@ class Interpreter
       return evalFunctionCall(node)
 
     when ReturnStatement
-      return evalNode(node.ReturnValue)
+      value = evalNode(node.ReturnValue)
+
+      if node.ErrorValue.is_a? Empty
+        error = WaidNull.new
+      else
+        error = evalNode(node.ErrorValue)
+      end
+      return WaidReturnTuple.new(value, error)
 
     when StatementList
       return evalStatementList(node)

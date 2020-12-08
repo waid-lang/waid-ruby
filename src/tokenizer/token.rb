@@ -57,18 +57,19 @@ module TokenKind
   OP_RETURN            = 0x2C
   OP_EXCLAMATION       = 0x2D
   OP_AT                = 0x2E
+  OP_ASSIGN_ERROR      = 0x2F
 
-  OP_COMMA             = 0x2F
-  OP_COLON             = 0x30
-  OP_DOUBLE_COLON      = 0x31
-  OP_DOT               = 0x32
-  OP_SINGLE_QUOTE      = 0x33
-  OP_OPEN_PARENTHESIS  = 0x34
-  OP_CLOSE_PARENTHESIS = 0x35
-  OP_OPEN_BRACKETS     = 0x36
-  OP_CLOSE_BRACKETS    = 0x37
-  OP_OPEN_CURLYBRACES  = 0x38
-  OP_CLOSE_CURLYBRACES = 0x39
+  OP_COMMA             = 0x30
+  OP_COLON             = 0x31
+  OP_DOUBLE_COLON      = 0x32
+  OP_DOT               = 0x33
+  OP_SINGLE_QUOTE      = 0x34
+  OP_OPEN_PARENTHESIS  = 0x35
+  OP_CLOSE_PARENTHESIS = 0x36
+  OP_OPEN_BRACKETS     = 0x37
+  OP_CLOSE_BRACKETS    = 0x38
+  OP_OPEN_CURLYBRACES  = 0x39
+  OP_CLOSE_CURLYBRACES = 0x3A
 end
 
 # token_string: TokenKind -> String
@@ -170,6 +171,8 @@ def token_string(tok)
         "!"
       when TokenKind::OP_AT
         "@"
+      when TokenKind::OP_ASSIGN_ERROR
+        "~>"
       when TokenKind::OP_COMMA
         ","
       when TokenKind::OP_COLON

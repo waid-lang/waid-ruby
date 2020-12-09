@@ -300,7 +300,7 @@ class Interpreter
     func = evalNode(node.Function)
 
     # Si no es una función, tiramos error
-    if not func.is_a? WaidFunction and not func.is_a? WaidBuiltin and not func.is_a? WaidForeignFunction
+    if not func.is_a? WaidFunction and not func.is_a? WaidBuiltin and not func.is_a? WaidForeignFunction and not func.is_a? WaidForeignInstanceFunction
       addRuntimeError("#{func.type} is not callable.", node.Token)
     end
 
@@ -376,6 +376,16 @@ class Interpreter
       end
 
       return a
+
+    elsif func.is_a? WaidForeignInstanceFunction
+      a = func.call(@runtime_stack.getTopMost, *arguments)
+      @runtime_stack.pop
+
+      if not node.ErrorVariable.is_a? Empty
+        @runtime_stack.define(node.ErrorVariable.Value, a.Error)
+      end
+
+      return a
     end
 
     # Definimos los argumentos dentro del StackFrame de la función
@@ -392,15 +402,14 @@ class Interpreter
       res = WaidReturnTuple.new(NullValue, NullValue)
     end
 
-    if node.Function.is_a? ModuleAccessExpression
+    if node.Function.is_a? ModuleAccessExpression and inModuleContext
       # Si la función era de un módulo le restamos uno al stack y popeamos un
       # StackFrame
-      @is_module -= 1
       @runtime_stack.pop
     end
 
     # Si no estábamos en un módulo, popeamos un StackFrame
-    if not inModuleContext
+    if not inModuleContext and not node.is_a? ModuleAccessExpression
       @runtime_stack.pop
     end
 
@@ -409,6 +418,9 @@ class Interpreter
 
     if not node.ErrorVariable.is_a? Empty
       @runtime_stack.define(node.ErrorVariable.Value, res.Error)
+    else
+      # Si no hay variable de error, devolvamos el valor solamente
+      res = res.Value
     end
     res
   end
@@ -424,7 +436,7 @@ class Interpreter
     record = evalNode(id)
 
     if id.is_a? ModuleAccessExpression
-      id = id.Module
+      id = id.Object
     end
 
     record_instance = WaidRecordInstance.new
@@ -459,6 +471,9 @@ class Interpreter
     expressions.each do |expr|
       ind_res = evalNode(expr)
       if ind_res
+        if ind_res.is_a? WaidReturnTuple
+          ind_res = ind_res.Value
+        end
         res.push(ind_res)
       end
     end
@@ -662,7 +677,6 @@ class Interpreter
       end
 
       @runtime_stack.push(object.Env)
-
       attr = evalNode(node.Attribute)
 
       @runtime_stack.pop
@@ -672,7 +686,7 @@ class Interpreter
       mod = evalNode(node.Module)
  
       if not mod.is_a? WaidModule and not mod.is_a? WaidForeignModule
-        addRuntimeError("'#{node.Module.Value}' is not a module", node.Module.Token)
+        addRuntimeError("'#{node.Module}' is not a module", node.Module.Token)
       end
      
       @runtime_stack.push(mod.StackFrame)

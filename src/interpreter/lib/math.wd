@@ -63,7 +63,7 @@ endfn
 # Valor absoluto con flotantes
 abs: func(x) =>
     if x < 0:
-        <- x * -1
+        <- -x
     endif
     <- x
 endfn
@@ -77,6 +77,8 @@ factorial: func(n) =>
     endwl
     <- n @ arr
 endfn
+
+sqrt => !(ffi::load_primitive "sqrt@math")
 
 # Ángulos y trigonometría
 degrees: func(rad) =>

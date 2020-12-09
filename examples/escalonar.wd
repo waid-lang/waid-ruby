@@ -94,7 +94,7 @@ while i < !(length matrices), i => i + 1:
     # Imprimimos la matriz original y su versión escalonada
     !(io::printLine "----------------------------")
     !(io::printLine "Matriz original:")
-    !(io::imprimir_matriz matriz)
+    !(imprimir_matriz matriz)
     !(io::printLine "")
     !(io::printLine "Matriz escalonada: ")
     !(imprimir_matriz !(escalonar matriz))

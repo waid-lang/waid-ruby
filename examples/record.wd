@@ -1,3 +1,5 @@
+include "io"
+
 Node: record =>
     value => null
     right => null
@@ -51,7 +53,7 @@ eval: func(node) =>
     if node'value == "/":
         right => !(eval node'right)
         if right == 0:
-            !(printLine "¡División por 0!")
+            !(io::printLine "¡División por 0!")
             <- null
         endif
         <- !(eval node'left) * right

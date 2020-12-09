@@ -25,9 +25,8 @@ class WaidForeignModule < WaidObject
     @StackFrame = StackFrame.new(id)
   end
 
-  def define_primitive(name, primitive, args)
-    func = WaidForeignFunction.new(primitive, args)
-    @StackFrame.define(name, func)
+  def define_primitive(name, primitive)
+    @StackFrame.define(name, primitive)
   end
 
   def type
@@ -39,8 +38,76 @@ class WaidForeignModule < WaidObject
   end
 end
 
+class WaidForeignRecord < WaidObject
+  attr_accessor :TypeName, :Env
+  def initialize(tn=nil)
+     @TypeName = tn
+     @Env = StackFrame.new(tn)
+  end
+
+  def define(name, obj)
+    @Env.define(name, obj)
+  end
+
+  def getName(name)
+    @Env.getLocalName(name)
+  end
+
+  def type
+    "Record"
+  end
+
+  def inspect
+    "<Record>"
+  end
+end
+
+class WaidForeignInstanceFunction < WaidObject
+  attr_accessor :Function, :Arity
+  def initialize(prim, args)
+     @Function = prim
+     @Arity = args
+  end
+
+  def call(sf, *args)
+    @Function.call(sf, *args)
+  end
+
+  def type
+    "Function"
+  end
+
+  def inspect
+    "<WaidFunction>"
+  end
+end
+
+class WaidForeignObject < WaidObject
+  attr_accessor :RubyObject
+  def initialize(obj, repr)
+    @RubyObject = obj
+    @Representation = repr
+  end
+
+  def type
+    @Representation
+  end
+
+  def inspect
+    @Representation
+  end
+end
+### Funciones para usar en las librerías ffi ###
+
 def returnValue(value=WaidNull.new, error=WaidNull.new)
   WaidReturnTuple.new(value, error)
+end
+
+def getParam(obj)
+  if obj.is_a? WaidReturnTuple
+    return obj.Value
+  end
+  obj
 end
 
 def isInt(obj)
@@ -57,4 +124,8 @@ end
 
 def isStr(obj)
   obj.is_a? WaidString
+end
+
+def isNull(obj)
+  obj.is_a? WaidNull
 end

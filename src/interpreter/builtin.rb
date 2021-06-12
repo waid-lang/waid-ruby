@@ -3,11 +3,11 @@ require_relative 'ffi'
 
 builtin_length = Proc.new do |str|
   if isStr(str)
-    next WaidInteger.new(str.Value.length)
+    next returnValue(WaidInteger.new(str.Value.length))
   elsif str.is_a?(WaidArray)
-    next WaidInteger.new(str.Values.length)
+    next returnValue(WaidInteger.new(str.Values.length))
   end
-  next WaidNull.new
+  next returnValue(WaidNull.new, WaidString.new("Not iterable"))
 end
 
 builtin_toStr = Proc.new do |obj|
@@ -19,29 +19,29 @@ builtin_toNum = Proc.new do |str|
   if is_number
     num = str.Value.to_f
     if num % 1 == 0
-      next WaidInteger.new(num.to_i)
+      next returnValue(WaidInteger.new(num.to_i))
     else
-      next WaidFloat.new(str.Value.to_f)
+      next returnValue(WaidFloat.new(str.Value.to_f))
     end
   end
-  next WaidNull.new
+  next returnValue(WaidNull.new, WaidString.new("nan"))
 end
 
 load_primitive = Proc.new do |location|
   if not isStr(location)
-    next WaidNull.new
+    next returnValue
   end
 
   object, library = location.Value.split("@")
-  
+
   library = File.expand_path(File.dirname(__FILE__)) + "/lib/" + library
   if not library or not object
-    next WaidNull.new
+    next returnValue(error="Could not parse object@library")
   end
   library += ".rb"
 
   if not File.file?(library)
-    next WaidNull.new
+    next returnValue(error="Could not find library file")
   end
 
   require File.expand_path(library)

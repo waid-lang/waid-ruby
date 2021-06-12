@@ -21,6 +21,7 @@ class RuntimeStack
     val
   end
 
+=begin
   def resolveName(name)
     value = getTopMost.getName(name)
     if not value
@@ -32,6 +33,15 @@ class RuntimeStack
           return current_global.getName(name)
         end
       end
+    end
+    value
+  end
+=end
+
+  def resolveName(name)
+    value = getTopMost.getName(name)
+    if not value
+      value = getBottomMost.getName(name)
     end
     value
   end
@@ -118,7 +128,7 @@ class StackFrame
     s += "|             #{@identifier} -> '#{previous}'     \n"
 
     @memory_map.each do |key, val|
-      s += "|'#{key} => #{val.inspect}\n"
+      s += "|'#{key}' => #{val.inspect}\n"
     end
     #s += "+-------------------------------+"
     s

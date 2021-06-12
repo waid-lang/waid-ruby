@@ -1,0 +1,65 @@
+- Add assign operators (+>, ->, *>, etc)
+This would of course make cleaner and more readable code, but in my opinion
+this would be mainly for while-for loops.
+So instead of
+
+i => 0
+while i < 10, i => i + 1:
+    !(io::printLine i)
+endwl
+
+we would have
+
+i => 0
+while i < 10, i +> 1:
+    !(io::printLine i)
+endwl
+
+- Add control flow keywords (break, next, continue, etc)
+- Default arguments in functions
+This one would be a little bit tricky to implement in ffi defined functions,
+but I think it would be a great addition to the language. It would work as
+expected:
+
+add: func(x, y=>4) => ...
+
+Another good syntax, to avoid using the same arrow in the same line, could be
+like this:
+
+add: func(x, y: 5) => ...
+
+- Escape sequences in strings
+This one is pretty easy and only a few lines must be changed in the Tokenizer.
+
+- "this" as a keyword (So as to not be overwritten)
+- Exponent operator
+I could steal pythons "**", although a lot of people find "^" to be more
+natural.
+
+- Alias in include statements
+Don't really have a specific syntax in mind, but here are a few ideas:
+
+include "math" as m
+include m => "math"
+include "math" => m
+include "math" m
+include "math": m
+include m: "math"
+
+And so on...
+
+- Include specific elements in modules
+The implementation would be tricky, because if I were to do something like
+
+include "io::{printLine}" # Example syntax
+
+The current stackframe would now need to have "printLine", but also "io". This
+is because "printLine", when called, should have "io" as its enclosing scope.
+
+- Private members in WaidForeignRecord to hide WaidForeignObjects from being
+  accesed
+In normal records, this doesn't seem too necessary, but in ForeignRecords, this
+is a must. Let's take an example of a File WaidForeignRecord. One of the main
+members of this object would be a native Ruby File object. In theory, Waid
+shoud never be able to interact with foreign objects without the ffi api.
+Don't really know how I'll do this, but we'll see.

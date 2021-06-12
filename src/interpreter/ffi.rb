@@ -58,7 +58,7 @@ class WaidForeignRecord < WaidObject
   end
 
   def inspect
-    "<Record>"
+    "<Record: #{@TypeName}>"
   end
 end
 
@@ -69,8 +69,8 @@ class WaidForeignInstanceFunction < WaidObject
      @Arity = args
   end
 
-  def call(sf, *args)
-    @Function.call(sf, *args)
+  def call(this, *args)
+    @Function.call(this.Env, *args)
   end
 
   def type

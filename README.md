@@ -13,7 +13,7 @@
 Waid is everything you never wanted. It's ugly, verbose and has a lot of arrows.
 It's currently implemented with a custom lexer and a LL(1) parser (recursive descent), although I would like to write a LL(1) parsing table in the future.
 
-I'm working on a tree walking interpreter at the moment, but I'm planning to write a VM in C or C++ eventually.
+I'm working on a tree walking interpreter at the moment, but I'm planning to write a VM in Go in the future.
 </br>
 </br>
 <div style="text-align:center"><img height="600x" src="https://raw.githubusercontent.com/TaconeoMental/WaidLang/main/assets/code_example.png" /></div>
@@ -24,5 +24,4 @@ $ ./waid.rb
 Usage: main [options] filename
     -t, --show-tokens                Print the tokens produced by the scanner
     -a, --show-ast                   Print the AST produced by the parser
-    -e, --show-final-env             Print the final state of the global enviroment
 ```

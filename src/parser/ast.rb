@@ -145,7 +145,7 @@ end
 # ((i - 1) @ array)
 #     |        |
 #     |        +------------------> @ArrayIdentifier
-#     +---------------------------> @IndexExpression 
+#     +---------------------------> @IndexExpression
 class IndexAccessExpression
   attr_accessor :Token, :IndexExpression, :ArrayIdentifier
   def initialize(ind=nil, name=nil, val=nil)
@@ -269,7 +269,7 @@ end
 #    |    +------> @Arguments
 #    +-----------> @Function
 #
-# 
+#
 # res => !(divide num1 num2)~> error
 class FunctionCall
   attr_accessor :Token, :Function, :Arguments, :ErrorVariable
@@ -395,7 +395,7 @@ end
 
 # Representa un bucle While.
 # Ejemplo:
-# 
+#
 #   +---------------------> @Token
 #   |      +--------------> @Condition
 # ~~+~~ ~~~+~~~
@@ -468,7 +468,7 @@ end
 class Identifier
   attr_accessor :Value, :Token
   def initialize(value, tok)
-    
+
     # El token IDENTIFIER
     @Token = tok
 
@@ -525,7 +525,7 @@ class BinaryOperatorExpression
     puts indent + $AST_LAST + "Right"
     @Right.print_tree(indent + $AST_SPACE, true)
   end
-end 
+end
 
 # Representa el acceso al atributo de un record.
 # Ejemplo compuesto:
@@ -557,7 +557,7 @@ class AttributeAccessExpression
     puts indent + $AST_LAST + "Attribute"
     @Attribute.print_tree(indent + $AST_SPACE, true)
   end
-end 
+end
 
 # Representa el acceso a un objecto en un módulo
 # Ejemplo:
@@ -585,7 +585,7 @@ class ModuleAccessExpression
     puts indent + $AST_LAST + "Object"
     @Object.print_tree(indent + $AST_SPACE, true)
   end
-end 
+end
 
 # Representa un operador unario. No tiene mucha más explicación, pero acá hay
 # unos ejemplos:

@@ -1,0 +1,47 @@
+format: func(fmt_str, items) =>
+    str_len => !(length fmt_str)
+
+    items_len => !(length items)
+    if not items_len:
+        <- null, "Second argument must be an array"
+    endif
+
+    final_str => ""
+
+    last_char => ""
+    current_char => ""
+
+    index => 0
+    while index < str_len, index => index + 1:
+        last_char => current_char
+        current_char => index @ fmt_str
+
+        if current_char == "%" and last_char /= "\\":
+            number_index => index + 1
+            number_str => number_index @ fmt_str
+
+            next => !(toNum number_str)
+            if not next:
+                #error_index => "%" . number_str
+                # Qué saben de recursión B)
+                <- null, !(format "Format index '%0' is not a number" [number_str])
+            endif
+
+            number_index => number_index + 1
+            while !(toNum number_index @ fmt_str), number_index => number_index + 1:
+                number_str => number_str . (number_index @ fmt_str)
+            endwl
+
+            next => !(toNum number_str)
+
+            if next > items_len:
+                <- null, !(format "Index '%0' greater than length of items (%1)" [next, items_len])
+            endif
+            final_str => final_str . !(toStr next @ items)
+            index => index + !(length number_str)
+        else:
+            final_str => final_str . current_char
+        endif
+    endwl
+    <- final_str
+endfn

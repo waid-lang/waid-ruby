@@ -1,0 +1,9 @@
+include "io"
+include "string"
+
+str => !(string::format "Hola %0, soy %1. Te llamas %0, ¿cierto? Vamos a ver %2." ["Mateo", "Javiera", "Lain"]) ~> error
+if not error:
+    !(io::printLine str)
+else:
+    !(io::printLine error)
+endif

@@ -62,6 +62,9 @@ class Interpreter
     if obj.is_a? WaidBoolean
       return obj.Value
     end
+    if obj.is_a? WaidReturnTuple
+      return isTruthy(obj.Value)
+    end
     not obj.is_a? WaidNull
   end
 
@@ -166,6 +169,13 @@ class Interpreter
   end
 
   def evalBinaryOperatorExpression(node, left, right)
+    if right.is_a? WaidReturnTuple
+      right = right.Value
+    end
+    if left.is_a? WaidReturnTuple
+      left = left.Value
+    end
+
     operator = node
     if left.is_a? WaidInteger and right.is_a? WaidInteger
       return evalIntegerBinaryOperatorexpression(node, left, right)
@@ -307,15 +317,14 @@ class Interpreter
     # Si es un acceso a atributo, por ejemplo algo así:
     #
     # pos => !(Vector'pos 24)
-    #
-    # El StackFrame para la función va a ser el StackFrame de la instancia que
-    # contiene a la función.
     if node.Function.is_a? AttributeAccessExpression
       id = node.Function.Attribute
-      stack_frame = evalNode(node.Function.Object).Env
+      #stack_frame = evalNode(node.Function.Object).Env
+      stack_frame = StackFrame.new(id.Value)
+      stack_frame.define("this", evalNode(node.Function.Object))
 
     # Si es un acceso a un módulo, por ejemplo:
-    # 
+    #
     # num => !(math::cos 45)
     #
     # Entonces:
@@ -378,7 +387,7 @@ class Interpreter
       return a
 
     elsif func.is_a? WaidForeignInstanceFunction
-      a = func.call(@runtime_stack.getTopMost, *arguments)
+      a = func.call(evalNode(node.Function.Object), *arguments)
       @runtime_stack.pop
 
       if not node.ErrorVariable.is_a? Empty
@@ -444,6 +453,7 @@ class Interpreter
     record_instance.Identifier = id
 
     record_instance.Env = StackFrame.new(id.Value)
+
     record_instance.Env.makeLinkTo(@runtime_stack.getBottomMost)
     record.Env.memory_map.each do |key, val|
       record_instance.Env.define(key, val)
@@ -589,8 +599,11 @@ class Interpreter
       # por previous.
       # Lo permitiré por ahora porque me da paja hacerlo antes de terminar
       # todo. Saludos cordiales.
-      ar = StackFrame.new(node.Identifier.Value, @runtime_stack.getTopMost)
+
+      #ar = StackFrame.new(node.Identifier.Value, @runtime_stack.getTopMost)
+      ar = StackFrame.new(node.Identifier.Value)
       @runtime_stack.push(ar)
+
       node.VariableDeclarations.each do |vd|
         evalNode(vd)
       end
@@ -684,11 +697,11 @@ class Interpreter
 
     when ModuleAccessExpression
       mod = evalNode(node.Module)
- 
+
       if not mod.is_a? WaidModule and not mod.is_a? WaidForeignModule
         addRuntimeError("'#{node.Module}' is not a module", node.Module.Token)
       end
-     
+
       @runtime_stack.push(mod.StackFrame)
 
       obj = evalNode(node.Object)

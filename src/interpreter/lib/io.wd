@@ -4,4 +4,3 @@
 printLine => !(ffi::load_primitive "printLine@io")
 print => !(ffi::load_primitive "print@io")
 input => !(ffi::load_primitive "input@io")
-File => !(ffi::load_primitive "File@io")

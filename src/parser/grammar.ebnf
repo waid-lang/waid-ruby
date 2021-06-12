@@ -11,10 +11,10 @@ LITERAL_FLOAT    = DECIMALES, ".", DECIMALES;
 DECIMALES        = DIGITO_DECIMAL, {DIGITO_DECIMAL};
 LITERAL          = LITERAL_ENTERO
                  | LITERAL_FLOAT;
-   
+
 OPERANDO         = LITERAL
                  | "(", EXPR, ")";
-                
+
 LISTA_STMTS      = {ESTAMENTO};
 LISTA_EXPR       = EXPR, {",", EXPR};
 

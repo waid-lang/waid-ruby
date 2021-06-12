@@ -119,7 +119,7 @@ class Parser
     index_access_expr = IndexAccessExpression.new
 
     index_expr = parseExpression
-    
+
     if not index_expr.is_a? BinaryOperatorExpression
       pushToken
       addParseError("Expected '@', but got #{@current_token} instead.", index_expr.Token.source_position)
@@ -127,7 +127,7 @@ class Parser
     index_access_expr.Token =  index_expr.Token
     if index_expr.Operator.kind != TokenKind::OP_AT
       addParseError("Expected '@', but got #{@peek_token} instead.", @peek_token.source_position)
-    
+
     # No creo que este elsif sea necesario porque el nombre del arreglo podría surgir de una
     # expresión, por ejemplo:
     #
@@ -567,7 +567,7 @@ class Parser
       if not peekTokenEquals(TokenKind::OP_CLOSE_CURLYBRACES)
         expr.Arguments.push(parseExpression)
       end
-      
+
       expr_ = parseExpression
       while expr_
         expr.Arguments.push(expr_)

@@ -7,11 +7,11 @@ Circle: record =>
 instance:
     area: func() =>
         pi => 3.14
-        <- !(round pi * radius * radius 5)
+        <- !(round pi * this'radius * this'radius 5)
     endfn
 
     info: func() =>
-        <- "Color: " . colour . "; Area: " . !(toStr !area)
+        <- "Color: " . this'colour . "; Area: " . !(toStr !this'area)
     endfn
 endrc
 

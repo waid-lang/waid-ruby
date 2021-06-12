@@ -1,0 +1,28 @@
+include "io"
+
+Vector: record =>
+    pos => null
+    nombre => ""
+
+instance:
+    add: func(v2) =>
+        <- !{Vector !(this'pos'add v2'pos) v2'nombre . this'nombre}
+    endfn
+endrc
+
+one: func() => <- 1 endfn
+
+Punto: record =>
+    x => 0
+    y => 0
+
+instance:
+    add: func(p2) =>
+        <- !{Punto this'x + p2'x this'y + p2'y}
+    endfn
+endrc
+
+v1 => !{Vector !{Punto 4 3} "V1"}
+v2 => !{Vector !{Punto 5 3} "V4"}
+
+v3 => !(v1'add v2)

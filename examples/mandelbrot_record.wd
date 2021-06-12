@@ -7,15 +7,15 @@ Complex: record =>
 
 instance:
     add: func(z) =>
-        <- !{Complex z'real + real z'im + im}
+        <- !{Complex z'real + this'real z'im + this'im}
     endfn
 
     mul: func(z) =>
-        <- !{Complex (z'real * real - z'im * im) (z'real * im + real * z'im)}
+        <- !{Complex (z'real * this'real - z'im * this'im) (z'real * this'im + this'real * z'im)}
     endfn
 
     abs: func() =>
-        <- real * real + im * im
+        <- this'real * this'real + this'im * this'im
     endfn
 endrc
 

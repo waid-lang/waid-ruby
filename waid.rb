@@ -16,10 +16,6 @@ def main
     op.on("-a", "--show-ast", "Print the AST produced by the parser") do
       @options[:show_ast] = true
     end
-
-    op.on("-e", "--show-final-env", "Print the final state of the global enviroment") do
-      @options[:show_env] = true
-    end
   end
 
   optparser.parse!
@@ -40,10 +36,6 @@ def main
 
     if @options[:show_ast]
       builder.set_show_ast
-    end
-
-    if @options[:show_env]
-      builder.set_show_env
     end
 
     builder.source_path = file

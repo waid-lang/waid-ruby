@@ -15,7 +15,7 @@ main: func() =>
     num1 => !(toNum !io::input)
     num2 => !(toNum !io::input)
 
-    res => !(divide num1 num2)~> error
+    res => !(divide num1 num2) ~> error
     if error:
         !(io::printLine error'msg)
     else:

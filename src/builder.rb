@@ -19,7 +19,6 @@ class Builder
   def initialize()
     @show_tokens = false
     @show_ast = false
-    @show_env = false
     @source_path = String.new
   end
 
@@ -31,10 +30,6 @@ class Builder
 
   def set_show_ast
     @show_ast = true
-  end
-
-  def set_show_env
-    @show_env = true
   end
 
   # Función principal llamada en main
@@ -68,14 +63,14 @@ class Builder
     # parser es la única instancia de Parser
     parser = Parser.new(tokenizer.tokens, error_collector)
     parser.parse!
-  
+
     # Mostramos es AST generado si es que el usuario seleccionó la opción.
     if @show_ast
       #parser.ast.to_string
       parser.ast.print_tree("", true)
       puts
     end
-    
+
     # Y mostramos los errores generados durante el análisis sintáctico.
     if error_collector.hasErrors
       error_collector.showErrors
@@ -84,20 +79,5 @@ class Builder
     # Creamos un nuevo intérprete e interpretamos el AST
     interpreter = Interpreter.new(parser.ast, error_collector)
     interpreter.run
-
-   # Prefiero implementar esto después
-    # Mostramos el estado final del Env
-    if @show_env
-      puts " \nEnviroment:"
-
-      # Mostramos las variables
-      if not interpreter.env.records.empty?
-        puts "Global variables"
-        puts "----------------"
-        interpreter.env[0].memory_map.each do |k, v|
-          puts "#{k} => #{v.inspect}"
-        end
-      end
-    end
   end
 end

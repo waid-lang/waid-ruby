@@ -15,6 +15,7 @@ syntax keyword waidKeywords
     \ true
     \ false
     \ null
+    \ this
 
 
 syntax keyword waidInclude include

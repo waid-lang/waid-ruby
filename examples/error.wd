@@ -1,12 +1,19 @@
 include "io"
+include "string"
 
-MathError: record =>
+Error: record =>
+    prefix => ""
     msg => ""
+
+instance:
+    string: func() =>
+        <- !(string::format "%0: %1." [this'prefix, this'msg])
+    endfn
 endrc
 
 divide: func(x, y) =>
     if y == 0:
-        <- null, !{MathError "¡División por 0!"}
+        <- null, !{Error "MathError" "Division by 0"}
     endif
     <- x / y
 endfn
@@ -17,7 +24,7 @@ main: func() =>
 
     res => !(divide num1 num2) ~> error
     if error:
-        !(io::printLine error'msg)
+        !(io::printLine !error'string)
     else:
         !(io::printLine res)
     endif

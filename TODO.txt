@@ -31,7 +31,6 @@ add: func(x, y: 5) => ...
 - Escape sequences in strings
 This one is pretty easy and only a few lines must be changed in the Tokenizer.
 
-- "this" as a keyword (So as to not be overwritten)
 - Exponent operator
 I could steal pythons "**", although a lot of people find "^" to be more
 natural.
@@ -63,3 +62,40 @@ is a must. Let's take an example of a File WaidForeignRecord. One of the main
 members of this object would be a native Ruby File object. In theory, Waid
 shoud never be able to interact with foreign objects without the ffi api.
 Don't really know how I'll do this, but we'll see.
+
+- Change scope resolution system
+Current one works like this:
+local->(enclosing), enclosing->(global)
+
+In theory it should be:
+local->(enclosing), enclosing, global, builtins
+
+In the case of record methods:
+local->(null), global, builtins
+
+And closures:
+local->(persisten env)->(enclosing), global, builtins
+
+- Add error message when trying to operate with keywords.
+For example, this code
+
+this => !(add 4 7)
+
+should bring up something like
+
+test.wd
+        Error: Can not use keyword 'this' as operand.
+        14| this => !(add 4 7)
+               ^
+Waid: 1 error
+
+- Allow to initialize records without curly braces.
+Functions without arguments can be called without parenthesis:
+
+one: func() => <- 1 endfn
+!one
+
+But records without arguments still have to be initialized like !{RecordType},
+when !RecordType should also be valid. Maybe the current syntax is better
+because it is clear that the identifier is a record and not a function, but
+we'll see.

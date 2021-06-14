@@ -64,6 +64,7 @@ NEG              = "-", NEG
 EXPR_PRIMARIA    = SCOPE_ACCESS, EXPR_PRIMARIA_P
                  | FUNC_CALL, EXPR_PRIMARIA_P
                  | RECORD_INIT, EXPR_PRIMARIA_P
+                 | "this"
 
 EXPR_PRIMARIA_P  = "'", IDENTIFICADOR, EXPR_PRIMARIA_P
                  | ε

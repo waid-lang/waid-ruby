@@ -22,7 +22,8 @@ $keywords = {
   "true" => TokenKind::KEY_TRUE,
   "false" => TokenKind::KEY_FALSE,
   "null" => TokenKind::KEY_NULL,
-  "include" => TokenKind::KEY_INCLUDE
+  "include" => TokenKind::KEY_INCLUDE,
+  "this" => TokenKind::KEY_THIS
 }
 
 # No necesita explicación
@@ -71,22 +72,22 @@ end
 # Tokenizer produce los siguientes Tokens:
 #
 # 1| IDENTIFIER x
-# 1| => 
+# 1| =>
 # 1| LITERAL_INT 0
 # 2| WHILE while
 # 2| IDENTIFIER x
-# 2| < 
+# 2| <
 # 2| LITERAL_INT 20
-# 2| : 
-# 3| ! 
-# 3| ( 
+# 2| :
+# 3| !
+# 3| (
 # 3| IDENTIFIER printLine
 # 3| IDENTIFIER x
-# 3| ) 
+# 3| )
 # 4| IDENTIFIER x
-# 4| => 
+# 4| =>
 # 4| IDENTIFIER x
-# 4| + 
+# 4| +
 # 4| IDENTIFIER i
 # 5| ENDWL endwl
 # 6| EOF
@@ -102,7 +103,7 @@ class Tokenizer
 
     # Número de línea actual
     @line_number = 1
-    
+
     # Número de columna en la línea actual
     @column_number = 0
 
@@ -381,7 +382,7 @@ class Tokenizer
           pushChar
           lit += @current_char
         end
-        tt = TokenKind::LITERAL_FLOAT       
+        tt = TokenKind::LITERAL_FLOAT
       else
         # TODO: Implementar enteros con otras bases. Ejemplo:
         # Base 2: 0b1011001

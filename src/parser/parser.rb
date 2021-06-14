@@ -467,17 +467,6 @@ class Parser
       operand = parseScopeAccess
     end
 
-    # Por ahora solo tengo implementado el acceso a un atributo a la vez, es
-    # decir, no puedo hacer algo tipo:
-    #
-    # pos_x => vector_1'posicion'x
-    #
-    # Tendría que hacerlo de 2 formas:
-    #
-    # 1) pos => vector_1'posicion
-    #    pos_x => pos'x
-    #
-    # 2) pos_x => (vector_1'posicion)'x
     if peekTokenEquals(TokenKind::OP_SINGLE_QUOTE)
       pushToken
       consumePeek(TokenKind::IDENTIFIER)
@@ -610,6 +599,9 @@ class Parser
     case @peek_token.kind
     when TokenKind::IDENTIFIER
       consumePeek(TokenKind::IDENTIFIER)
+      operand = Identifier.new(@current_token.value, @current_token)
+    when TokenKind::KEY_THIS
+      consumePeek(TokenKind::KEY_THIS)
       operand = Identifier.new(@current_token.value, @current_token)
     when TokenKind::OP_OPEN_PARENTHESIS
       consumePeek(TokenKind::OP_OPEN_PARENTHESIS)

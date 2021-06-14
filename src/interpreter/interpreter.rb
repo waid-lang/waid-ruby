@@ -127,7 +127,7 @@ class Interpreter
       if right.Value == 0
         addRuntimeError("Division by 0", node.Token)
       end
-      return WaidFloat.new(left.Value / right.Value)
+      return WaidFloat.new(left.Value.fdiv(right.Value))
     when TokenKind::OP_MODULUS
       return WaidInteger.new(left.Value % right.Value)
     when TokenKind::OP_LESS

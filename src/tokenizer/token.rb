@@ -36,40 +36,41 @@ module TokenKind
   KEY_FALSE            = 0x18
   KEY_NULL             = 0x19
   KEY_INCLUDE          = 0x1A
+  KEY_THIS             = 0x1B
 
-  OP_PLUS              = 0x1B
   OP_MINUS             = 0x1C
-  OP_ASTERISK          = 0x1D
-  OP_SLASH             = 0x1E
-  OP_MODULUS           = 0x1F
-  OP_ASSIGN            = 0x20
-  OP_PLUS_ASSIGN       = 0x21
-  OP_MINUS_ASSIGN      = 0x22
-  OP_ASTERISK_ASSIGN   = 0x23
-  OP_SLASH_ASSIGN      = 0x24
-  OP_MODULUS_ASSIGN    = 0x25
-  OP_LESS              = 0x26
-  OP_GREATER           = 0x27
-  OP_EQUAL             = 0x28
-  OP_NOT_EQUAL         = 0x29
-  OP_LESS_EQUAL        = 0x2A
-  OP_GREATER_EQUAL     = 0x2B
-  OP_RETURN            = 0x2C
-  OP_EXCLAMATION       = 0x2D
-  OP_AT                = 0x2E
-  OP_ASSIGN_ERROR      = 0x2F
+  OP_PLUS              = 0x1D
+  OP_ASTERISK          = 0x1E
+  OP_SLASH             = 0x1F
+  OP_MODULUS           = 0x20
+  OP_ASSIGN            = 0x21
+  OP_PLUS_ASSIGN       = 0x22
+  OP_MINUS_ASSIGN      = 0x23
+  OP_ASTERISK_ASSIGN   = 0x24
+  OP_SLASH_ASSIGN      = 0x25
+  OP_MODULUS_ASSIGN    = 0x26
+  OP_LESS              = 0x27
+  OP_GREATER           = 0x28
+  OP_EQUAL             = 0x29
+  OP_NOT_EQUAL         = 0x2A
+  OP_LESS_EQUAL        = 0x2B
+  OP_GREATER_EQUAL     = 0x2C
+  OP_RETURN            = 0x2D
+  OP_EXCLAMATION       = 0x2E
+  OP_AT                = 0x2F
+  OP_ASSIGN_ERROR      = 0x30
 
-  OP_COMMA             = 0x30
-  OP_COLON             = 0x31
-  OP_DOUBLE_COLON      = 0x32
-  OP_DOT               = 0x33
-  OP_SINGLE_QUOTE      = 0x34
-  OP_OPEN_PARENTHESIS  = 0x35
-  OP_CLOSE_PARENTHESIS = 0x36
-  OP_OPEN_BRACKETS     = 0x37
-  OP_CLOSE_BRACKETS    = 0x38
-  OP_OPEN_CURLYBRACES  = 0x39
-  OP_CLOSE_CURLYBRACES = 0x3A
+  OP_COMMA             = 0x31
+  OP_COLON             = 0x32
+  OP_DOUBLE_COLON      = 0x33
+  OP_DOT               = 0x34
+  OP_SINGLE_QUOTE      = 0x35
+  OP_OPEN_PARENTHESIS  = 0x36
+  OP_CLOSE_PARENTHESIS = 0x37
+  OP_OPEN_BRACKETS     = 0x38
+  OP_CLOSE_BRACKETS    = 0x39
+  OP_OPEN_CURLYBRACES  = 0x3A
+  OP_CLOSE_CURLYBRACES = 0x3B
 end
 
 # token_string: TokenKind -> String
@@ -131,6 +132,8 @@ def token_string(tok)
         "NULL"
       when TokenKind::KEY_INCLUDE
         "INCLUDE"
+      when TokenKind::KEY_THIS
+        "THIS"
       when TokenKind::OP_PLUS
         "+"
       when TokenKind::OP_MINUS

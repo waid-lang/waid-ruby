@@ -28,9 +28,6 @@ like this:
 
 add: func(x, y: 5) => ...
 
-- Escape sequences in strings
-This one is pretty easy and only a few lines must be changed in the Tokenizer.
-
 - Exponent operator
 I could steal pythons "**", although a lot of people find "^" to be more
 natural.

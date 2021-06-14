@@ -340,10 +340,34 @@ class Tokenizer
       pushChar
 
       # Acá podría haber usado "readUntil", pero eso habría permitido strings
-      # con saltos de línea, así que hice que leyera hasta encontrarse con otro
-      # ", pero si se encuentra un salto de línea en medio, arroja un error de
+      # con saltos de línea, y además veo el tema de las secuencias de escape
+      # así que hice que leyera hasta encontrarse con otro ", pero si se
+      # encuentra un salto de línea en medio, arroja un error de
       # sintaxis.
       while @current_char != '"'
+        if @current_char == "\\"
+          pushChar
+          escape = case @current_char
+          when "n"
+            "\n"
+          when "t"
+            "\t"
+          when "r"
+            "\r"
+          when "b"
+            "\b"
+          when "\\"
+            "\\"
+          when "\""
+            "\""
+          else
+            "\\#{@current_char}"
+          end
+          lit += escape
+          pushChar
+          next
+        end
+
         lit += @current_char
         if @peek_char == "\n"
           addSyntaxError("Unexpected EOL reading string literal")

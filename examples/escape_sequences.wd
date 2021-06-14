@@ -1,0 +1,4 @@
+include "io"
+include "string"
+!(io::print "Enter your name: ")
+!(io::printLine !(string::format "Hello, \"%0\"\nThis is very far:\t%0" [!io::input]))

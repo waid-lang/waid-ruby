@@ -96,3 +96,37 @@ But records without arguments still have to be initialized like !{RecordType},
 when !RecordType should also be valid. Maybe the current syntax is better
 because it is clear that the identifier is a record and not a function, but
 we'll see.
+
+- Implement closures
+Doesn't seem very easy with the stackframe approach I currently have, but it
+would be a great addition.
+
+adder: func(x) =>
+    add_f: func(num) =>
+        <- num + x
+    endfn
+    <- add_f
+endfn
+add_5 => !(adder 5)
+a => !(add_5 8)
+
+- Function assignment operator
+Because it's impossible to pass parameters as reference in Waid (except with
+mutable objects like arrays), we could simplify code like this:
+
+bar => !(modify bar)
+foo => !(add foo 4)
+
+into this:
+
+bar !> modify
+foo !> (add $ 4)
+
+- Add "Whitespace" or "Newline" token and "ignore_whitespace" method to
+  tokenizer.
+We avoid declarations like
+
+foo =>
+!(bar 8)
+
+- Implement assignment as binary operation... maybe?

@@ -1,3 +1,6 @@
+[![stability-experimental](https://img.shields.io/badge/stability-experimental-orange.svg)](https://github.com/emersion/stability-badges#experimental)
+
+
 <div>
     </br>
     <img src="https://raw.githubusercontent.com/TaconeoMental/WaidLang/main/assets/WaidLogo.png"
